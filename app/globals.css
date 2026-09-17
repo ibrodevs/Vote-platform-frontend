@@ -1,26 +1,342 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* CRM Admin Light Theme (Travel Hub · CRM ibrodevs specification) */
+  --blue: #2566ff;
+  --blue-hover: #1b57e6;
+  --blue-press: #1a4fce;
+  --blue-soft: #eaf1ff;
+  --blue-soft-text: #3567ec;
+  --indigo: #5a5af0;
+
+  --ink: #0e1726;
+  --body: #222b39;
+  --muted: #7e889a;
+  --muted-2: #9aa3b2;
+  --faint: #b6bdc9;
+  --gray: #8b95a6;
+
+  --line: #ebedf2;
+  --line-strong: #e2e5ec;
+  --field-line: #dfe3ea;
+
+  --bg: #f7f8fa;
+  --surface: #ffffff;
+  --surface-2: #f7f8fa;
+  --hover: #f5f7fb;
+
+  /* Semantic Status Colors (Soft tints) */
+  --green: #1f9d57;
+  --green-bg: #d9f2e1;
+  --green-strong: #167a42;
+
+  --red: #d6573b;
+  --red-bg: #fbdcd3;
+  --red-strong: #b43d22;
+
+  --amber: #c47e22;
+  --amber-bg: #fbe7cf;
+  --amber-strong: #9c6013;
+
+  --teal: #2f88aa;
+  --teal-bg: #daedf6;
+  --teal-strong: #226984;
+
+  --gray-pill-bg: #eef0f4;
+  --gray-pill-text: #6c7686;
+
+  /* Radii */
+  --r-card: 16px;
+  --r-input: 12px;
+  --r-pill: 999px;
+  --r-modal: 22px;
+
+  /* Shell */
+  --sb-w: 300px;
+  --sb-collapsed: 78px;
+
+  /* Shadows */
+  --shadow-card: 0 1px 3px rgba(14, 23, 38, 0.04), 0 4px 12px rgba(14, 23, 38, 0.02);
+  --shadow-blue-btn: 0 8px 18px rgba(37, 102, 255, 0.22);
+  --shadow-nav-active: 0 6px 16px rgba(37, 102, 255, 0.28);
+  --shadow-pop: 0 10px 30px rgba(14, 23, 38, 0.08);
+  --shadow-modal: 0 20px 45px rgba(14, 23, 38, 0.16);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+:root[data-theme="dark"] {
+  /* CRM Admin Dark Theme */
+  --blue: #3b82f6;
+  --blue-hover: #2563eb;
+  --blue-press: #1d4ed8;
+  --blue-soft: rgba(59, 130, 246, 0.16);
+  --blue-soft-text: #60a5fa;
+  --indigo: #6366f1;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --ink: #f0f4f9;
+  --body: #d1d9e4;
+  --muted: #8b99ad;
+  --muted-2: #6f7f96;
+  --faint: #4b5a70;
+  --gray: #9aa7b9;
+
+  --line: #223046;
+  --line-strong: #2c3e5a;
+  --field-line: #2b3d56;
+
+  --bg: #0c121c;
+  --surface: #141c2b;
+  --surface-2: #192438;
+  --hover: #1e2b42;
+
+  /* Semantic Status Colors Dark */
+  --green: #34d399;
+  --green-bg: rgba(31, 157, 87, 0.2);
+  --green-strong: #10b981;
+
+  --red: #f87171;
+  --red-bg: rgba(214, 87, 59, 0.2);
+  --red-strong: #ef4444;
+
+  --amber: #fbbf24;
+  --amber-bg: rgba(196, 126, 34, 0.2);
+  --amber-strong: #f59e0b;
+
+  --teal: #38bdf8;
+  --teal-bg: rgba(47, 136, 170, 0.2);
+  --teal-strong: #0ea5e9;
+
+  --gray-pill-bg: rgba(108, 118, 134, 0.2);
+  --gray-pill-text: #94a3b8;
+
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.24), 0 4px 12px rgba(0, 0, 0, 0.2);
+  --shadow-blue-btn: 0 8px 18px rgba(59, 130, 246, 0.28);
+  --shadow-nav-active: 0 6px 16px rgba(59, 130, 246, 0.32);
+  --shadow-pop: 0 10px 30px rgba(0, 0, 0, 0.4);
+  --shadow-modal: 0 20px 45px rgba(0, 0, 0, 0.6);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--bg);
+  color: var(--body);
+  font-family: "Golos Text", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 15px;
+  line-height: 1.45;
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* CRM Input System: 48px height, 12px radius, hairline border, 3px focus glow */
+.crm-input {
+  height: 48px;
+  border-radius: var(--r-input);
+  background-color: var(--surface);
+  border: 1px solid var(--field-line);
+  color: var(--ink);
+  font-family: "Golos Text", sans-serif;
+  font-size: 14.5px;
+  padding-left: 16px;
+  padding-right: 16px;
+  transition: all 0.15s ease-in-out;
+  outline: none;
+  width: 100%;
+}
+
+/* Explicit left padding for inputs with an icon on the left (ensures text never overlaps icon) */
+.crm-input.pl-10,
+.crm-input.pl-11,
+.crm-input.pl-12,
+.relative > svg.absolute ~ input.crm-input,
+.relative > svg.absolute ~ select.crm-input,
+.relative > svg:first-child ~ input.crm-input,
+.relative > svg:first-child ~ select.crm-input,
+.relative:has(> svg.absolute) > .crm-input {
+  padding-left: 44px !important;
+}
+
+.crm-input.pr-10,
+.crm-input.pr-11,
+.crm-input.pr-12 {
+  padding-right: 44px !important;
+}
+
+/* Ensure absolute icons inside inputs do not block clicks */
+.relative > svg.absolute {
+  pointer-events: none;
+}
+
+.crm-input:focus {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(37, 102, 255, 0.18);
+}
+
+.crm-input::placeholder {
+  color: var(--muted-2);
+}
+
+/* CRM Buttons: 46px height, 12px radius */
+.crm-btn-primary {
+  height: 46px;
+  border-radius: var(--r-input);
+  background-color: var(--blue);
+  color: #ffffff;
+  font-family: "Golos Text", sans-serif;
+  font-weight: 600;
+  font-size: 14.5px;
+  padding: 0 22px;
+  box-shadow: var(--shadow-blue-btn);
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: none;
+}
+
+.crm-btn-primary:hover {
+  background-color: var(--blue-hover);
+  transform: translateY(-0.5px);
+}
+
+.crm-btn-primary:active {
+  background-color: var(--blue-press);
+  transform: translateY(0);
+}
+
+.crm-btn-secondary {
+  height: 46px;
+  border-radius: var(--r-input);
+  background-color: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--field-line);
+  font-family: "Golos Text", sans-serif;
+  font-weight: 500;
+  font-size: 14.5px;
+  padding: 0 20px;
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.crm-btn-secondary:hover {
+  background-color: var(--hover);
+  border-color: var(--line-strong);
+}
+
+/* Status Pills: 30px height, 999px radius, semantic soft tints */
+.pill-green {
+  background-color: var(--green-bg);
+  color: var(--green);
+}
+
+.pill-blue {
+  background-color: var(--blue-soft);
+  color: var(--blue-soft-text);
+}
+
+.pill-red {
+  background-color: var(--red-bg);
+  color: var(--red);
+}
+
+.pill-amber {
+  background-color: var(--amber-bg);
+  color: var(--amber);
+}
+
+.pill-teal {
+  background-color: var(--teal-bg);
+  color: var(--teal);
+}
+
+.pill-gray {
+  background-color: var(--gray-pill-bg);
+  color: var(--gray-pill-text);
+}
+
+/* CRM Card: 16px radius, surface background, subtle border */
+.crm-card {
+  background-color: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  box-shadow: var(--shadow-card);
+}
+
+/* Sticky topbar */
+.gtop {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background-color: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--line);
+}
+
+:root[data-theme="dark"] .gtop {
+  background-color: rgba(20, 28, 43, 0.85);
+}
+
+/* Operational Table Card */
+.table-card {
+  background-color: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+}
+
+.table-card th {
+  background-color: var(--surface-2);
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 13px 18px;
+  border-bottom: 1px solid var(--line);
+}
+
+.table-card td {
+  padding: 15px 18px;
+  border-bottom: 1px solid var(--line);
+  color: var(--ink);
+  font-size: 14.5px;
+}
+
+.table-card tr:last-child td {
+  border-bottom: none;
+}
+
+.table-card tbody tr:hover {
+  background-color: var(--hover);
+}
+
+/* Custom modern scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--line-strong);
+  border-radius: 9999px;
+  border: 2px solid var(--surface);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--muted-2);
+}
+
+/* Hide scrollbar for clean horizontal mobile pill tabs */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
