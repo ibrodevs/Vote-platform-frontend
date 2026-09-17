@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
+import { Modal } from '@/components/ui/Modal';
 import { api } from '@/lib/api';
 
 interface AdminSidebarProps {
@@ -29,6 +30,7 @@ export function AdminSidebar({
   const router = useRouter();
   const [adminUser, setAdminUser] = useState<any>(null);
   const [activeElectionId, setActiveElectionId] = useState<string | null>(null);
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
   useEffect(() => {
     const savedUser = localStorage.getItem('admin_user');
@@ -51,11 +53,13 @@ export function AdminSidebar({
   }, []);
 
   const handleLogout = () => {
-    if (confirm('Вы действительно хотите выйти из панели управления?')) {
-      localStorage.removeItem('admin_token');
-      localStorage.removeItem('admin_user');
-      router.push('/admin/login');
-    }
+    setIsLogoutModalOpen(true);
+  };
+
+  const confirmLogout = () => {
+    localStorage.removeItem('admin_token');
+    localStorage.removeItem('admin_user');
+    router.push('/admin/login');
   };
 
   const isSuperAdmin = adminUser?.role === 'super_admin';
@@ -328,6 +332,37 @@ export function AdminSidebar({
           );
         })}
       </nav>
+      {/* Logout Confirmation Modal */}
+      <Modal
+        isOpen={isLogoutModalOpen}
+        onClose={() => setIsLogoutModalOpen(false)}
+        title="Выход из панели управления"
+        maxWidth="sm"
+      >
+        <div className="space-y-4">
+          <p className="text-[14px] text-[var(--muted)] leading-relaxed">
+            Вы действительно хотите завершить административную сессию и выйти из системы?
+          </p>
+          <div className="pt-4 flex justify-end gap-3 border-t border-[var(--line)]">
+            <Button
+              type="button"
+              variant="secondary"
+              size="md"
+              onClick={() => setIsLogoutModalOpen(false)}
+            >
+              Отмена
+            </Button>
+            <Button
+              type="button"
+              variant="danger"
+              size="md"
+              onClick={confirmLogout}
+            >
+              Выйти
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </>
   );
 }

@@ -13,7 +13,7 @@ import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { Modal } from '@/components/ui/Modal';
 import { Card } from '@/components/ui/Card';
-import { api, ApiError } from '@/lib/api';
+import { api, ApiError, getMediaUrl } from '@/lib/api';
 
 export default function DirectElectionBallotPage() {
   const params = useParams();
@@ -348,7 +348,7 @@ export default function DirectElectionBallotPage() {
                   <div className="w-14 h-14 rounded-[14px] bg-[var(--surface-2)] border border-[var(--line)] overflow-hidden shrink-0 flex items-center justify-center text-[var(--blue)] font-bold text-[18px]">
                     {cand.photo_url || cand.photo ? (
                       <img
-                        src={cand.photo_url || cand.photo}
+                        src={getMediaUrl(cand.photo || cand.photo_url)}
                         alt={cand.full_name}
                         className="w-full h-full object-cover"
                       />
@@ -448,7 +448,7 @@ export default function DirectElectionBallotPage() {
             <div className="w-12 h-12 rounded-[12px] bg-[var(--surface)] flex items-center justify-center font-bold text-[var(--blue)] shrink-0 overflow-hidden">
               {programModalCandidate?.photo_url || programModalCandidate?.photo ? (
                 <img
-                  src={programModalCandidate.photo_url || programModalCandidate.photo}
+                  src={getMediaUrl(programModalCandidate.photo || programModalCandidate.photo_url)}
                   alt={programModalCandidate.full_name}
                   className="w-full h-full object-cover"
                 />

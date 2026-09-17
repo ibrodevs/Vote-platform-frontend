@@ -99,9 +99,9 @@ export default function UniversityPortalPage() {
               }
             </p>
 
-            <Link href={`/vote/${uniCode}/login`} className="block">
+            <Link href={`/vote/auth?university=${uniCode}`} className="block">
               <Button variant="primary" size="md" className="w-full justify-center gap-2">
-                <span>{lang === 'ru' ? 'Авторизоваться как студент' : 'Студент катары кирүү'}</span>
+                <span>{lang === 'ru' ? 'Войти / Регистрация' : 'Кирүү / Катталуу'}</span>
                 <ArrowRight className="w-4 h-4" />
               </Button>
             </Link>

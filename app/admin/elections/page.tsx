@@ -122,25 +122,35 @@ export default function AdminElectionsPage() {
     }
   };
 
-  const handleStatusChange = async (electionId: string, action: 'start' | 'finish' | 'cancel') => {
-    const actionNames = {
-      start: 'запустить голосование в данных выборах',
-      finish: 'завершить выборы и подвести официальные итоги',
-      cancel: 'отменить проведение данных выборов'
-    };
+  const [actionModal, setActionModal] = useState<{
+    electionId: string;
+    electionTitle: string;
+    action: 'start' | 'finish' | 'cancel';
+  } | null>(null);
+  const [isProcessingAction, setIsProcessingAction] = useState(false);
+  const [actionError, setActionError] = useState('');
 
-    if (!confirm(`Вы действительно хотите ${actionNames[action]}?`)) {
-      return;
-    }
+  const openActionModal = (electionId: string, electionTitle: string, action: 'start' | 'finish' | 'cancel') => {
+    setActionModal({ electionId, electionTitle, action });
+    setActionError('');
+  };
+
+  const confirmStatusChange = async () => {
+    if (!actionModal) return;
+    setIsProcessingAction(true);
+    setActionError('');
 
     try {
-      if (action === 'start') await api.startElection(electionId);
-      if (action === 'finish') await api.finishElection(electionId);
-      if (action === 'cancel') await api.cancelElection(electionId);
+      if (actionModal.action === 'start') await api.startElection(actionModal.electionId);
+      if (actionModal.action === 'finish') await api.finishElection(actionModal.electionId);
+      if (actionModal.action === 'cancel') await api.cancelElection(actionModal.electionId);
 
+      setActionModal(null);
       loadElections();
     } catch (err: any) {
-      alert('Ошибка: ' + (err.message || 'серверная ошибка'));
+      setActionError(err.message || 'Ошибка сервера при изменении статуса выборов');
+    } finally {
+      setIsProcessingAction(false);
     }
   };
 
@@ -288,7 +298,7 @@ export default function AdminElectionsPage() {
                   <Button
                     variant="primary"
                     size="sm"
-                    onClick={() => handleStatusChange(elec.id, 'start')}
+                    onClick={() => openActionModal(elec.id, elec.title, 'start')}
                     className="gap-1.5 shadow-[var(--shadow-blue-btn)]"
                   >
                     <Play className="w-3.5 h-3.5 fill-current" />
@@ -308,7 +318,7 @@ export default function AdminElectionsPage() {
                     <Button
                       variant="secondary"
                       size="sm"
-                      onClick={() => handleStatusChange(elec.id, 'finish')}
+                      onClick={() => openActionModal(elec.id, elec.title, 'finish')}
                       className="gap-1.5"
                     >
                       <CheckSquare className="w-3.5 h-3.5 text-[var(--blue)]" />
@@ -328,7 +338,7 @@ export default function AdminElectionsPage() {
 
                 {elec.status !== 'finished' && elec.status !== 'cancelled' && (
                   <button
-                    onClick={() => handleStatusChange(elec.id, 'cancel')}
+                    onClick={() => openActionModal(elec.id, elec.title, 'cancel')}
                     className="w-9 h-9 rounded-[10px] flex items-center justify-center text-[var(--muted)] hover:text-[var(--red)] hover:bg-[var(--red-bg)] transition-colors cursor-pointer border border-[var(--field-line)]"
                     title="Отменить выборы"
                   >
@@ -463,6 +473,77 @@ export default function AdminElectionsPage() {
             </Button>
           </div>
         </form>
+      </Modal>
+
+      {/* Action Confirmation Modal */}
+      <Modal
+        isOpen={Boolean(actionModal)}
+        onClose={() => setActionModal(null)}
+        title={
+          actionModal?.action === 'start'
+            ? 'Запуск выборов'
+            : actionModal?.action === 'finish'
+            ? 'Завершение выборов'
+            : 'Отмена выборов'
+        }
+        maxWidth="sm"
+      >
+        <div className="space-y-4">
+          {actionError && (
+            <div className="p-3.5 rounded-[12px] bg-[var(--red-bg)] border border-[var(--red)]/20 text-[var(--red)] text-[13px] flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 shrink-0" />
+              <span>{actionError}</span>
+            </div>
+          )}
+
+          <p className="text-[14px] text-[var(--muted)] leading-relaxed">
+            {actionModal?.action === 'start' && (
+              <>
+                Вы действительно хотите запустить голосование для выборов{' '}
+                <strong className="text-[var(--ink)] font-bold">«{actionModal.electionTitle}»</strong>?
+                Избиратели сразу получат доступ к бюллетеню.
+              </>
+            )}
+            {actionModal?.action === 'finish' && (
+              <>
+                Вы действительно хотите завершить выборы{' '}
+                <strong className="text-[var(--ink)] font-bold">«{actionModal.electionTitle}»</strong>?
+                Голосование будет остановлено и откроются официальные итоги.
+              </>
+            )}
+            {actionModal?.action === 'cancel' && (
+              <>
+                Вы уверены, что хотите отменить проведение выборов{' '}
+                <strong className="text-[var(--ink)] font-bold">«{actionModal.electionTitle}»</strong>?
+              </>
+            )}
+          </p>
+
+          <div className="pt-4 flex justify-end gap-3 border-t border-[var(--line)]">
+            <Button
+              type="button"
+              variant="secondary"
+              size="md"
+              onClick={() => setActionModal(null)}
+              disabled={isProcessingAction}
+            >
+              Отмена
+            </Button>
+            <Button
+              type="button"
+              variant={actionModal?.action === 'start' ? 'primary' : 'danger'}
+              size="md"
+              onClick={confirmStatusChange}
+              isLoading={isProcessingAction}
+            >
+              {actionModal?.action === 'start'
+                ? 'Запустить сейчас'
+                : actionModal?.action === 'finish'
+                ? 'Завершить выборы'
+                : 'Отменить выборы'}
+            </Button>
+          </div>
+        </div>
       </Modal>
     </div>
   );

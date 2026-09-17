@@ -21,9 +21,8 @@ export default function StudentLoginPage() {
   const [errorMsg, setErrorMsg] = useState('');
 
   useEffect(() => {
-    const currentLang = (localStorage.getItem('app_lang') as Language) || 'ru';
-    setLang(currentLang);
-  }, []);
+    router.replace(`/vote/auth?university=${uniCode}&mode=login`);
+  }, [router, uniCode]);
 
   const t = translations[lang];
 

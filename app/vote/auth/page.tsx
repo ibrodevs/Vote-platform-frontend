@@ -23,6 +23,8 @@ function StudentAuthContent() {
   // Registration Form State
   const [fullName, setFullName] = useState('');
   const [selectedUniversityId, setSelectedUniversityId] = useState('');
+  const [facultiesList, setFacultiesList] = useState<any[]>([]);
+  const [faculty, setFaculty] = useState('');
   const [course, setCourse] = useState<number>(1);
   const [group, setGroup] = useState('');
   const [email, setEmail] = useState('');
@@ -36,13 +38,26 @@ function StudentAuthContent() {
   const [errorMsg, setErrorMsg] = useState('');
 
   useEffect(() => {
+    const uniParam = searchParams.get('university') || searchParams.get('university_id') || searchParams.get('uni');
+
     // Load active universities
     api.getUniversities()
       .then(list => {
         const active = (list || []).filter((u: any) => u.is_active);
         setUniversities(active);
-        if (active.length > 0 && !selectedUniversityId) {
-          setSelectedUniversityId(active[0].id);
+
+        let initialUniId = '';
+        if (uniParam) {
+          const matched = active.find((u: any) => u.id === uniParam || u.code === uniParam.toLowerCase());
+          if (matched) initialUniId = matched.id;
+        }
+
+        if (!initialUniId && active.length > 0) {
+          initialUniId = active[0].id;
+        }
+
+        if (initialUniId && !selectedUniversityId) {
+          setSelectedUniversityId(initialUniId);
         }
       })
       .catch(() => {});
@@ -59,12 +74,37 @@ function StudentAuthContent() {
         .catch(() => {});
     }
 
-    // Default mode: if user already has an account, or if mode param passed
     const queryMode = searchParams.get('mode');
     if (queryMode === 'login') {
       setMode('login');
     }
   }, [targetElectionId, searchParams]);
+
+  // When university changes, load its faculties
+  useEffect(() => {
+    if (!selectedUniversityId) {
+      setFacultiesList([]);
+      setFaculty('');
+      return;
+    }
+
+    const currentUni = universities.find(u => u.id === selectedUniversityId);
+    if (currentUni && Array.isArray(currentUni.faculties) && currentUni.faculties.length > 0) {
+      setFacultiesList(currentUni.faculties);
+      setFaculty('');
+    } else {
+      api.getUniversityFaculties(selectedUniversityId)
+        .then(facs => {
+          const list = Array.isArray(facs) ? facs : ((facs as any)?.results || []);
+          setFacultiesList(list);
+          setFaculty('');
+        })
+        .catch(() => {
+          setFacultiesList([]);
+          setFaculty('');
+        });
+    }
+  }, [selectedUniversityId, universities]);
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -80,6 +120,7 @@ function StudentAuthContent() {
       const res = await api.studentRegister({
         full_name: fullName.trim(),
         university_id: selectedUniversityId,
+        faculty: faculty.trim(),
         course: Number(course),
         group: group.trim(),
         email: email.trim().toLowerCase(),
@@ -271,6 +312,38 @@ function StudentAuthContent() {
                       </option>
                     ))}
                   </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[13px] font-semibold text-[var(--ink)] mb-1.5">
+                  Факультет {facultiesList.length > 0 ? '*' : ''}
+                </label>
+                <div className="relative">
+                  <GraduationCap className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--muted)]" />
+                  {facultiesList.length > 0 ? (
+                    <select
+                      value={faculty}
+                      onChange={e => setFaculty(e.target.value)}
+                      className="crm-input pl-10 font-medium"
+                      required
+                    >
+                      <option value="">Выберите факультет...</option>
+                      {facultiesList.map((fac: any) => (
+                        <option key={fac.id || fac.name} value={fac.name}>
+                          {fac.name}
+                        </option>
+                      ))}
+                    </select>
+                  ) : (
+                    <input
+                      type="text"
+                      value={faculty}
+                      onChange={e => setFaculty(e.target.value)}
+                      placeholder="Например, Информационные технологии"
+                      className="crm-input pl-10"
+                    />
+                  )}
                 </div>
               </div>
 

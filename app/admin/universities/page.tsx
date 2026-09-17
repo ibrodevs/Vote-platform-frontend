@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Plus, Edit2, Trash2, AlertCircle, School, ExternalLink } from 'lucide-react';
+import { Plus, Edit2, Trash2, AlertCircle, School, BookOpen, X } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { Modal } from '@/components/ui/Modal';
@@ -13,6 +13,7 @@ export default function AdminUniversitiesPage() {
   const [adminUser, setAdminUser] = useState<any>(null);
   const [universities, setUniversities] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [pageError, setPageError] = useState('');
 
   // Modal form states
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -21,17 +22,27 @@ export default function AdminUniversitiesPage() {
   const [nameKy, setNameKy] = useState('');
   const [code, setCode] = useState('');
   const [isActive, setIsActive] = useState(true);
+  const [faculties, setFaculties] = useState<string[]>([]);
+  const [newFacultyInput, setNewFacultyInput] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
+  // Delete modal state
+  const [uniToDelete, setUniToDelete] = useState<any>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
   const loadUniversities = () => {
     setIsLoading(true);
+    setPageError('');
     api.getAdminUniversities()
       .then(res => {
         const list = Array.isArray(res) ? res : (res?.results || []);
         setUniversities(list);
       })
-      .catch(err => console.error('Failed to load universities', err))
+      .catch(err => {
+        console.error('Failed to load universities', err);
+        setPageError('Не удалось загрузить список университетов');
+      })
       .finally(() => setIsLoading(false));
   };
 
@@ -63,6 +74,8 @@ export default function AdminUniversitiesPage() {
     setNameKy('');
     setCode('');
     setIsActive(true);
+    setFaculties([]);
+    setNewFacultyInput('');
     setErrorMsg('');
     setIsModalOpen(true);
   };
@@ -73,8 +86,25 @@ export default function AdminUniversitiesPage() {
     setNameKy(uni.name_ky || '');
     setCode(uni.code);
     setIsActive(uni.is_active);
+    const existingFacs = Array.isArray(uni.faculties)
+      ? uni.faculties.map((f: any) => (typeof f === 'string' ? f : f.name))
+      : [];
+    setFaculties(existingFacs);
+    setNewFacultyInput('');
     setErrorMsg('');
     setIsModalOpen(true);
+  };
+
+  const handleAddFaculty = () => {
+    const val = newFacultyInput.trim();
+    if (val && !faculties.includes(val)) {
+      setFaculties([...faculties, val]);
+      setNewFacultyInput('');
+    }
+  };
+
+  const handleRemoveFaculty = (facNameToRemove: string) => {
+    setFaculties(faculties.filter(f => f !== facNameToRemove));
   };
 
   const handleSave = async (e: React.FormEvent) => {
@@ -83,20 +113,18 @@ export default function AdminUniversitiesPage() {
     setIsSaving(true);
 
     try {
+      const payload = {
+        name,
+        name_ky: nameKy,
+        code,
+        is_active: isActive,
+        faculties_input: faculties
+      };
+
       if (editingUni) {
-        await api.updateAdminUniversity(editingUni.id, {
-          name,
-          name_ky: nameKy,
-          code,
-          is_active: isActive
-        });
+        await api.updateAdminUniversity(editingUni.id, payload);
       } else {
-        await api.createAdminUniversity({
-          name,
-          name_ky: nameKy,
-          code,
-          is_active: isActive
-        });
+        await api.createAdminUniversity(payload);
       }
       setIsModalOpen(false);
       loadUniversities();
@@ -111,15 +139,19 @@ export default function AdminUniversitiesPage() {
     }
   };
 
-  const handleDelete = async (id: string, uniName: string) => {
-    if (!confirm(`Вы действительно хотите удалить университет «${uniName}»? Все связанные данные будут удалены.`)) {
-      return;
-    }
+  const confirmDeleteUni = async () => {
+    if (!uniToDelete) return;
+    setIsDeleting(true);
+    setPageError('');
+
     try {
-      await api.deleteAdminUniversity(id);
+      await api.deleteAdminUniversity(uniToDelete.id);
+      setUniToDelete(null);
       loadUniversities();
     } catch (err: any) {
-      alert('Ошибка при удалении: ' + (err.message || 'серверная ошибка'));
+      setPageError('Ошибка при удалении университета: ' + (err.message || 'серверная ошибка'));
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -133,7 +165,7 @@ export default function AdminUniversitiesPage() {
             Управление университетами
           </h1>
           <p className="text-[14px] text-[var(--muted)]">
-            Реестр образовательных учреждений и их параметров подключения
+            Реестр образовательных учреждений, факультетов и их параметров подключения
           </p>
         </div>
 
@@ -142,6 +174,18 @@ export default function AdminUniversitiesPage() {
           <span>Добавить университет</span>
         </Button>
       </div>
+
+      {pageError && (
+        <div className="p-4 rounded-[12px] bg-[var(--red-bg)] border border-[var(--red)]/20 text-[var(--red)] text-[13.5px] flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 shrink-0" />
+            <span>{pageError}</span>
+          </div>
+          <button onClick={() => setPageError('')} className="p-1 hover:bg-black/5 rounded cursor-pointer">
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
 
       {isLoading ? (
         <div className="p-12 text-center text-[var(--muted)] text-[14px] crm-card">
@@ -175,11 +219,32 @@ export default function AdminUniversitiesPage() {
                   {uni.name_ky}
                 </p>
 
-                <div className="flex gap-4 text-[13px] text-[var(--muted)] mb-5">
-                  <span>Студентов: <strong className="text-[var(--ink)]">{uni.students_count || 0}</strong></span>
+                <div className="flex flex-wrap gap-4 text-[13px] text-[var(--muted)] mb-4">
+                  <span>Студентов: <strong className="text-[var(--ink)] font-bold">{uni.students_count || 0}</strong></span>
                   <span>•</span>
-                  <span>Активных выборов: <strong className="text-[var(--ink)]">{uni.active_elections_count || 0}</strong></span>
+                  <span>Факультетов: <strong className="text-[var(--blue)] font-bold">{uni.faculties?.length || 0}</strong></span>
+                  <span>•</span>
+                  <span>Активных выборов: <strong className="text-[var(--ink)] font-bold">{uni.active_elections_count || 0}</strong></span>
                 </div>
+
+                {/* Faculties Preview */}
+                {uni.faculties && uni.faculties.length > 0 && (
+                  <div className="mb-4">
+                    <span className="text-[11.5px] font-bold uppercase tracking-wider text-[var(--muted)] block mb-1.5">
+                      Факультеты:
+                    </span>
+                    <div className="flex flex-wrap gap-1.5 max-h-20 overflow-y-auto">
+                      {uni.faculties.map((fac: any) => (
+                        <span
+                          key={fac.id || fac.name}
+                          className="px-2 py-0.5 rounded-[6px] bg-[var(--surface-2)] border border-[var(--line)] text-[12px] text-[var(--body)]"
+                        >
+                          {fac.name}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div className="pt-4 border-t border-[var(--line)] flex items-center justify-between">
@@ -196,7 +261,7 @@ export default function AdminUniversitiesPage() {
                     <Edit2 className="w-4 h-4" />
                   </button>
                   <button
-                    onClick={() => handleDelete(uni.id, uni.name)}
+                    onClick={() => setUniToDelete(uni)}
                     className="w-8 h-8 rounded-[8px] flex items-center justify-center text-[var(--muted)] hover:text-[var(--red)] hover:bg-[var(--red-bg)] transition-colors cursor-pointer"
                     title="Удалить"
                   >
@@ -266,6 +331,65 @@ export default function AdminUniversitiesPage() {
             />
           </div>
 
+          {/* Faculties Management */}
+          <div className="pt-2 border-t border-[var(--line)]">
+            <label className="block text-[13px] font-semibold text-[var(--ink)] mb-2">
+              Факультеты университета
+            </label>
+            <p className="text-[12px] text-[var(--muted)] mb-3">
+              Студенты смогут выбрать свой факультет из этого списка при регистрации.
+            </p>
+
+            <div className="flex gap-2 mb-3">
+              <input
+                type="text"
+                value={newFacultyInput}
+                onChange={e => setNewFacultyInput(e.target.value)}
+                onKeyDown={e => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleAddFaculty();
+                  }
+                }}
+                placeholder="Название факультета (нажмите Enter или Добавить)"
+                className="crm-input flex-1"
+              />
+              <Button
+                type="button"
+                variant="secondary"
+                size="md"
+                onClick={handleAddFaculty}
+              >
+                <Plus className="w-4 h-4" />
+                <span>Добавить</span>
+              </Button>
+            </div>
+
+            {faculties.length > 0 ? (
+              <div className="flex flex-wrap gap-2 max-h-36 overflow-y-auto p-2.5 bg-[var(--surface-2)] rounded-[12px] border border-[var(--line)]">
+                {faculties.map((fac, idx) => (
+                  <span
+                    key={idx}
+                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-[8px] bg-[var(--surface)] border border-[var(--line)] text-[13px] text-[var(--ink)] font-medium shadow-xs"
+                  >
+                    <span>{fac}</span>
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveFaculty(fac)}
+                      className="text-[var(--muted)] hover:text-[var(--red)] cursor-pointer"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </span>
+                ))}
+              </div>
+            ) : (
+              <div className="text-[12.5px] text-[var(--muted)] italic p-2 bg-[var(--surface-2)] rounded-[8px] border border-[var(--line)] text-center">
+                Факультеты еще не добавлены. Введите название выше.
+              </div>
+            )}
+          </div>
+
           <div className="flex items-center gap-2.5 pt-2">
             <input
               type="checkbox"
@@ -298,6 +422,42 @@ export default function AdminUniversitiesPage() {
             </Button>
           </div>
         </form>
+      </Modal>
+
+      {/* Delete Confirmation Modal */}
+      <Modal
+        isOpen={Boolean(uniToDelete)}
+        onClose={() => setUniToDelete(null)}
+        title="Удаление университета"
+        maxWidth="sm"
+      >
+        <div className="space-y-4">
+          <p className="text-[14px] text-[var(--muted)] leading-relaxed">
+            Вы действительно хотите удалить университет{' '}
+            <strong className="text-[var(--ink)] font-bold">«{uniToDelete?.name}»</strong>?
+            Все связанные факультеты, выборы и учетные записи студентов будут удалены.
+          </p>
+          <div className="pt-4 flex justify-end gap-3 border-t border-[var(--line)]">
+            <Button
+              type="button"
+              variant="secondary"
+              size="md"
+              onClick={() => setUniToDelete(null)}
+              disabled={isDeleting}
+            >
+              Отмена
+            </Button>
+            <Button
+              type="button"
+              variant="danger"
+              size="md"
+              onClick={confirmDeleteUni}
+              isLoading={isDeleting}
+            >
+              Удалить навсегда
+            </Button>
+          </div>
+        </div>
       </Modal>
     </div>
   );

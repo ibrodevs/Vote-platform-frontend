@@ -244,7 +244,7 @@ export default function HomePage() {
                   <span className="text-[13px] font-mono text-[var(--muted)]">
                     /vote/{uni.code}
                   </span>
-                  <Link href={`/vote/${uni.code}/login`}>
+                  <Link href={`/vote/auth?university=${uni.id}`}>
                     <Button variant="primary" size="sm" className="gap-1.5">
                       <span>{lang === 'ru' ? 'Войти' : 'Кирүү'}</span>
                       <ArrowRight className="w-3.5 h-3.5" />

@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
-import { api, ApiError } from '@/lib/api';
+import { api, ApiError, getMediaUrl } from '@/lib/api';
 
 export default function StudentCabinetPage() {
   const router = useRouter();
@@ -150,8 +150,12 @@ export default function StudentCabinetPage() {
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-5 sm:gap-6">
             <div className="flex items-start gap-3.5 sm:gap-5">
               {/* Avatar */}
-              <div className="w-14 h-14 sm:w-18 sm:h-18 rounded-[16px] bg-[var(--blue)] text-white flex items-center justify-center font-[800] text-[20px] sm:text-[24px] shadow-[var(--shadow-blue-btn)] shrink-0">
-                {getInitials(student?.full_name)}
+              <div className="w-14 h-14 sm:w-18 sm:h-18 rounded-[16px] bg-[var(--blue)] text-white flex items-center justify-center font-[800] text-[20px] sm:text-[24px] shadow-[var(--shadow-blue-btn)] shrink-0 overflow-hidden">
+                {student?.photo ? (
+                  <img src={getMediaUrl(student.photo)} alt={student.full_name} className="w-full h-full object-cover" />
+                ) : (
+                  getInitials(student?.full_name)
+                )}
               </div>
 
               {/* Information */}
@@ -167,6 +171,12 @@ export default function StudentCabinetPage() {
 
                 {/* Info Chips */}
                 <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-[12px] sm:text-[13px]">
+                  {student?.faculty && (
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[8px] bg-[var(--surface-2)] border border-[var(--line)] text-[var(--muted)]">
+                      <School className="w-3.5 h-3.5 text-[var(--blue)] shrink-0" />
+                      <span className="font-semibold text-[var(--ink)]">{student.faculty}</span>
+                    </span>
+                  )}
                   {student?.email && (
                     <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[8px] bg-[var(--surface-2)] border border-[var(--line)] text-[var(--muted)]">
                       <Mail className="w-3.5 h-3.5 text-[var(--blue)] shrink-0" />

@@ -1,4 +1,4 @@
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api/v1';
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://voteplatformbackend.pythonanywhere.com/api/v1';
 
 export class ApiError extends Error {
   code: string;
@@ -78,13 +78,23 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
   return data;
 }
 
+export function getMediaUrl(path?: string | null): string {
+  if (!path) return '';
+  if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('data:')) {
+    return path;
+  }
+  const base = (process.env.NEXT_PUBLIC_API_URL || 'https://voteplatformbackend.pythonanywhere.com/api/v1').replace(/\/api\/v1\/?$/, '');
+  return `${base}${path.startsWith('/') ? '' : '/'}${path}`;
+}
+
 export const api = {
-  // Public Universities
+  // Public Universities & Faculties
   getUniversities: () => request<any[]>('/universities/'),
   getUniversityInfo: (code: string) => request<any>(`/universities/${code}/info/`),
+  getUniversityFaculties: (universityId: string) => request<any[]>(`/universities/${universityId}/faculties/`),
 
   // Student Auth
-  studentRegister: (data: { full_name: string; university_id: string; course: number; group: string; email: string; password: string }) =>
+  studentRegister: (data: { full_name: string; university_id: string; faculty?: string; course: number; group: string; email: string; password: string }) =>
     request<any>('/auth/student/register/', {
       method: 'POST',
       body: JSON.stringify(data)
@@ -129,7 +139,7 @@ export const api = {
     }),
   adminMe: () => request<any>('/auth/admin/me/'),
 
-  // Admin Universities
+  // Admin Universities & Faculties
   getAdminUniversities: () => request<any>('/admin/universities/'),
   createAdminUniversity: (data: any) =>
     request<any>('/admin/universities/', {
@@ -145,15 +155,29 @@ export const api = {
     request<any>(`/admin/universities/${id}/`, {
       method: 'DELETE'
     }),
+  createAdminFaculty: (universityId: string, data: { name: string; name_ky?: string; code?: string }) =>
+    request<any>(`/admin/universities/${universityId}/faculties/`, {
+      method: 'POST',
+      body: JSON.stringify(data)
+    }),
+  deleteAdminFaculty: (universityId: string, facultyId: string) =>
+    request<any>(`/admin/universities/${universityId}/faculties/${facultyId}/`, {
+      method: 'DELETE'
+    }),
 
   // Admin Students
-  getAdminStudents: (universityId: string, params: { page?: number; search?: string; faculty?: string; course?: number } = {}) => {
+  getAdminStudents: (universityId?: string, params: { page?: number; search?: string; faculty?: string; course?: number; onlyRegistered?: boolean } = {}) => {
     const q = new URLSearchParams();
     if (params.page) q.set('page', String(params.page));
     if (params.search) q.set('search', params.search);
     if (params.faculty) q.set('faculty', params.faculty);
     if (params.course) q.set('course', String(params.course));
-    return request<any>(`/admin/universities/${universityId}/students/?${q.toString()}`);
+    if (params.onlyRegistered) q.set('only_registered', 'true');
+
+    if (universityId && universityId !== 'all') {
+      return request<any>(`/admin/universities/${universityId}/students/?${q.toString()}`);
+    }
+    return request<any>(`/admin/students/?${q.toString()}`);
   },
   uploadStudents: (universityId: string, file: File) => {
     const formData = new FormData();

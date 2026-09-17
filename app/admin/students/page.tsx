@@ -63,14 +63,14 @@ export default function AdminStudentsPage() {
   }, [router]);
 
   const loadStudents = () => {
-    if (!selectedUniId) return;
     setIsLoading(true);
 
-    api.getAdminStudents(selectedUniId, {
+    api.getAdminStudents(selectedUniId === 'all' ? undefined : selectedUniId, {
       page,
       search,
       faculty: faculty || undefined,
-      course: course ? Number(course) : undefined
+      course: course ? Number(course) : undefined,
+      onlyRegistered: true
     })
       .then(res => {
         const list = Array.isArray(res) ? res : (res?.results || []);
@@ -85,9 +85,7 @@ export default function AdminStudentsPage() {
   };
 
   useEffect(() => {
-    if (selectedUniId) {
-      loadStudents();
-    }
+    loadStudents();
   }, [selectedUniId, page, search, faculty, course]);
 
   // Polling for Upload Batch Status
@@ -134,7 +132,7 @@ export default function AdminStudentsPage() {
   };
 
   const handleDownloadTemplate = (format: 'csv' | 'xlsx') => {
-    const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api/v1';
+    const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://voteplatformbackend.pythonanywhere.com/api/v1';
     window.open(`${API_BASE}/admin/students/template/?format=${format}`, '_blank');
   };
 
@@ -150,7 +148,7 @@ export default function AdminStudentsPage() {
             Реестр студентов
           </h1>
           <p className="text-[14px] text-[var(--muted)]">
-            Списки избирателей для авторизации через OTP и проверки права голоса
+            Список всех зарегистрированных студентов, имеющих активную учетную запись
           </p>
         </div>
 
@@ -188,6 +186,7 @@ export default function AdminStudentsPage() {
                 }}
                 className="crm-input"
               >
+                <option value="all">Все университеты</option>
                 {universitiesList.map(u => (
                   <option key={u.id} value={u.id}>
                     {u.name} ({u.code.toUpperCase()})
@@ -211,7 +210,7 @@ export default function AdminStudentsPage() {
                   setSearch(e.target.value);
                   setPage(1);
                 }}
-                placeholder="Поиск по ФИО, номеру ID или телефону..."
+                placeholder="Поиск по ФИО, номеру ID или email..."
                 className="crm-input pl-10"
               />
             </div>
@@ -262,7 +261,7 @@ export default function AdminStudentsPage() {
       <div className="table-card">
         <div className="p-4 sm:p-5 border-b border-[var(--line)] flex items-center justify-between">
           <span className="text-[13.5px] text-[var(--muted)]">
-            Всего в выборке: <strong className="text-[var(--ink)] font-bold">{totalStudents}</strong>
+            Всего зарегистрированных: <strong className="text-[var(--ink)] font-bold">{totalStudents}</strong>
           </span>
           <button
             onClick={loadStudents}
@@ -279,7 +278,7 @@ export default function AdminStudentsPage() {
               <tr>
                 <th>ID Студента</th>
                 <th>ФИО</th>
-                <th>Телефон для OTP</th>
+                <th>Почта</th>
                 <th>Факультет</th>
                 <th>Курс</th>
                 <th className="text-center">Статус</th>
@@ -295,7 +294,7 @@ export default function AdminStudentsPage() {
               ) : studentsList.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="py-12 text-center text-[var(--muted)]">
-                    Студенты не найдены. Загрузите список через Excel или измените фильтры.
+                    Студенты не найдены.
                   </td>
                 </tr>
               ) : (
@@ -303,9 +302,9 @@ export default function AdminStudentsPage() {
                   <tr key={s.id}>
                     <td className="font-mono font-bold text-[var(--ink)]">{s.student_id}</td>
                     <td className="font-medium text-[var(--ink)]">{s.full_name}</td>
-                    <td className="text-[var(--muted)] font-mono">{s.phone_number}</td>
-                    <td className="text-[var(--muted)]">{s.faculty}</td>
-                    <td className="font-medium text-[var(--ink)]">{s.course}</td>
+                    <td className="text-[var(--body)] font-medium">{s.email || '—'}</td>
+                    <td className="text-[var(--muted)]">{s.faculty || '—'}</td>
+                    <td className="font-medium text-[var(--ink)]">{s.course} курс</td>
                     <td className="text-center">
                       <Badge variant={s.is_active ? 'green' : 'gray'} dot={s.is_active}>
                         {s.is_active ? 'АКТИВЕН' : 'ОТКЛЮЧЕН'}

@@ -5,10 +5,11 @@ import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
   Users, Vote, ShieldCheck, RefreshCw,
-  CheckSquare, ArrowLeft
+  CheckSquare, ArrowLeft, AlertCircle
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
+import { Modal } from '@/components/ui/Modal';
 import { api } from '@/lib/api';
 
 export default function ElectionTurnoutPage() {
@@ -45,16 +46,22 @@ export default function ElectionTurnoutPage() {
     return () => clearInterval(timer);
   }, [electionId, router]);
 
-  const handleFinishElection = async () => {
-    if (!confirm('Завершить выборы? После этого голосование будет остановлено и откроются итоговые результаты по кандидатам.')) {
-      return;
-    }
+  const [isFinishModalOpen, setIsFinishModalOpen] = useState(false);
+  const [finishError, setFinishError] = useState('');
+
+  const handleFinishElection = () => {
+    setIsFinishModalOpen(true);
+    setFinishError('');
+  };
+
+  const confirmFinishElection = async () => {
     setIsFinishing(true);
+    setFinishError('');
     try {
       await api.finishElection(electionId);
       router.push(`/admin/elections/${electionId}/results`);
     } catch (err: any) {
-      alert('Ошибка: ' + (err.message || 'серверная ошибка'));
+      setFinishError(err.message || 'Ошибка сервера при завершении выборов');
       setIsFinishing(false);
     }
   };
@@ -186,6 +193,48 @@ export default function ElectionTurnoutPage() {
           </div>
         </div>
       </div>
+
+      {/* Finish Election Modal */}
+      <Modal
+        isOpen={isFinishModalOpen}
+        onClose={() => setIsFinishModalOpen(false)}
+        title="Завершение голосования"
+        maxWidth="sm"
+      >
+        <div className="space-y-4">
+          {finishError && (
+            <div className="p-3.5 rounded-[12px] bg-[var(--red-bg)] border border-[var(--red)]/20 text-[var(--red)] text-[13px] flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 shrink-0" />
+              <span>{finishError}</span>
+            </div>
+          )}
+
+          <p className="text-[14px] text-[var(--muted)] leading-relaxed">
+            Вы действительно хотите завершить выборы? После этого электронное голосование будет немедленно остановлено и система сформирует итоговый протокол с распределением голосов по кандидатам.
+          </p>
+
+          <div className="pt-4 flex justify-end gap-3 border-t border-[var(--line)]">
+            <Button
+              type="button"
+              variant="secondary"
+              size="md"
+              onClick={() => setIsFinishModalOpen(false)}
+              disabled={isFinishing}
+            >
+              Отмена
+            </Button>
+            <Button
+              type="button"
+              variant="primary"
+              size="md"
+              onClick={confirmFinishElection}
+              isLoading={isFinishing}
+            >
+              Завершить и открыть итоги
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }

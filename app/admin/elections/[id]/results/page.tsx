@@ -4,11 +4,11 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
-  Trophy, Download, User, ArrowLeft, ShieldCheck, RefreshCw
+  Trophy, Download, User, ArrowLeft, ShieldCheck, RefreshCw, AlertCircle, X
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
-import { api } from '@/lib/api';
+import { api, getMediaUrl } from '@/lib/api';
 
 export default function ElectionResultsPage() {
   const params = useParams();
@@ -19,6 +19,7 @@ export default function ElectionResultsPage() {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isExporting, setIsExporting] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string>('');
+  const [exportError, setExportError] = useState<string>('');
 
   useEffect(() => {
     const token = localStorage.getItem('admin_token');
@@ -31,13 +32,14 @@ export default function ElectionResultsPage() {
       .then(data => setResults(data))
       .catch(err => {
         console.error('Results fetch error', err);
-        setErrorMsg(err.message || 'Результаты пока недоступны');
+        setErrorMsg('Не удалось загрузить официальный протокол');
       })
       .finally(() => setIsLoading(false));
   }, [electionId, router]);
 
-  const handleExportExcel = async () => {
+  const handleExport = async () => {
     setIsExporting(true);
+    setExportError('');
     try {
       const blob = await api.exportElectionResults(electionId);
       const url = window.URL.createObjectURL(blob);
@@ -49,7 +51,7 @@ export default function ElectionResultsPage() {
       a.remove();
       window.URL.revokeObjectURL(url);
     } catch (err: any) {
-      alert('Ошибка при экспорте файла: ' + (err.message || 'ошибка'));
+      setExportError('Ошибка при экспорте файла: ' + (err.message || 'ошибка сервера'));
     } finally {
       setIsExporting(false);
     }
@@ -98,6 +100,19 @@ export default function ElectionResultsPage() {
         </Badge>
       </div>
 
+      {/* Error banner */}
+      {exportError && (
+        <div className="p-4 rounded-[12px] bg-[var(--red-bg)] border border-[var(--red)]/20 text-[var(--red)] text-[13.5px] flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 shrink-0" />
+            <span>{exportError}</span>
+          </div>
+          <button onClick={() => setExportError('')} className="p-1 hover:bg-black/5 rounded cursor-pointer">
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
+
       {/* Title & Actions */}
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-5">
         <div>
@@ -112,7 +127,7 @@ export default function ElectionResultsPage() {
         <Button
           variant="primary"
           size="md"
-          onClick={handleExportExcel}
+          onClick={handleExport}
           isLoading={isExporting}
           className="gap-2 shrink-0 shadow-[var(--shadow-blue-btn)]"
         >
@@ -128,7 +143,7 @@ export default function ElectionResultsPage() {
             <div className="flex items-center gap-5">
               <div className="w-18 h-18 rounded-full overflow-hidden border-2 border-[var(--blue)]/40 shrink-0 bg-[var(--surface-2)] shadow-sm">
                 {winner.photo_url || winner.photo ? (
-                  <img src={winner.photo_url || winner.photo} alt={winner.full_name} className="w-full h-full object-cover" />
+                  <img src={getMediaUrl(winner.photo || winner.photo_url)} alt={winner.full_name} className="w-full h-full object-cover" />
                 ) : (
                   <User className="w-full h-full p-4 text-[var(--muted)]" />
                 )}
@@ -224,7 +239,7 @@ export default function ElectionResultsPage() {
 
                   <div className="w-12 h-12 rounded-full overflow-hidden border border-[var(--line)] bg-[var(--surface-2)] shrink-0 shadow-sm">
                     {c.photo_url || c.photo ? (
-                      <img src={c.photo_url || c.photo} alt={c.full_name} className="w-full h-full object-cover" />
+                      <img src={getMediaUrl(c.photo || c.photo_url)} alt={c.full_name} className="w-full h-full object-cover" />
                     ) : (
                       <User className="w-full h-full p-3 text-[var(--muted)]" />
                     )}

@@ -11,11 +11,15 @@ import {
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { Modal } from '@/components/ui/Modal';
-import { api, ApiError } from '@/lib/api';
+import { api, ApiError, getMediaUrl } from '@/lib/api';
 
 export default function AdminCandidatesPage() {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const [candidateToDelete, setCandidateToDelete] = useState<{ id: string; name: string } | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState('');
 
   const [adminUser, setAdminUser] = useState<any>(null);
   const [universities, setUniversities] = useState<any[]>([]);
@@ -206,7 +210,7 @@ export default function AdminCandidatesPage() {
     setFullName(cand.full_name || '');
     setShortBio(cand.short_bio || '');
     setPhotoFile(null);
-    setPhotoPreview(cand.photo_url || cand.photo || '');
+    setPhotoPreview(getMediaUrl(cand.photo || cand.photo_url) || '');
     setPhotoUrlInput(cand.photo_url || '');
     setShowUrlInput(false);
     setErrorMsg('');
@@ -225,7 +229,11 @@ export default function AdminCandidatesPage() {
     }
 
     setPhotoFile(file);
-    setPhotoPreview(URL.createObjectURL(file));
+    const reader = new FileReader();
+    reader.onload = () => {
+      setPhotoPreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
     setErrorMsg('');
   };
 
@@ -315,13 +323,23 @@ export default function AdminCandidatesPage() {
   };
 
   // Delete candidate
-  const handleDelete = async (id: string, name: string) => {
-    if (!confirm(`Вы действительно хотите удалить кандидата «${name}»?`)) return;
+  const handleDelete = (id: string, name: string) => {
+    setCandidateToDelete({ id, name });
+    setDeleteError('');
+  };
+
+  const confirmDeleteCandidate = async () => {
+    if (!candidateToDelete) return;
+    setIsDeleting(true);
+    setDeleteError('');
     try {
-      await api.deleteCandidate(id);
+      await api.deleteCandidate(candidateToDelete.id);
+      setCandidateToDelete(null);
       loadCandidates(selectedElectionId);
     } catch (err: any) {
-      alert('Ошибка при удалении: ' + (err.message || 'серверная ошибка'));
+      setDeleteError(err.message || 'Ошибка сервера при удалении кандидата');
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -510,7 +528,7 @@ export default function AdminCandidatesPage() {
                 <div className="w-14 h-14 rounded-[14px] overflow-hidden bg-[var(--surface-2)] border border-[var(--line)] shrink-0 flex items-center justify-center font-bold text-[var(--blue)] text-[18px]">
                   {cand.photo_url || cand.photo ? (
                     <img
-                      src={cand.photo_url || cand.photo}
+                      src={getMediaUrl(cand.photo || cand.photo_url)}
                       alt={cand.full_name}
                       className="w-full h-full object-cover"
                     />
@@ -752,6 +770,50 @@ export default function AdminCandidatesPage() {
             </Button>
           </div>
         </form>
+      </Modal>
+
+      {/* Delete Candidate Confirmation Modal */}
+      <Modal
+        isOpen={Boolean(candidateToDelete)}
+        onClose={() => setCandidateToDelete(null)}
+        title="Удаление кандидата"
+        maxWidth="sm"
+      >
+        <div className="space-y-4">
+          {deleteError && (
+            <div className="p-3.5 rounded-[12px] bg-[var(--red-bg)] border border-[var(--red)]/20 text-[var(--red)] text-[13px] flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 shrink-0" />
+              <span>{deleteError}</span>
+            </div>
+          )}
+
+          <p className="text-[14px] text-[var(--muted)] leading-relaxed">
+            Вы действительно хотите удалить кандидата{' '}
+            <strong className="text-[var(--ink)] font-bold">«{candidateToDelete?.name}»</strong>?
+            Анкета и загруженная фотография будут удалены из системы.
+          </p>
+
+          <div className="pt-4 flex justify-end gap-3 border-t border-[var(--line)]">
+            <Button
+              type="button"
+              variant="secondary"
+              size="md"
+              onClick={() => setCandidateToDelete(null)}
+              disabled={isDeleting}
+            >
+              Отмена
+            </Button>
+            <Button
+              type="button"
+              variant="danger"
+              size="md"
+              onClick={confirmDeleteCandidate}
+              isLoading={isDeleting}
+            >
+              Удалить кандидата
+            </Button>
+          </div>
+        </div>
       </Modal>
     </div>
   );
