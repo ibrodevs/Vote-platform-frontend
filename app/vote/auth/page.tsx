@@ -106,9 +106,17 @@ function StudentAuthContent() {
     }
   }, [selectedUniversityId, universities]);
 
+  const currentSelectedUni = universities.find(u => u.id === selectedUniversityId);
+  const isRegistrationClosed = currentSelectedUni ? currentSelectedUni.is_registration_open === false : false;
+
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg('');
+
+    if (isRegistrationClosed) {
+      setErrorMsg('Регистрация новых студентов в выбранном университете закрыта администратором. Вы можете войти в существующий аккаунт.');
+      return;
+    }
 
     if (!fullName.trim() || !selectedUniversityId || !group.trim() || !email.trim() || !password) {
       setErrorMsg('Пожалуйста, заполните все обязательные поля');
@@ -245,13 +253,18 @@ function StudentAuthContent() {
             <button
               type="button"
               onClick={() => { setMode('register'); setErrorMsg(''); }}
-              className={`flex-1 h-[38px] rounded-[10px] text-[13.5px] font-bold transition-all cursor-pointer ${
+              className={`flex-1 h-[38px] rounded-[10px] text-[13.5px] font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
                 mode === 'register'
                   ? 'bg-[var(--surface)] text-[var(--ink)] shadow-sm'
                   : 'text-[var(--muted)] hover:text-[var(--ink)]'
               }`}
             >
-              Регистрация
+              <span>Регистрация</span>
+              {isRegistrationClosed && (
+                <span className="text-[10px] uppercase font-bold px-1.5 py-0.5 rounded-[5px] bg-[var(--red-bg)] text-[var(--red)] border border-[var(--red)]/20">
+                  Закрыта
+                </span>
+              )}
             </button>
             <button
               type="button"
@@ -265,6 +278,31 @@ function StudentAuthContent() {
               Вход
             </button>
           </div>
+
+          {/* Registration Closed Warning Banner */}
+          {isRegistrationClosed && mode === 'register' && (
+            <div className="mb-5 p-4 rounded-[14px] bg-[var(--amber-bg)] border border-[var(--amber)]/30 text-[var(--amber)] text-[13px] space-y-2.5">
+              <div className="flex items-center gap-2 font-bold text-[14px]">
+                <Lock className="w-4 h-4 shrink-0" />
+                <span>Регистрация новых студентов закрыта</span>
+              </div>
+              <p className="leading-relaxed">
+                Администрация университета <strong>{currentSelectedUni?.name}</strong> временно приостановила регистрацию новых избирателей.
+                Если у вас уже есть аккаунт, перейдите на вкладку <strong>«Вход»</strong>.
+              </p>
+              <div className="pt-1">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => { setMode('login'); setErrorMsg(''); }}
+                  className="font-bold gap-1.5 shadow-xs"
+                >
+                  Перейти ко входу по email и паролю →
+                </Button>
+              </div>
+            </div>
+          )}
 
           {/* Error Alert */}
           {errorMsg && (
@@ -422,12 +460,13 @@ function StudentAuthContent() {
 
               <Button
                 type="submit"
-                variant="primary"
+                variant={isRegistrationClosed ? 'secondary' : 'primary'}
                 size="md"
                 isLoading={isLoading}
-                className="w-full justify-center mt-2 text-[15px]"
+                disabled={isRegistrationClosed || isLoading}
+                className={`w-full justify-center mt-2 text-[15px] ${isRegistrationClosed ? 'opacity-60 cursor-not-allowed' : ''}`}
               >
-                Зарегистрироваться и продолжить
+                {isRegistrationClosed ? 'Регистрация закрыта' : 'Зарегистрироваться и продолжить'}
               </Button>
             </form>
           )}

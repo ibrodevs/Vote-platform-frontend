@@ -22,6 +22,7 @@ export default function AdminUniversitiesPage() {
   const [nameKy, setNameKy] = useState('');
   const [code, setCode] = useState('');
   const [isActive, setIsActive] = useState(true);
+  const [isRegistrationOpen, setIsRegistrationOpen] = useState(true);
   const [faculties, setFaculties] = useState<string[]>([]);
   const [newFacultyInput, setNewFacultyInput] = useState('');
   const [isSaving, setIsSaving] = useState(false);
@@ -58,8 +59,8 @@ export default function AdminUniversitiesPage() {
       try {
         const u = JSON.parse(savedUser);
         setAdminUser(u);
-        if (u.role !== 'super_admin') {
-          router.push('/admin/dashboard');
+        if (u.role !== 'super_admin' && !u.is_superuser) {
+          router.push('/admin/elections');
           return;
         }
       } catch (e) {}
@@ -74,6 +75,7 @@ export default function AdminUniversitiesPage() {
     setNameKy('');
     setCode('');
     setIsActive(true);
+    setIsRegistrationOpen(true);
     setFaculties([]);
     setNewFacultyInput('');
     setErrorMsg('');
@@ -86,6 +88,7 @@ export default function AdminUniversitiesPage() {
     setNameKy(uni.name_ky || '');
     setCode(uni.code);
     setIsActive(uni.is_active);
+    setIsRegistrationOpen(uni.is_registration_open !== false);
     const existingFacs = Array.isArray(uni.faculties)
       ? uni.faculties.map((f: any) => (typeof f === 'string' ? f : f.name))
       : [];
@@ -113,11 +116,12 @@ export default function AdminUniversitiesPage() {
     setIsSaving(true);
 
     try {
-      const payload = {
+      const payload: any = {
         name,
         name_ky: nameKy,
         code,
         is_active: isActive,
+        is_registration_open: isRegistrationOpen,
         faculties_input: faculties
       };
 
@@ -207,9 +211,14 @@ export default function AdminUniversitiesPage() {
                   <Badge variant="blue">
                     {uni.code.toUpperCase()}
                   </Badge>
-                  <Badge variant={uni.is_active ? 'green' : 'gray'} dot={uni.is_active}>
-                    {uni.is_active ? 'АКТИВЕН' : 'НЕАКТИВЕН'}
-                  </Badge>
+                  <div className="flex items-center gap-2">
+                    <Badge variant={uni.is_registration_open !== false ? 'green' : 'red'}>
+                      {uni.is_registration_open !== false ? 'РЕГИСТРАЦИЯ ОТКРЫТА' : 'РЕГИСТРАЦИЯ ЗАКРЫТА'}
+                    </Badge>
+                    <Badge variant={uni.is_active ? 'green' : 'gray'} dot={uni.is_active}>
+                      {uni.is_active ? 'АКТИВЕН' : 'НЕАКТИВЕН'}
+                    </Badge>
+                  </div>
                 </div>
 
                 <h3 className="text-[19px] font-bold text-[var(--ink)] mb-1">
@@ -390,17 +399,32 @@ export default function AdminUniversitiesPage() {
             )}
           </div>
 
-          <div className="flex items-center gap-2.5 pt-2">
-            <input
-              type="checkbox"
-              id="is_active"
-              checked={isActive}
-              onChange={e => setIsActive(e.target.checked)}
-              className="w-4 h-4 rounded-[4px] accent-[var(--blue)] cursor-pointer"
-            />
-            <label htmlFor="is_active" className="text-[13.5px] font-medium text-[var(--body)] cursor-pointer">
-              Университет активен и принимает участие в выборах
-            </label>
+          <div className="flex flex-col gap-2.5 pt-2">
+            <div className="flex items-center gap-2.5">
+              <input
+                type="checkbox"
+                id="is_reg_open"
+                checked={isRegistrationOpen}
+                onChange={e => setIsRegistrationOpen(e.target.checked)}
+                className="w-4 h-4 rounded-[4px] accent-[var(--blue)] cursor-pointer"
+              />
+              <label htmlFor="is_reg_open" className="text-[13.5px] font-medium text-[var(--body)] cursor-pointer">
+                Разрешить самостоятельную регистрацию студентов
+              </label>
+            </div>
+
+            <div className="flex items-center gap-2.5">
+              <input
+                type="checkbox"
+                id="is_active"
+                checked={isActive}
+                onChange={e => setIsActive(e.target.checked)}
+                className="w-4 h-4 rounded-[4px] accent-[var(--blue)] cursor-pointer"
+              />
+              <label htmlFor="is_active" className="text-[13.5px] font-medium text-[var(--body)] cursor-pointer">
+                Университет активен и принимает участие в выборах
+              </label>
+            </div>
           </div>
 
           <div className="pt-6 flex justify-end gap-3 border-t border-[var(--line)]">

@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   Upload, Download, Search, AlertCircle,
-  FileSpreadsheet, RefreshCw
+  FileSpreadsheet, RefreshCw, Lock, Unlock, CheckCircle2
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
@@ -24,6 +24,12 @@ export default function AdminStudentsPage() {
   const [faculty, setFaculty] = useState<string>('');
   const [course, setCourse] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  // Registration toggle states
+  const [isTogglingReg, setIsTogglingReg] = useState<boolean>(false);
+  const [regConfirmModalOpen, setRegConfirmModalOpen] = useState<boolean>(false);
+  const [regSuccessMsg, setRegSuccessMsg] = useState<string>('');
+  const [regErrorMsg, setRegErrorMsg] = useState<string>('');
 
   // Upload modal states
   const [isUploadOpen, setIsUploadOpen] = useState<boolean>(false);
@@ -139,10 +145,44 @@ export default function AdminStudentsPage() {
   const studentsList = Array.isArray(students) ? students : [];
   const universitiesList = Array.isArray(universities) ? universities : [];
 
+  const currentUni = universitiesList.find(u => u.id === selectedUniId);
+  const isCurrentRegOpen = selectedUniId === 'all'
+    ? (universitiesList.length > 0 ? universitiesList.every(u => u.is_registration_open !== false) : true)
+    : (currentUni ? currentUni.is_registration_open !== false : true);
+
+  const handleToggleRegistration = async () => {
+    setIsTogglingReg(true);
+    setRegSuccessMsg('');
+    setRegErrorMsg('');
+    try {
+      const targetUniId = selectedUniId === 'all' ? undefined : selectedUniId;
+      const nextStatus = !isCurrentRegOpen;
+      const res = await api.toggleStudentRegistration(targetUniId, nextStatus);
+
+      setUniversities(prev => prev.map(u => {
+        if (selectedUniId === 'all') {
+          return { ...u, is_registration_open: res.is_registration_open };
+        }
+        if (u.id === selectedUniId) {
+          return { ...u, is_registration_open: res.is_registration_open };
+        }
+        return u;
+      }));
+
+      setRegSuccessMsg(res.message || `Регистрация студентов успешно ${res.is_registration_open ? 'открыта' : 'закрыта'}`);
+      setRegConfirmModalOpen(false);
+      setTimeout(() => setRegSuccessMsg(''), 5000);
+    } catch (err: any) {
+      setRegErrorMsg(err?.message || 'Ошибка изменения статуса регистрации');
+    } finally {
+      setIsTogglingReg(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
         <div>
           <h1 className="text-[28px] sm:text-[32px] font-[700] tracking-[-0.025em] text-[var(--ink)] mb-1">
             Реестр студентов
@@ -152,22 +192,69 @@ export default function AdminStudentsPage() {
           </p>
         </div>
 
-        <Button
-          variant="primary"
-          size="md"
-          onClick={() => {
-            setSelectedFile(null);
-            setBatchStatus(null);
-            setActiveBatchId(null);
-            setUploadError('');
-            setIsUploadOpen(true);
-          }}
-          className="gap-2 shadow-[var(--shadow-blue-btn)]"
-        >
-          <Upload className="w-4 h-4" />
-          <span>Загрузить список (Excel/CSV)</span>
-        </Button>
+        <div className="flex flex-wrap items-center gap-3">
+          {/* Registration Status & Toggle Button */}
+          <div className="flex items-center gap-3 bg-[var(--surface)] border border-[var(--line)] p-2 px-3.5 rounded-[14px] shadow-xs">
+            <div className="flex items-center gap-2">
+              <span className="text-[12.5px] font-semibold text-[var(--muted)]">Регистрация:</span>
+              <Badge variant={isCurrentRegOpen ? 'green' : 'red'} dot={true}>
+                {isCurrentRegOpen ? 'ОТКРЫТА' : 'ЗАКРЫТА'}
+              </Badge>
+            </div>
+            <button
+              onClick={() => setRegConfirmModalOpen(true)}
+              className={`h-[36px] px-3 rounded-[10px] text-[12.5px] font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                isCurrentRegOpen
+                  ? 'bg-[var(--red-bg)] text-[var(--red)] hover:bg-[var(--red)] hover:text-white border border-[var(--red)]/20'
+                  : 'bg-[var(--blue-soft)] text-[var(--blue)] hover:bg-[var(--blue)] hover:text-white border border-[var(--blue)]/20'
+              }`}
+              title={isCurrentRegOpen ? 'Закрыть регистрацию студентов' : 'Открыть регистрацию студентов'}
+            >
+              {isCurrentRegOpen ? (
+                <>
+                  <Lock className="w-3.5 h-3.5" />
+                  <span>Закрыть регистрацию</span>
+                </>
+              ) : (
+                <>
+                  <Unlock className="w-3.5 h-3.5" />
+                  <span>Открыть регистрацию</span>
+                </>
+              )}
+            </button>
+          </div>
+
+          <Button
+            variant="primary"
+            size="md"
+            onClick={() => {
+              setSelectedFile(null);
+              setBatchStatus(null);
+              setActiveBatchId(null);
+              setUploadError('');
+              setIsUploadOpen(true);
+            }}
+            className="gap-2 shadow-[var(--shadow-blue-btn)]"
+          >
+            <Upload className="w-4 h-4" />
+            <span>Загрузить список (Excel/CSV)</span>
+          </Button>
+        </div>
       </div>
+
+      {/* Success / Error banners */}
+      {regSuccessMsg && (
+        <div className="p-4 rounded-[12px] bg-[var(--green-bg)] border border-[var(--green)]/20 text-[var(--green)] text-[13.5px] flex items-center gap-2.5">
+          <CheckCircle2 className="w-4 h-4 shrink-0" />
+          <span>{regSuccessMsg}</span>
+        </div>
+      )}
+      {regErrorMsg && (
+        <div className="p-4 rounded-[12px] bg-[var(--red-bg)] border border-[var(--red)]/20 text-[var(--red)] text-[13.5px] flex items-center gap-2.5">
+          <AlertCircle className="w-4 h-4 shrink-0" />
+          <span>{regErrorMsg}</span>
+        </div>
+      )}
 
       {/* Controls & Filters */}
       <div className="crm-card p-6">
@@ -482,6 +569,59 @@ export default function AdminStudentsPage() {
               </div>
             </div>
           )}
+        </div>
+      </Modal>
+
+      {/* Registration Status Confirmation Modal */}
+      <Modal
+        isOpen={regConfirmModalOpen}
+        onClose={() => !isTogglingReg && setRegConfirmModalOpen(false)}
+        title={isCurrentRegOpen ? 'Закрыть регистрацию студентов?' : 'Открыть регистрацию студентов?'}
+        maxWidth="sm"
+      >
+        <div className="space-y-4 py-1">
+          <div className={`w-12 h-12 rounded-full flex items-center justify-center mx-auto ${
+            isCurrentRegOpen ? 'bg-[var(--red-bg)] text-[var(--red)]' : 'bg-[var(--blue-soft)] text-[var(--blue)]'
+          }`}>
+            {isCurrentRegOpen ? <Lock className="w-6 h-6" /> : <Unlock className="w-6 h-6" />}
+          </div>
+
+          <p className="text-[13.5px] text-[var(--muted)] text-center leading-relaxed">
+            {isCurrentRegOpen ? (
+              <>
+                При закрытии регистрации <strong>новые студенты не смогут создавать аккаунты</strong> на портале. Студенты, у которых уже есть аккаунт, смогут свободно входить и голосовать.
+              </>
+            ) : (
+              <>
+                Вы собираетесь <strong>открыть регистрацию</strong> для студентов. Новые студенты смогут самостоятельно регистрироваться на портале.
+              </>
+            )}
+          </p>
+
+          <div className="flex gap-3 pt-3">
+            <Button
+              type="button"
+              variant="secondary"
+              className="flex-1 justify-center"
+              onClick={() => setRegConfirmModalOpen(false)}
+              disabled={isTogglingReg}
+            >
+              Отмена
+            </Button>
+            <Button
+              type="button"
+              variant={isCurrentRegOpen ? 'danger' : 'primary'}
+              className="flex-1 justify-center"
+              onClick={handleToggleRegistration}
+              disabled={isTogglingReg}
+            >
+              {isTogglingReg
+                ? 'Сохранение...'
+                : isCurrentRegOpen
+                  ? 'Да, закрыть'
+                  : 'Да, открыть'}
+            </Button>
+          </div>
         </div>
       </Modal>
     </div>

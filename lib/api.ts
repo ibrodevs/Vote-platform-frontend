@@ -151,6 +151,16 @@ export const api = {
       method: 'PATCH',
       body: JSON.stringify(data)
     }),
+  toggleStudentRegistration: (universityId?: string, isOpen?: boolean) => {
+    const url = universityId ? `/admin/universities/${universityId}/toggle-registration/` : '/admin/universities/toggle-registration/';
+    const body: any = {};
+    if (universityId) body.university_id = universityId;
+    if (typeof isOpen === 'boolean') body.is_registration_open = isOpen;
+    return request<any>(url, {
+      method: 'POST',
+      body: JSON.stringify(body)
+    });
+  },
   deleteAdminUniversity: (id: string) =>
     request<any>(`/admin/universities/${id}/`, {
       method: 'DELETE'

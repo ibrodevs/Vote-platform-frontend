@@ -39,6 +39,7 @@ export default function AdminCandidatesPage() {
   const [modalElectionId, setModalElectionId] = useState('');
   const [fullName, setFullName] = useState('');
   const [shortBio, setShortBio] = useState('');
+  const [program, setProgram] = useState('');
 
   // Photo upload & preview
   const [photoFile, setPhotoFile] = useState<File | null>(null);
@@ -192,6 +193,7 @@ export default function AdminCandidatesPage() {
 
     setFullName('');
     setShortBio('');
+    setProgram('');
     setPhotoFile(null);
     setPhotoPreview('');
     setPhotoUrlInput('');
@@ -209,6 +211,7 @@ export default function AdminCandidatesPage() {
 
     setFullName(cand.full_name || '');
     setShortBio(cand.short_bio || '');
+    setProgram(cand.program || '');
     setPhotoFile(null);
     setPhotoPreview(getMediaUrl(cand.photo || cand.photo_url) || '');
     setPhotoUrlInput(cand.photo_url || '');
@@ -257,6 +260,14 @@ export default function AdminCandidatesPage() {
       setErrorMsg('Укажите ФИО кандидата');
       return;
     }
+    if (shortBio.trim().length > 100) {
+      setErrorMsg('Краткая биография не должна превышать 100 символов');
+      return;
+    }
+    if (program.trim().length > 100) {
+      setErrorMsg('Предвыборная программа не должна превышать 100 символов');
+      return;
+    }
 
     setErrorMsg('');
     setIsSaving(true);
@@ -269,6 +280,7 @@ export default function AdminCandidatesPage() {
         formData.append('university', modalUniId);
         formData.append('full_name', fullName.trim());
         formData.append('short_bio', shortBio.trim());
+        formData.append('program', program.trim());
         formData.append('photo', photoFile);
         formData.append('position', 'Кандидат');
         formData.append('faculty', '');
@@ -286,6 +298,7 @@ export default function AdminCandidatesPage() {
           university: modalUniId,
           full_name: fullName.trim(),
           short_bio: shortBio.trim(),
+          program: program.trim(),
           position: 'Кандидат',
           faculty: '',
           course: 1
@@ -538,13 +551,18 @@ export default function AdminCandidatesPage() {
                 </div>
 
                 {/* Candidate Information */}
-                <div className="space-y-1">
+                <div className="space-y-1.5">
                   <h3 className="text-[17px] font-bold text-[var(--ink)]">
                     {cand.full_name}
                   </h3>
                   {cand.short_bio && (
                     <p className="text-[13px] text-[var(--muted)] line-clamp-2 max-w-xl">
-                      {cand.short_bio}
+                      <span className="font-semibold text-[var(--ink)]">Биография:</span> {cand.short_bio}
+                    </p>
+                  )}
+                  {cand.program && (
+                    <p className="text-[13px] text-[var(--blue)] line-clamp-2 max-w-xl">
+                      <span className="font-semibold text-[var(--ink)]">Программа:</span> {cand.program}
                     </p>
                   )}
                 </div>
@@ -629,7 +647,7 @@ export default function AdminCandidatesPage() {
               >
                 {availableElectionsForModalUni.map(e => (
                   <option key={e.id} value={e.id}>
-                    {e.title} ({getStatusText(e.status)})
+                    {e.title}
                   </option>
                 ))}
               </select>
@@ -733,17 +751,43 @@ export default function AdminCandidatesPage() {
             )}
           </div>
 
-          {/* 5. Краткая биография */}
+          {/* 5. Краткая биография (макс. 100 символов) */}
           <div>
-            <label className="block text-[13px] font-semibold text-[var(--ink)] mb-1.5">
-              Краткая биография
-            </label>
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="text-[13px] font-semibold text-[var(--ink)]">
+                Краткая биография
+              </label>
+              <span className={`text-[12px] font-mono ${shortBio.length >= 95 ? 'text-[var(--red)] font-bold' : 'text-[var(--muted)]'}`}>
+                {shortBio.length}/100
+              </span>
+            </div>
             <textarea
-              rows={4}
+              rows={3}
+              maxLength={100}
               value={shortBio}
               onChange={e => setShortBio(e.target.value)}
-              placeholder="Краткие сведения о кандидате, предвыборные тезисы, опыт..."
-              className="w-full bg-[var(--surface)] border border-[var(--field-line)] rounded-[12px] p-3 text-[14px] text-[var(--ink)] placeholder-[var(--muted-2)] focus:outline-none focus:border-[var(--blue)] focus:ring-2 focus:ring-[var(--blue)]/20 transition-all font-sans"
+              placeholder="Краткие сведения о кандидате, опыт, статус (до 100 символов)..."
+              className="w-full bg-[var(--surface)] border border-[var(--field-line)] rounded-[12px] p-3 text-[14px] text-[var(--ink)] placeholder-[var(--muted-2)] focus:outline-none focus:border-[var(--blue)] focus:ring-2 focus:ring-[var(--blue)]/20 transition-all font-sans resize-none"
+            />
+          </div>
+
+          {/* 6. Предвыборная программа (макс. 100 символов) */}
+          <div>
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="text-[13px] font-semibold text-[var(--ink)]">
+                Предвыборная программа
+              </label>
+              <span className={`text-[12px] font-mono ${program.length >= 95 ? 'text-[var(--red)] font-bold' : 'text-[var(--muted)]'}`}>
+                {program.length}/100
+              </span>
+            </div>
+            <textarea
+              rows={3}
+              maxLength={100}
+              value={program}
+              onChange={e => setProgram(e.target.value)}
+              placeholder="Главные цели и тезисы программы кандидата (до 100 символов)..."
+              className="w-full bg-[var(--surface)] border border-[var(--field-line)] rounded-[12px] p-3 text-[14px] text-[var(--ink)] placeholder-[var(--muted-2)] focus:outline-none focus:border-[var(--blue)] focus:ring-2 focus:ring-[var(--blue)]/20 transition-all font-sans resize-none"
             />
           </div>
 

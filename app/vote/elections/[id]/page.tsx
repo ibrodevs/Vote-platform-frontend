@@ -380,7 +380,7 @@ export default function DirectElectionBallotPage() {
 
                 {/* Right program link */}
                 <div className="shrink-0 flex items-center justify-between sm:justify-end gap-3 pt-2 sm:pt-0 border-t sm:border-t-0 border-[var(--line)]">
-                  {cand.biography && (
+                  {(cand.program || cand.short_bio) && (
                     <button
                       type="button"
                       onClick={(e) => {
@@ -390,7 +390,7 @@ export default function DirectElectionBallotPage() {
                       className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-[var(--blue)] hover:underline cursor-pointer"
                     >
                       <BookOpen className="w-3.5 h-3.5" />
-                      <span>Программа</span>
+                      <span>Анкета и программа</span>
                     </button>
                   )}
 
@@ -466,8 +466,34 @@ export default function DirectElectionBallotPage() {
             </div>
           </div>
 
-          <div className="prose prose-sm max-h-[60vh] overflow-y-auto pr-2 text-[14px] text-[var(--ink)] leading-relaxed whitespace-pre-wrap">
-            {programModalCandidate?.biography || 'Программа и биография не указаны.'}
+          <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-2 text-[14px] text-[var(--ink)] leading-relaxed">
+            {programModalCandidate?.short_bio && (
+              <div className="p-3.5 rounded-[12px] bg-[var(--surface-2)] border border-[var(--line)] space-y-1">
+                <span className="text-[12px] font-bold uppercase tracking-wider text-[var(--muted)]">
+                  Краткая биография
+                </span>
+                <p className="text-[13.5px] text-[var(--ink)] whitespace-pre-wrap">
+                  {programModalCandidate.short_bio}
+                </p>
+              </div>
+            )}
+
+            {programModalCandidate?.program && (
+              <div className="p-3.5 rounded-[12px] bg-[var(--blue-soft)] border border-[var(--blue)]/20 space-y-1">
+                <span className="text-[12px] font-bold uppercase tracking-wider text-[var(--blue)]">
+                  Предвыборная программа
+                </span>
+                <p className="text-[13.5px] text-[var(--ink)] whitespace-pre-wrap">
+                  {programModalCandidate.program}
+                </p>
+              </div>
+            )}
+
+            {!programModalCandidate?.short_bio && !programModalCandidate?.program && (
+              <p className="text-[13.5px] text-[var(--muted)] italic text-center py-4">
+                Кандидат пока не заполнил биографию и предвыборную программу.
+              </p>
+            )}
           </div>
 
           <div className="pt-4 border-t border-[var(--line)] flex justify-end gap-3">
