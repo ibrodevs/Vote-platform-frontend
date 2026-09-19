@@ -357,3 +357,42 @@ body {
   animation: slideInFromRight 0.24s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
+/* Canopy FlipFlow Animations */
+@keyframes canopy-x {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(calc(-100% - var(--gap, 12px)));
+  }
+}
+
+@keyframes canopy-y {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(calc(-100% - var(--gap, 12px)));
+  }
+}
+
+.animate-canopy-horizontal {
+  animation: canopy-x var(--duration, 25s) infinite linear;
+}
+
+.animate-canopy-vertical {
+  animation: canopy-y var(--duration, 25s) linear infinite;
+}
+
+.direction-reverse.animate-canopy-horizontal {
+  animation-direction: reverse;
+}
+
+.direction-reverse.animate-canopy-vertical {
+  animation-direction: reverse;
+}
+
+.group:hover .group-hover\:paused {
+  animation-play-state: paused;
+}
+
