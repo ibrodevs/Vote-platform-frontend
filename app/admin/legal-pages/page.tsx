@@ -30,17 +30,26 @@ export default function AdminLegalPagesPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
+  const [isServer404, setIsServer404] = useState(false);
+
   const loadPages = () => {
     setIsLoading(true);
     setPageError('');
+    setIsServer404(false);
     api.getAdminStaticPages()
       .then((res) => {
         const list = Array.isArray(res) ? res : ((res as any)?.results || []);
         setPages(list);
       })
-      .catch((err) => {
+      .catch((err: any) => {
         console.error('Failed to load legal pages', err);
-        setPageError('Не удалось загрузить список документов');
+        const is404 = err?.message?.includes('404') || err?.code === '404';
+        if (is404) {
+          setIsServer404(true);
+          setPageError('Эндпоинт API /api/v1/admin/content/pages/ вернул 404. Сервер PythonAnywhere требует обновления.');
+        } else {
+          setPageError(err?.message || 'Не удалось загрузить список документов');
+        }
       })
       .finally(() => setIsLoading(false));
   };
@@ -133,12 +142,37 @@ export default function AdminLegalPagesPage() {
         </div>
       </div>
 
-      {pageError && (
+      {isServer404 ? (
+        <div className="p-5 rounded-xl bg-amber-500/10 border border-amber-500/25 text-[var(--ink)] text-sm space-y-3">
+          <div className="flex items-center gap-2 font-bold text-[15px] text-amber-600 dark:text-amber-400">
+            <AlertCircle className="w-5 h-5 shrink-0" />
+            <span>Требуется применить обновления на сервере PythonAnywhere</span>
+          </div>
+          <p className="text-[13px] text-[var(--muted)] leading-relaxed">
+            Сервер вернул <code>404 Not Found</code> для адреса <code>/api/v1/admin/content/pages/</code>. Это означает, что на PythonAnywhere еще не подтянуты изменения из репозитория, не выполнены миграции или не перезагружен рабочий процесс веб-приложения.
+          </p>
+          <div className="p-3.5 rounded-lg bg-[var(--surface-2)] border border-[var(--line)] font-mono text-[12px] space-y-1.5">
+            <p className="text-[var(--muted)] font-sans text-xs font-semibold">1. Выполните в Bash-консоли на PythonAnywhere:</p>
+            <p className="text-[var(--blue)] font-bold select-all bg-[var(--surface)] p-2 rounded border border-[var(--field-line)]">
+              git pull origin main && python manage.py migrate && python manage.py seed_content
+            </p>
+            <p className="text-[var(--muted)] font-sans text-xs font-semibold pt-1">2. Перезагрузите веб-приложение:</p>
+            <p className="text-[var(--body)] font-sans text-[12.5px]">
+              В панели управления PythonAnywhere откройте вкладку <strong>«Web»</strong> и нажмите зеленую кнопку <strong>«Reload voteplatformbackend.pythonanywhere.com»</strong>.
+            </p>
+          </div>
+          <div className="pt-1">
+            <Button size="sm" variant="secondary" onClick={loadPages}>
+              Повторить попытку загрузки
+            </Button>
+          </div>
+        </div>
+      ) : pageError ? (
         <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 text-sm flex items-center gap-2">
           <AlertCircle className="w-5 h-5 shrink-0" />
           <span>{pageError}</span>
         </div>
-      )}
+      ) : null}
 
       {successMsg && (
         <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-sm flex items-center gap-2">
