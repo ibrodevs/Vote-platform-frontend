@@ -3,7 +3,7 @@ import "./globals.css";
 import { AppShell } from "@/components/ui/AppShell";
 
 export const metadata: Metadata = {
-  title: "CRM Vote — Платформа студенческих выборов",
+  title: "Dobush.kg — Платформа студенческих выборов",
   description: "Корпоративная система электронного студенческого голосования с физическим разделением реестра явки и урны бюллетеней.",
 };
 

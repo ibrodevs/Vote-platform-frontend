@@ -86,7 +86,7 @@ export function Navbar() {
             </svg>
           </div>
           <span className="text-[18px] sm:text-[20px] font-[800] tracking-[-0.025em] text-[var(--ink)]">
-            Vote <span className="text-[var(--blue)]">CRM</span>
+            Dobush<span className="text-[var(--blue)]">.kg</span>
           </span>
         </Link>
 

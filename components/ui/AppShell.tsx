@@ -23,14 +23,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <div className="flex items-center gap-2">
             <span className="h-2 w-2 rounded-full bg-[var(--blue)]" />
             <span className="text-[12px] uppercase tracking-wider text-[var(--ink)] font-bold">
-              VOTE CRM // ARCHITECTURE SPEC 5.0
+              DOBUSH.KG // ARCHITECTURE SPEC 5.0
             </span>
           </div>
           <div className="text-[var(--muted)] text-center md:text-left text-[13px]">
             Физическое разделение реестра явки (<code className="text-[var(--blue)] font-mono">VoteRecord</code>) и бюллетеней (<code className="text-[var(--blue)] font-mono">Ballot</code>) на уровне базы данных.
           </div>
           <div className="text-[12px] text-[var(--muted-2)]">
-            © 2026 Vote CRM. Все права защищены.
+            © 2026 Dobush.kg. Все права защищены.
           </div>
         </div>
       </footer>

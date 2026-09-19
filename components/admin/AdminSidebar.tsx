@@ -144,7 +144,7 @@ export function AdminSidebar({
             {!isCollapsed && (
               <div className="leading-tight truncate">
                 <div className="text-[19px] font-[800] tracking-[-0.02em] text-[var(--ink)]">
-                  Vote <span className="text-[var(--blue)]">CRM</span>
+                  Dobush<span className="text-[var(--blue)]">.kg</span>
                 </div>
                 <div className="text-[11px] text-[var(--muted)] font-medium flex items-center gap-1.5 mt-0.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-[var(--green)] animate-pulse" />
@@ -279,7 +279,7 @@ export function AdminSidebar({
                     {adminUser?.full_name || 'Администратор'}
                   </div>
                   <div className="text-[12px] text-[var(--muted)] truncate">
-                    {adminUser?.email || 'admin@votecrm.io'}
+                    {adminUser?.email || 'admin@dobush.kg'}
                   </div>
                 </div>
               )}

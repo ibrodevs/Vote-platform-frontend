@@ -63,7 +63,7 @@ export default function AdminDashboardPage() {
         <div>
           <div className="flex items-center gap-3 mb-1.5">
             <h1 className="text-[28px] sm:text-[32px] font-[700] tracking-[-0.025em] text-[var(--ink)]">
-              Контрольная панель CRM
+              Контрольная панель Dobush.kg
             </h1>
             <Badge variant={isSuperAdmin ? 'blue' : 'gray'}>
               {isSuperAdmin ? 'SUPER ADMIN' : 'UNIVERSITY ADMIN'}

@@ -72,7 +72,7 @@ export default function HomePage() {
               {/* Eyebrow Badge */}
               <div className="mb-5">
                 <Badge variant="blue" dot={true}>
-                  {lang === 'ru' ? 'ПРОТОКОЛ ТАЙНОГО ГОЛОСОВАНИЯ 5.0' : 'ЖАШЫРУУН ШАЙЛОО ТУТУМУ 5.0'}
+                  {lang === 'ru' ? 'DOBUSH.KG — ЭЛЕКТРОННОЕ ГОЛОСОВАНИЕ 5.0' : 'DOBUSH.KG — ЭЛЕКТРОНДУК ДОБУШ БЕРҮҮ 5.0'}
                 </Badge>
               </div>
 

@@ -104,7 +104,7 @@ export default function AdminLoginPage() {
             </svg>
           </div>
           <h1 className="text-[28px] font-[800] text-[var(--ink)] tracking-tight mb-2">
-            Vote <span className="text-[var(--blue)]">CRM</span>
+            Dobush<span className="text-[var(--blue)]">.kg</span>
           </h1>
           <p className="text-[14px] text-[var(--muted)]">
             Авторизация избирательной комиссии и супер-администратора
@@ -162,7 +162,7 @@ export default function AdminLoginPage() {
               isLoading={isLoading}
               className="w-full justify-center mt-2 text-[15px]"
             >
-              Войти в CRM
+              Войти в Dobush.kg
             </Button>
           </form>
 

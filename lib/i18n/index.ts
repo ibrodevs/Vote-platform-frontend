@@ -2,7 +2,7 @@ export type Language = 'ru' | 'ky';
 
 export const translations = {
   ru: {
-    brand_title: "Студенческие Выборы",
+    brand_title: "Dobush.kg",
     brand_tag: "СИСТЕМА ТАЙНОГО ГОЛОСОВАНИЯ",
     home: "Главная",
     admin_portal: "Панель администратора",
@@ -73,7 +73,7 @@ export const translations = {
     login_btn: "Войти в панель управления →",
   },
   ky: {
-    brand_title: "Студенттик Шайлоолор",
+    brand_title: "Dobush.kg",
     brand_tag: "ЖАШЫРУУН ДОБУШ БЕРҮҮ СИСТЕМАСЫ",
     home: "Башкы бет",
     admin_portal: "Администратор панели",

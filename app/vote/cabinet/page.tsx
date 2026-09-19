@@ -115,7 +115,7 @@ export default function StudentCabinetPage() {
                 <Vote className="w-4 h-4" />
               </div>
               <span className="text-[17px] sm:text-[19px] font-[800] tracking-[-0.02em] text-[var(--ink)]">
-                Vote <span className="text-[var(--blue)]">CRM</span>
+                Dobush<span className="text-[var(--blue)]">.kg</span>
               </span>
             </Link>
             <span className="hidden sm:inline-block text-[var(--muted)] text-[13px] border-l border-[var(--line)] pl-3 ml-1 font-medium">
