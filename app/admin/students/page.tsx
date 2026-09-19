@@ -66,6 +66,21 @@ export default function AdminStudentsPage() {
         }
       })
       .catch(err => console.error('Failed to load universities', err));
+
+    const handleCreateEvent = () => setIsUploadOpen(true);
+    window.addEventListener('admin-create-students', handleCreateEvent);
+
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('create') === '1' || params.get('create') === 'true') {
+        setIsUploadOpen(true);
+        window.history.replaceState({}, '', window.location.pathname);
+      }
+    }
+
+    return () => {
+      window.removeEventListener('admin-create-students', handleCreateEvent);
+    };
   }, [router]);
 
   const loadStudents = () => {
@@ -411,12 +426,14 @@ export default function AdminStudentsPage() {
         </div>
       </div>
 
-      {/* Upload Excel / CSV Modal */}
+      {/* Upload Excel / CSV Drawer (Side Menu) */}
       <Modal
         isOpen={isUploadOpen}
         onClose={() => setIsUploadOpen(false)}
         title="Пакетная загрузка списка студентов"
+        subtitle="Импорт реестра избирателей через боковую панель"
         maxWidth="lg"
+        variant="drawer"
       >
         <div className="space-y-6">
           <div className="p-4 rounded-[12px] bg-[var(--surface-2)] border border-[var(--line)] text-[13px] text-[var(--muted)] space-y-2">

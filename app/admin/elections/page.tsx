@@ -73,6 +73,21 @@ export default function AdminElectionsPage() {
       .catch(err => console.error('Failed to load universities', err));
 
     loadElections();
+
+    const handleCreateEvent = () => openCreateModal();
+    window.addEventListener('admin-create-elections', handleCreateEvent);
+
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('create') === '1' || params.get('create') === 'true') {
+        openCreateModal();
+        window.history.replaceState({}, '', window.location.pathname);
+      }
+    }
+
+    return () => {
+      window.removeEventListener('admin-create-elections', handleCreateEvent);
+    };
   }, [router]);
 
   const openCreateModal = () => {
@@ -361,12 +376,14 @@ export default function AdminElectionsPage() {
         </div>
       )}
 
-      {/* Create Election Modal */}
+      {/* Create Election Drawer (Side Menu) */}
       <Modal
         isOpen={isCreateOpen}
         onClose={() => setIsCreateOpen(false)}
         title="Создание избирательной кампании"
-        maxWidth="lg"
+        subtitle="Заполните параметры кампании в боковой панели"
+        maxWidth="xl"
+        variant="drawer"
       >
         {errorMsg && (
           <div className="mb-5 p-4 rounded-[12px] bg-[var(--red-bg)] border border-[var(--red)]/20 text-[var(--red)] text-[13.5px] flex items-center gap-2">

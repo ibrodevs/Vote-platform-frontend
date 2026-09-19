@@ -1,13 +1,13 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
   LayoutDashboard, Vote, Users, GraduationCap, Building2,
   Activity, ShieldCheck, ExternalLink, LogOut,
   Plus, X, ChevronLeft, ChevronRight, School,
-  Newspaper, HelpCircle, Sparkles, FileText
+  Newspaper, HelpCircle, Sparkles, FileText, ChevronDown
 } from 'lucide-react';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
@@ -32,6 +32,8 @@ export function AdminSidebar({
   const [adminUser, setAdminUser] = useState<any>(null);
   const [activeElectionId, setActiveElectionId] = useState<string | null>(null);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+  const [isQuickAddOpen, setIsQuickAddOpen] = useState(false);
+  const quickAddRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const savedUser = localStorage.getItem('admin_user');
@@ -53,6 +55,21 @@ export function AdminSidebar({
       .catch(() => {});
   }, []);
 
+  // Close quick add menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (quickAddRef.current && !quickAddRef.current.contains(event.target as Node)) {
+        setIsQuickAddOpen(false);
+      }
+    };
+    if (isQuickAddOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isQuickAddOpen]);
+
   const handleLogout = () => {
     setIsLogoutModalOpen(true);
   };
@@ -63,8 +80,76 @@ export function AdminSidebar({
     router.push('/admin/login');
   };
 
-  const isSuperAdmin = adminUser?.role === 'super_admin';
+  const isSuperAdmin = adminUser?.role === 'super_admin' || adminUser?.is_superuser;
   const isObserver = adminUser?.role === 'observer';
+
+  const triggerCreate = (href: string, entityKey: string) => {
+    if (onClose) onClose();
+    setIsQuickAddOpen(false);
+    if (pathname === href) {
+      window.dispatchEvent(new CustomEvent(`admin-create-${entityKey}`));
+    } else {
+      router.push(`${href}?create=1`);
+    }
+  };
+
+  const quickAddActions = [
+    ...(!isObserver ? [
+      {
+        title: 'Выборы / Кампания',
+        desc: 'Создать новую избирательную кампанию',
+        href: '/admin/elections',
+        entityKey: 'elections',
+        icon: Vote,
+      },
+      {
+        title: 'Кандидат',
+        desc: 'Зарегистрировать кандидата',
+        href: '/admin/candidates',
+        entityKey: 'candidates',
+        icon: Users,
+      },
+    ] : []),
+    {
+      title: 'Новость',
+      desc: 'Опубликовать пресс-релиз или новость',
+      href: '/admin/news',
+      entityKey: 'news',
+      icon: Newspaper,
+    },
+    ...(!isObserver ? [
+      {
+        title: 'Реестр студентов',
+        desc: 'Импортировать список избирателей',
+        href: '/admin/students',
+        entityKey: 'students',
+        icon: GraduationCap,
+      },
+    ] : []),
+    ...(isSuperAdmin ? [
+      {
+        title: 'Вопрос и ответ',
+        desc: 'Добавить пункт в FAQ',
+        href: '/admin/faqs',
+        entityKey: 'faqs',
+        icon: HelpCircle,
+      },
+      {
+        title: 'Сотрудник вуза',
+        desc: 'Создать аккаунт координатора',
+        href: '/admin/users',
+        entityKey: 'users',
+        icon: Users,
+      },
+      {
+        title: 'Университет',
+        desc: 'Подключить новый вуз к платформе',
+        href: '/admin/universities',
+        entityKey: 'universities',
+        icon: Building2,
+      },
+    ] : [])
+  ];
 
   const navGroups = [
     {
@@ -74,14 +159,20 @@ export function AdminSidebar({
           name: 'Главная панель',
           href: '/admin/dashboard',
           icon: LayoutDashboard,
-          badge: null
+          badge: null,
+          canAdd: false,
+          entityKey: '',
+          addLabel: ''
         },
         ...(activeElectionId ? [
           {
             name: 'Мониторинг явки',
             href: `/admin/elections/${activeElectionId}/turnout`,
             icon: Activity,
-            badge: 'LIVE'
+            badge: 'LIVE',
+            canAdd: false,
+            entityKey: '',
+            addLabel: ''
           }
         ] : [])
       ]
@@ -93,34 +184,49 @@ export function AdminSidebar({
           name: 'Выборы',
           href: '/admin/elections',
           icon: Vote,
-          badge: null
+          badge: null,
+          canAdd: !isObserver,
+          entityKey: 'elections',
+          addLabel: 'Создать выборы'
         },
         ...(!isObserver ? [
           {
             name: 'Кандидаты',
             href: '/admin/candidates',
             icon: Users,
-            badge: null
+            badge: null,
+            canAdd: true,
+            entityKey: 'candidates',
+            addLabel: 'Добавить кандидата'
           }
         ] : []),
         {
           name: 'Реестр студентов',
           href: '/admin/students',
           icon: GraduationCap,
-          badge: null
+          badge: null,
+          canAdd: !isObserver,
+          entityKey: 'students',
+          addLabel: 'Импортировать студентов'
         },
         ...(isSuperAdmin ? [
           {
             name: 'Сотрудники вузов',
             href: '/admin/users',
             icon: Users,
-            badge: 'ROOT'
+            badge: 'ROOT',
+            canAdd: true,
+            entityKey: 'users',
+            addLabel: 'Добавить сотрудника'
           },
           {
             name: 'Университеты',
             href: '/admin/universities',
             icon: Building2,
-            badge: 'ROOT'
+            badge: 'ROOT',
+            canAdd: true,
+            entityKey: 'universities',
+            addLabel: 'Добавить университет'
           }
         ] : [])
       ]
@@ -132,26 +238,38 @@ export function AdminSidebar({
           name: 'Новости',
           href: '/admin/news',
           icon: Newspaper,
-          badge: null
+          badge: null,
+          canAdd: true,
+          entityKey: 'news',
+          addLabel: 'Добавить новость'
         },
         ...(isSuperAdmin ? [
           {
             name: 'Вопросы и ответы',
             href: '/admin/faqs',
             icon: HelpCircle,
-            badge: 'ROOT'
+            badge: 'ROOT',
+            canAdd: true,
+            entityKey: 'faqs',
+            addLabel: 'Добавить вопрос'
           },
           {
             name: 'Последние выборы',
             href: '/admin/recent-elections',
             icon: Sparkles,
-            badge: 'ROOT'
+            badge: 'ROOT',
+            canAdd: false,
+            entityKey: '',
+            addLabel: ''
           },
           {
             name: 'Регламенты и документы',
             href: '/admin/legal-pages',
             icon: FileText,
-            badge: 'ROOT'
+            badge: 'ROOT',
+            canAdd: false,
+            entityKey: '',
+            addLabel: ''
           }
         ] : [])
       ]
@@ -228,19 +346,67 @@ export function AdminSidebar({
           </div>
         )}
 
-        {/* Quick Action */}
+        {/* Quick Action Button & Popover */}
         {!isObserver && (
-          <div className="p-4 border-b border-[var(--line)]">
-            <Link href="/admin/elections" className="w-full block">
-              <Button
-                variant="primary"
-                size="md"
-                className={`w-full gap-2 justify-center shadow-[var(--shadow-blue-btn)] ${isCollapsed ? 'px-0' : ''}`}
+          <div className="p-4 border-b border-[var(--line)] relative" ref={quickAddRef}>
+            <Button
+              type="button"
+              variant="primary"
+              size="md"
+              onClick={() => setIsQuickAddOpen(prev => !prev)}
+              className={`w-full gap-2 justify-center shadow-[var(--shadow-blue-btn)] ${isCollapsed ? 'px-0' : ''}`}
+              title="Создать через боковое меню"
+            >
+              <Plus className="w-4 h-4 shrink-0" />
+              {!isCollapsed && (
+                <>
+                  <span className="font-semibold">Создать...</span>
+                  <ChevronDown className={`w-3.5 h-3.5 opacity-70 transition-transform duration-150 ${isQuickAddOpen ? 'rotate-180' : ''}`} />
+                </>
+              )}
+            </Button>
+
+            {/* Quick Add Popover Dropdown */}
+            {isQuickAddOpen && (
+              <div
+                className={`absolute top-[calc(100%-8px)] z-50 bg-[var(--surface)] border border-[var(--line)] rounded-[16px] shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150 ${
+                  isCollapsed ? 'left-[80px] w-[260px]' : 'left-4 right-4'
+                }`}
               >
-                <Plus className="w-4 h-4 shrink-0" />
-                {!isCollapsed && <span>Создать кампанию</span>}
-              </Button>
-            </Link>
+                <div className="px-3.5 py-2.5 bg-[var(--surface-2)] border-b border-[var(--line)] flex items-center justify-between">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-[var(--muted-2)]">
+                    Быстрое добавление
+                  </span>
+                  <span className="text-[10px] text-[var(--blue)] font-bold">БОКОВОЕ МЕНЮ</span>
+                </div>
+                <div className="p-1.5 space-y-0.5 max-h-[320px] overflow-y-auto">
+                  {quickAddActions.map((action, idx) => {
+                    const ActionIcon = action.icon;
+                    return (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => triggerCreate(action.href, action.entityKey)}
+                        className="w-full flex items-center gap-3 px-3 py-2.5 rounded-[10px] hover:bg-[var(--hover)] text-left transition-colors cursor-pointer group"
+                      >
+                        <div className="w-8 h-8 rounded-[8px] bg-[var(--blue-soft)] text-[var(--blue-soft-text)] flex items-center justify-center shrink-0 group-hover:bg-[var(--blue)] group-hover:text-white transition-colors">
+                          <ActionIcon className="w-4 h-4" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="text-[13.5px] font-semibold text-[var(--ink)] truncate">
+                            {action.title}
+                          </div>
+                          <div className="text-[11px] text-[var(--muted)] truncate">
+                            {action.desc}
+                          </div>
+                        </div>
+                        <Plus className="w-3.5 h-3.5 text-[var(--muted)] group-hover:text-[var(--blue)] shrink-0" />
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -259,34 +425,51 @@ export function AdminSidebar({
                   const isActive = pathname === item.href || (item.href !== '/admin/dashboard' && pathname.startsWith(item.href));
 
                   return (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      onClick={onClose}
-                      title={isCollapsed ? item.name : undefined}
-                      className={`flex items-center ${isCollapsed ? 'justify-center px-0' : 'justify-between px-3.5'} py-2.5 rounded-[13px] text-[15px] transition-all duration-150 ${
-                        isActive
-                          ? 'bg-[var(--blue)] text-white font-medium shadow-[var(--shadow-nav-active)]'
-                          : 'text-[var(--muted)] hover:text-[var(--ink)] hover:bg-[var(--hover)]'
-                      }`}
-                    >
-                      <div className="flex items-center gap-3 truncate">
-                        <Icon className={`w-5 h-5 shrink-0 ${isActive ? 'text-white' : 'text-[var(--muted)]'}`} />
-                        {!isCollapsed && <span className="truncate">{item.name}</span>}
-                      </div>
+                    <div key={item.href} className="flex items-center gap-1 group/item">
+                      <Link
+                        href={item.href}
+                        onClick={onClose}
+                        title={isCollapsed ? item.name : undefined}
+                        className={`flex-1 flex items-center ${isCollapsed ? 'justify-center px-0' : 'justify-between px-3.5'} py-2.5 rounded-[13px] text-[15px] transition-all duration-150 ${
+                          isActive
+                            ? 'bg-[var(--blue)] text-white font-medium shadow-[var(--shadow-nav-active)]'
+                            : 'text-[var(--muted)] hover:text-[var(--ink)] hover:bg-[var(--hover)]'
+                        }`}
+                      >
+                        <div className="flex items-center gap-3 truncate">
+                          <Icon className={`w-5 h-5 shrink-0 ${isActive ? 'text-white' : 'text-[var(--muted)]'}`} />
+                          {!isCollapsed && <span className="truncate">{item.name}</span>}
+                        </div>
 
-                      {!isCollapsed && item.badge && (
-                        <span
-                          className={`text-[11px] px-2 py-0.5 rounded-full font-bold ${
-                            item.badge === 'LIVE'
-                              ? 'bg-white text-[var(--blue)] animate-pulse'
-                              : 'bg-[var(--surface-2)] text-[var(--muted)] border border-[var(--line)]'
-                          }`}
+                        {!isCollapsed && item.badge && (
+                          <span
+                            className={`text-[11px] px-2 py-0.5 rounded-full font-bold ${
+                              item.badge === 'LIVE'
+                                ? 'bg-white text-[var(--blue)] animate-pulse'
+                                : 'bg-[var(--surface-2)] text-[var(--muted)] border border-[var(--line)]'
+                            }`}
+                          >
+                            {item.badge}
+                          </span>
+                        )}
+                      </Link>
+
+                      {/* Quick + Button on each actionable nav item */}
+                      {!isCollapsed && item.canAdd && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            triggerCreate(item.href, item.entityKey);
+                          }}
+                          title={item.addLabel || 'Добавить через боковое меню'}
+                          className="w-7 h-7 rounded-[8px] flex items-center justify-center text-[var(--muted)] hover:text-white hover:bg-[var(--blue)] hover:border-transparent border border-[var(--line)] bg-[var(--surface-2)] transition-all cursor-pointer shrink-0 opacity-60 group-hover/item:opacity-100"
                         >
-                          {item.badge}
-                        </span>
+                          <Plus className="w-3.5 h-3.5" />
+                        </button>
                       )}
-                    </Link>
+                    </div>
                   );
                 })}
               </nav>
@@ -375,12 +558,14 @@ export function AdminSidebar({
           );
         })}
       </nav>
+
       {/* Logout Confirmation Modal */}
       <Modal
         isOpen={isLogoutModalOpen}
         onClose={() => setIsLogoutModalOpen(false)}
         title="Выход из панели управления"
         maxWidth="sm"
+        variant="center"
       >
         <div className="space-y-4">
           <p className="text-[14px] text-[var(--muted)] leading-relaxed">

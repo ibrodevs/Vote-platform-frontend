@@ -78,6 +78,21 @@ export default function AdminUsersPage() {
     }
 
     loadData();
+
+    const handleCreateEvent = () => openCreateModal();
+    window.addEventListener('admin-create-users', handleCreateEvent);
+
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('create') === '1' || params.get('create') === 'true') {
+        openCreateModal();
+        window.history.replaceState({}, '', window.location.pathname);
+      }
+    }
+
+    return () => {
+      window.removeEventListener('admin-create-users', handleCreateEvent);
+    };
   }, [router]);
 
   const openCreateModal = () => {
@@ -384,12 +399,14 @@ export default function AdminUsersPage() {
         </div>
       )}
 
-      {/* Create / Edit User Modal */}
+      {/* Create / Edit User Drawer (Side Menu) */}
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         title={editingUser ? 'Редактирование сотрудника' : 'Новый сотрудник университета'}
-        maxWidth="md"
+        subtitle={editingUser ? 'Изменение роли и параметров доступа' : 'Создание учетной записи сотрудника или наблюдателя'}
+        maxWidth="lg"
+        variant="drawer"
       >
         {errorMsg && (
           <div className="mb-4 p-3.5 rounded-[12px] bg-[var(--red-bg)] border border-[var(--red)]/20 text-[var(--red)] text-[13px] flex items-center gap-2">

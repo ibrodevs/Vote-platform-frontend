@@ -353,12 +353,14 @@ export default function AdminRecentElectionsPage() {
         )}
       </div>
 
-      {/* Edit Featured Modal */}
+      {/* Edit Featured Drawer (Side Menu) */}
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         title="Настройка выборов для главной страницы"
-        maxWidth="md"
+        subtitle="Настройка карточки и обложки в боковой панели"
+        maxWidth="lg"
+        variant="drawer"
       >
         <form onSubmit={handleSave} className="space-y-4 p-6">
           {errorMsg && (

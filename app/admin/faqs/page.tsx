@@ -70,6 +70,21 @@ export default function AdminFaqsPage() {
     }
 
     loadFaqs();
+
+    const handleCreateEvent = () => openCreateModal();
+    window.addEventListener('admin-create-faqs', handleCreateEvent);
+
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('create') === '1' || params.get('create') === 'true') {
+        openCreateModal();
+        window.history.replaceState({}, '', window.location.pathname);
+      }
+    }
+
+    return () => {
+      window.removeEventListener('admin-create-faqs', handleCreateEvent);
+    };
   }, [router]);
 
   const openCreateModal = () => {
@@ -289,12 +304,14 @@ export default function AdminFaqsPage() {
         )}
       </div>
 
-      {/* Create/Edit Modal */}
+      {/* Create/Edit Drawer (Side Menu) */}
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         title={editingFaq ? 'Редактирование вопроса' : 'Новый вопрос FAQ'}
+        subtitle={editingFaq ? 'Изменение ответа в боковой панели' : 'Добавление вопроса и ответа на двух языках (RU/KY)'}
         maxWidth="lg"
+        variant="drawer"
       >
         <form onSubmit={handleSave} className="space-y-4 p-6">
           {errorMsg && (

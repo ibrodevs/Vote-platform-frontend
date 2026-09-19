@@ -78,6 +78,21 @@ export default function AdminNewsPage() {
     }
 
     loadNews();
+
+    const handleCreateEvent = () => openCreateModal();
+    window.addEventListener('admin-create-news', handleCreateEvent);
+
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('create') === '1' || params.get('create') === 'true') {
+        openCreateModal();
+        window.history.replaceState({}, '', window.location.pathname);
+      }
+    }
+
+    return () => {
+      window.removeEventListener('admin-create-news', handleCreateEvent);
+    };
   }, [router, selectedCategory]);
 
   const openCreateModal = () => {
@@ -392,12 +407,14 @@ export default function AdminNewsPage() {
         )}
       </div>
 
-      {/* Create/Edit Modal */}
+      {/* Create/Edit Drawer (Side Menu) */}
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         title={editingArticle ? 'Редактирование новости' : 'Добавление новости'}
+        subtitle={editingArticle ? 'Изменение публикации в боковой панели' : 'Создание публикации на двух языках (RU/KY)'}
         maxWidth="xl"
+        variant="drawer"
       >
         <form onSubmit={handleSave} className="space-y-4 p-6">
           {errorMsg && (

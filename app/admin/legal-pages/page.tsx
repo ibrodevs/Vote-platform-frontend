@@ -223,12 +223,14 @@ export default function AdminLegalPagesPage() {
         </div>
       )}
 
-      {/* Edit Modal */}
+      {/* Edit Drawer (Side Menu) */}
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         title={`Редактирование: ${editingPage?.title || ''}`}
+        subtitle="Редактирование регламента или политики в боковой панели"
         maxWidth="xl"
+        variant="drawer"
       >
         <form onSubmit={handleSave} className="space-y-4 p-6">
           {errorMsg && (

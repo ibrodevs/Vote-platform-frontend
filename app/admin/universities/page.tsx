@@ -65,6 +65,21 @@ export default function AdminUniversitiesPage() {
     }
 
     loadUniversities();
+
+    const handleCreateEvent = () => openCreateModal();
+    window.addEventListener('admin-create-universities', handleCreateEvent);
+
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('create') === '1' || params.get('create') === 'true') {
+        openCreateModal();
+        window.history.replaceState({}, '', window.location.pathname);
+      }
+    }
+
+    return () => {
+      window.removeEventListener('admin-create-universities', handleCreateEvent);
+    };
   }, [router]);
 
   const openCreateModal = () => {
@@ -261,12 +276,14 @@ export default function AdminUniversitiesPage() {
         </div>
       )}
 
-      {/* Create / Edit University Modal */}
+      {/* Create / Edit University Drawer (Side Menu) */}
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         title={editingUni ? 'Редактирование университета' : 'Добавление нового университета'}
-        maxWidth="md"
+        subtitle={editingUni ? 'Изменение данных университета' : 'Регистрация вуза в системе'}
+        maxWidth="lg"
+        variant="drawer"
       >
         {errorMsg && (
           <div className="mb-5 p-4 rounded-[12px] bg-[var(--red-bg)] border border-[var(--red)]/20 text-[var(--red)] text-[13.5px] flex items-center gap-2">

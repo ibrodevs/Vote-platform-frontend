@@ -176,6 +176,23 @@ export default function AdminCandidatesPage() {
     }
   }, [selectedElectionId]);
 
+  useEffect(() => {
+    const handleCreateEvent = () => openCreateModal();
+    window.addEventListener('admin-create-candidates', handleCreateEvent);
+
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('create') === '1' || params.get('create') === 'true') {
+        openCreateModal();
+        window.history.replaceState({}, '', window.location.pathname);
+      }
+    }
+
+    return () => {
+      window.removeEventListener('admin-create-candidates', handleCreateEvent);
+    };
+  }, [allElections, selectedUniId, selectedElectionId]);
+
   // Elections filtered by the main page university selector
   const availableElectionsForSelectedUni = allElections.filter(
     e => String(e.university) === String(selectedUniId)
@@ -608,12 +625,14 @@ export default function AdminCandidatesPage() {
         </div>
       )}
 
-      {/* Create / Edit Candidate Modal */}
+      {/* Create / Edit Candidate Drawer (Side Menu) */}
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         title={editingCandidate ? 'Редактирование кандидата' : 'Добавление кандидата'}
-        maxWidth="md"
+        subtitle={editingCandidate ? 'Изменение данных профиля кандидата' : 'Регистрация нового кандидата в боковой панели'}
+        maxWidth="lg"
+        variant="drawer"
       >
         {errorMsg && (
           <div className="mb-5 p-4 rounded-[12px] bg-[var(--red-bg)] border border-[var(--red)]/20 text-[var(--red)] text-[13.5px] flex items-center gap-2">
