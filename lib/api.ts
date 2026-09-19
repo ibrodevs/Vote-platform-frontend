@@ -286,4 +286,60 @@ export const api = {
       method: 'POST',
       body: JSON.stringify({ ordered_ids: orderedIds })
     }),
+
+  // Public & Admin News
+  getNews: (params: { category?: string; search?: string } = {}) => {
+    const q = new URLSearchParams();
+    if (params.category && params.category !== 'all') q.set('category', params.category);
+    if (params.search) q.set('search', params.search);
+    return request<any>(`/news/?${q.toString()}`);
+  },
+  getRecentNews: () => request<any[]>('/news/recent/'),
+  getNewsDetail: (id: string) => request<any>(`/news/${id}/`),
+  getAdminNews: (params: { category?: string; search?: string } = {}) => {
+    const q = new URLSearchParams();
+    if (params.category && params.category !== 'all') q.set('category', params.category);
+    if (params.search) q.set('search', params.search);
+    return request<any>(`/admin/content/news/?${q.toString()}`);
+  },
+  createAdminNews: (data: FormData | any) =>
+    request<any>('/admin/content/news/', {
+      method: 'POST',
+      body: data instanceof FormData ? data : JSON.stringify(data)
+    }),
+  updateAdminNews: (id: string, data: FormData | any) =>
+    request<any>(`/admin/content/news/${id}/`, {
+      method: 'PATCH',
+      body: data instanceof FormData ? data : JSON.stringify(data)
+    }),
+  deleteAdminNews: (id: string) =>
+    request<any>(`/admin/content/news/${id}/`, {
+      method: 'DELETE'
+    }),
+
+  // Public & Admin FAQ
+  getFaqs: () => request<any[]>('/faqs/'),
+  getAdminFaqs: () => request<any[]>('/admin/content/faqs/'),
+  createAdminFaq: (data: any) =>
+    request<any>('/admin/content/faqs/', {
+      method: 'POST',
+      body: JSON.stringify(data)
+    }),
+  updateAdminFaq: (id: string, data: any) =>
+    request<any>(`/admin/content/faqs/${id}/`, {
+      method: 'PATCH',
+      body: JSON.stringify(data)
+    }),
+  deleteAdminFaq: (id: string) =>
+    request<any>(`/admin/content/faqs/${id}/`, {
+      method: 'DELETE'
+    }),
+
+  // Admin Featured Elections (Superadmin)
+  getAdminFeaturedElections: () => request<any[]>('/admin/elections/featured/'),
+  updateElectionFeatured: (id: string, data: FormData | any) =>
+    request<any>(`/admin/elections/${id}/featured/`, {
+      method: 'PATCH',
+      body: data instanceof FormData ? data : JSON.stringify(data)
+    }),
 };

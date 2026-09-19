@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { Calendar, Users, ChevronRight } from 'lucide-react';
 import { DepthCard } from '@/components/ui/depth-card';
 import { Badge } from '@/components/ui/Badge';
-import { api } from '@/lib/api';
+import { api, getMediaUrl } from '@/lib/api';
 import { Language } from '@/lib/i18n';
 
 interface ElectionItem {
@@ -119,7 +119,7 @@ export function RecentElections({ lang = 'ru' }: RecentElectionsProps) {
               candidates_count: item.candidates_count ?? 0,
               start_date: startDate,
               end_date: endDate,
-              image: COVER_IMAGES[idx % COVER_IMAGES.length],
+              image: getMediaUrl(item.cover_image || item.cover_image_url) || COVER_IMAGES[idx % COVER_IMAGES.length],
             };
           });
 
@@ -171,8 +171,17 @@ export function RecentElections({ lang = 'ru' }: RecentElectionsProps) {
   };
 
   return (
-    <section className="py-16 md:py-24 border-b border-[var(--line)] bg-[var(--surface)] transition-colors duration-500">
-      <div className="max-w-[1280px] mx-auto px-4 md:px-8">
+    <section className="relative py-16 md:py-24 border-b border-[var(--line)] bg-[var(--surface)] transition-colors duration-500 overflow-hidden">
+      {/* Top Smooth Transition Gradient from Hero */}
+      <div className="absolute top-0 inset-x-0 h-36 sm:h-48 md:h-56 bg-gradient-to-b from-[var(--bg)] via-[var(--bg)]/60 to-transparent pointer-events-none z-0" />
+
+      {/* Top Radial Ambient Spotlight */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-5xl h-48 sm:h-64 bg-[radial-gradient(ellipse_at_top,rgba(37,102,255,0.12),transparent_70%)] pointer-events-none z-0" />
+
+      {/* Subtle separator glow line that fades at edges */}
+      <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-[var(--line)] to-transparent z-10" />
+
+      <div className="relative z-10 max-w-[1280px] mx-auto px-4 md:px-8">
         {/* Section Header */}
         <div className="max-w-2xl mx-auto text-center mb-12">
           <Badge variant="blue" className="mb-3">

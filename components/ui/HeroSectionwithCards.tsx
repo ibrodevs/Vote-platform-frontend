@@ -11,7 +11,7 @@ interface HeroSectionProps {
 
 export function HeroSectionwithCards({ lang = 'ru' }: HeroSectionProps) {
   return (
-    <section className="relative w-full border-b border-[var(--line)] bg-[var(--bg)] overflow-hidden transition-colors duration-500 h-[480px] sm:h-[560px] md:h-[640px]">
+    <section className="relative w-full bg-[var(--bg)] overflow-hidden transition-colors duration-500 h-[480px] sm:h-[560px] md:h-[640px]">
       {/* Text Content */}
       <div className="relative z-10 flex flex-col items-center pt-10 sm:pt-14 md:pt-16 text-center px-4 max-w-4xl mx-auto">
         {/* Eyebrow Badge */}

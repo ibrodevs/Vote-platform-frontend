@@ -6,7 +6,8 @@ import { usePathname, useRouter } from 'next/navigation';
 import {
   LayoutDashboard, Vote, Users, GraduationCap, Building2,
   Activity, ShieldCheck, ExternalLink, LogOut,
-  Plus, X, ChevronLeft, ChevronRight, School
+  Plus, X, ChevronLeft, ChevronRight, School,
+  Newspaper, HelpCircle, Sparkles
 } from 'lucide-react';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
@@ -119,6 +120,31 @@ export function AdminSidebar({
             name: 'Университеты',
             href: '/admin/universities',
             icon: Building2,
+            badge: 'ROOT'
+          }
+        ] : [])
+      ]
+    },
+    {
+      title: 'КОНТЕНТ И САЙТ',
+      items: [
+        {
+          name: 'Новости',
+          href: '/admin/news',
+          icon: Newspaper,
+          badge: null
+        },
+        ...(isSuperAdmin ? [
+          {
+            name: 'Вопросы и ответы',
+            href: '/admin/faqs',
+            icon: HelpCircle,
+            badge: 'ROOT'
+          },
+          {
+            name: 'Последние выборы',
+            href: '/admin/recent-elections',
+            icon: Sparkles,
             badge: 'ROOT'
           }
         ] : [])
