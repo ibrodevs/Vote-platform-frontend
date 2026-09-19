@@ -788,35 +788,7 @@ export default function AdminCandidatesPage() {
             )}
           </div>
 
-          {/* 5. Должность (RU & KY) */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-[13px] font-semibold text-[var(--ink)] mb-1.5">
-                Должность / статус (RU)
-              </label>
-              <input
-                type="text"
-                value={position}
-                onChange={e => setPosition(e.target.value)}
-                placeholder="Кандидат / Студент 3 курса"
-                className="crm-input"
-              />
-            </div>
-            <div>
-              <label className="block text-[13px] font-semibold text-[var(--ink)] mb-1.5">
-                Кызмат орду / статусу (KY)
-              </label>
-              <input
-                type="text"
-                value={positionKy}
-                onChange={e => setPositionKy(e.target.value)}
-                placeholder="Талапкер / 3-курстун студенти"
-                className="crm-input"
-              />
-            </div>
-          </div>
-
-          {/* 6. Краткая биография (RU & KY) */}
+          {/* 5. Краткая биография (RU & KY) */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <div className="flex items-center justify-between mb-1.5">
@@ -857,7 +829,7 @@ export default function AdminCandidatesPage() {
             </div>
           </div>
 
-          {/* 7. Предвыборная программа (RU & KY) */}
+          {/* 6. Предвыборная программа (RU & KY) */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <div className="flex items-center justify-between mb-1.5">
