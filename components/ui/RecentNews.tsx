@@ -45,17 +45,17 @@ export function RecentNews({ lang = 'ru' }: RecentNewsProps) {
   }, []);
 
   return (
-    <section className="py-16 md:py-24 border-b border-[var(--line)] bg-[var(--bg)] transition-colors duration-500">
-      <div className="max-w-[1280px] mx-auto px-4 md:px-8">
+    <section className="py-10 sm:py-16 md:py-24 border-b border-[var(--line)] bg-[var(--bg)] transition-colors duration-500">
+      <div className="max-w-[1280px] mx-auto px-3.5 sm:px-6 md:px-8">
         {/* Section Header */}
-        <div className="max-w-2xl mx-auto text-center mb-12">
-          <Badge variant="blue" className="mb-3">
+        <div className="max-w-2xl mx-auto text-center mb-7 sm:mb-12">
+          <Badge variant="blue" className="mb-2.5 sm:mb-3 text-[11px] sm:text-xs">
             {lang === 'ru' ? 'НОВОСТИ И СОБЫТИЯ' : 'ЖАҢЫЛЫКТАР ЖАНА ОКУЯЛАР'}
           </Badge>
-          <h2 className="text-[28px] sm:text-[34px] md:text-[40px] font-[800] text-[var(--ink)] tracking-tight mb-3">
+          <h2 className="text-[24px] sm:text-[32px] md:text-[40px] font-[800] text-[var(--ink)] tracking-tight mb-2.5 sm:mb-3">
             {lang === 'ru' ? 'Последние новости' : 'Акыркы жаңылыктар'}
           </h2>
-          <p className="text-[15px] text-[var(--muted)] leading-relaxed">
+          <p className="text-[13.5px] sm:text-[15px] text-[var(--muted)] leading-relaxed px-1">
             {lang === 'ru'
               ? 'Актуальная информация о студенческих выборах, обновлениях платформы Dobush.kg и ключевых событиях в вузах.'
               : 'Студенттик шайлоолор, Dobush.kg платформасынын жаңыртуулары жана ЖОЖдордогу маанилүү окуялар тууралуу маалымат.'}
@@ -63,15 +63,16 @@ export function RecentNews({ lang = 'ru' }: RecentNewsProps) {
         </div>
 
         {/* 3 Depth Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 md:gap-8 max-w-6xl mx-auto mb-8 sm:mb-12">
           {news.map((article) => (
-            <div key={article.id} className="h-[440px] w-full">
+            <div key={article.id} className="h-[390px] sm:h-[430px] md:h-[440px] w-full">
               <DepthCard
                 image={article.image}
                 maxRotation={16}
                 maxTranslation={18}
                 borderRadius="20px"
                 spotlight={true}
+                disableOnMobile={true}
                 spotlightColor="rgba(37, 102, 255, 0.35)"
                 href={`/news/${article.id}`}
                 className="border border-black/10 dark:border-white/10 shadow-xl"
@@ -79,15 +80,15 @@ export function RecentNews({ lang = 'ru' }: RecentNewsProps) {
               >
                 {/* Top: Date */}
                 <div className="flex items-center justify-end w-full">
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-black/50 backdrop-blur-md text-white/95 border border-white/20">
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-black/50 backdrop-blur-md text-white/95 border border-white/20">
                     <Calendar className="w-3.5 h-3.5 text-[var(--blue-soft)]" />
                     {article.date}
                   </span>
                 </div>
 
                 {/* Bottom: Title & 'Читать полностью' Button */}
-                <div className="space-y-4">
-                  <h3 className="text-xl font-bold text-white leading-snug drop-shadow-md line-clamp-3">
+                <div className="space-y-3 sm:space-y-4">
+                  <h3 className="text-lg sm:text-xl font-bold text-white leading-snug drop-shadow-md line-clamp-3">
                     {lang === 'ky' ? article.title_ky : article.title}
                   </h3>
 
@@ -102,14 +103,14 @@ export function RecentNews({ lang = 'ru' }: RecentNewsProps) {
         </div>
 
         {/* "Все новости" Button */}
-        <div className="flex justify-center">
-          <Link href="/news">
+        <div className="flex justify-center px-4">
+          <Link href="/news" className="w-full sm:w-auto">
             <Button
               variant="secondary"
               size="lg"
-              className="gap-2 px-8 py-3 rounded-full text-base font-bold shadow-md hover:shadow-lg transition-all"
+              className="w-full sm:w-auto gap-2 px-6 sm:px-8 py-2.5 sm:py-3 rounded-full text-sm sm:text-base font-bold shadow-md hover:shadow-lg transition-all justify-center"
             >
-              <Newspaper className="w-5 h-5 text-[var(--blue)]" />
+              <Newspaper className="w-4 h-4 sm:w-5 sm:h-5 text-[var(--blue)]" />
               <span>{lang === 'ru' ? 'Все новости' : 'Бардык жаңылыктар'}</span>
               <ArrowRight className="w-4 h-4" />
             </Button>

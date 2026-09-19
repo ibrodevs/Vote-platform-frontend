@@ -140,15 +140,15 @@ export default function FrequentlyAskedQuestions({
   const words = currentTitle.split(' ');
 
   return (
-    <section className={cn('relative w-full overflow-hidden py-20 md:py-28 bg-[var(--bg)] border-b border-[var(--line)] transition-colors duration-500', className)}>
-      <div className="mx-auto max-w-3xl px-4 md:px-6">
-        <div className="text-center mb-4">
-          <Badge variant="blue" className="mb-3">
+    <section className={cn('relative w-full overflow-hidden py-10 sm:py-16 md:py-24 bg-[var(--bg)] border-b border-[var(--line)] transition-colors duration-500', className)}>
+      <div className="mx-auto max-w-3xl px-3.5 sm:px-6">
+        <div className="text-center mb-3 sm:mb-4">
+          <Badge variant="blue" className="mb-2.5 sm:mb-3 text-[11px] sm:text-xs">
             {lang === 'ru' ? 'FAQ & ПОДДЕРЖКА' : 'FAQ ЖАНА КОЛДОО'}
           </Badge>
         </div>
 
-        <h2 className="relative z-10 mx-auto max-w-4xl text-center text-3xl font-bold tracking-tight text-[var(--ink)] md:text-5xl lg:text-5xl">
+        <h2 className="relative z-10 mx-auto max-w-4xl text-center text-2xl sm:text-3xl md:text-5xl font-bold tracking-tight text-[var(--ink)]">
           {words.map((word, index) => (
             <motion.span
               key={`${word}-${index}`}
@@ -172,7 +172,7 @@ export default function FrequentlyAskedQuestions({
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.4 }}
-          className="relative z-10 mx-auto mt-5 max-w-2xl text-center text-sm md:text-base text-[var(--muted)] leading-relaxed"
+          className="relative z-10 mx-auto mt-3 sm:mt-5 max-w-2xl text-center text-xs sm:text-sm md:text-base text-[var(--muted)] leading-relaxed px-2"
         >
           {currentDescription}{' '}
           <a
@@ -188,7 +188,7 @@ export default function FrequentlyAskedQuestions({
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.5 }}
-          className="mt-12 bg-[var(--surface)] border border-[var(--line)] rounded-2xl p-4 sm:p-8 shadow-sm"
+          className="mt-7 sm:mt-12 bg-[var(--surface)] border border-[var(--line)] rounded-[18px] sm:rounded-2xl p-3.5 sm:p-8 shadow-xs"
         >
           <Accordion type="single" collapsible className="w-full">
             {currentData.map((item: any, index: number) => (

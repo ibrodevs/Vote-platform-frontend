@@ -166,12 +166,12 @@ export default function FooterWithFadedBrand({
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true }}
-        className="relative z-10 max-w-[1280px] mx-auto px-6 pt-16 pb-8 md:px-12 md:pt-18"
+        className="relative z-10 max-w-[1280px] mx-auto px-4 pt-10 pb-6 sm:px-6 sm:pt-16 sm:pb-8 md:px-12 md:pt-18"
       >
         {/* Brand & Tagline */}
         <motion.div
           variants={itemVariants}
-          className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-10 pb-6 border-b border-[var(--line)]/60"
+          className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 pb-4 sm:mb-10 sm:pb-6 border-b border-[var(--line)]/60"
         >
           <Link href="/" className="flex items-center gap-2.5">
             <img
@@ -183,20 +183,20 @@ export default function FooterWithFadedBrand({
               Dobush<span className="text-[var(--blue)]">.kg</span>
             </span>
           </Link>
-          <div className="flex items-center gap-2 text-xs font-semibold tracking-[0.2em] uppercase text-[var(--muted)]">
+          <div className="flex items-center gap-2 text-[11px] sm:text-xs font-semibold tracking-wider sm:tracking-[0.2em] uppercase text-[var(--muted)]">
             <span className="h-2 w-2 rounded-full bg-[var(--blue)] shrink-0" />
             <span>{defaultTagline}</span>
           </div>
         </motion.div>
 
         {/* Links Grid */}
-        <div className="grid grid-cols-2 gap-x-10 gap-y-8 md:grid-cols-3 md:gap-x-16 lg:gap-x-24">
+        <div className="grid grid-cols-2 gap-x-5 gap-y-6 sm:gap-x-10 sm:gap-y-8 md:grid-cols-3 md:gap-x-16 lg:gap-x-24">
           {currentColumns.map((col, ci) => (
             <motion.div key={ci} variants={itemVariants}>
-              <p className="text-[11px] font-bold tracking-widest uppercase mb-4 text-[var(--muted)]">
+              <p className="text-[11px] font-bold tracking-widest uppercase mb-3 sm:mb-4 text-[var(--muted)]">
                 {col.heading}
               </p>
-              <ul className="flex flex-col gap-3">
+              <ul className="flex flex-col gap-2.5 sm:gap-3">
                 {col.links.map((link, li) => {
                   const isExternal = link.external || link.url.startsWith('mailto:') || link.url.startsWith('http');
                   return (
@@ -206,14 +206,14 @@ export default function FooterWithFadedBrand({
                           href={link.url}
                           target={link.url.startsWith('http') ? '_blank' : undefined}
                           rel={link.url.startsWith('http') ? 'noopener noreferrer' : undefined}
-                          className="text-sm font-medium text-[var(--body)] hover:text-[var(--blue)] transition-colors duration-200 inline-block"
+                          className="text-[13px] sm:text-sm font-medium text-[var(--body)] hover:text-[var(--blue)] transition-colors duration-200 inline-block"
                         >
                           {link.text}
                         </a>
                       ) : (
                         <Link
                           href={link.url}
-                          className="text-sm font-medium text-[var(--body)] hover:text-[var(--blue)] transition-colors duration-200 inline-block"
+                          className="text-[13px] sm:text-sm font-medium text-[var(--body)] hover:text-[var(--blue)] transition-colors duration-200 inline-block"
                         >
                           {link.text}
                         </Link>
@@ -229,23 +229,23 @@ export default function FooterWithFadedBrand({
         {/* Divider */}
         <motion.div
           variants={itemVariants}
-          className="mt-12 border-t border-[var(--line)]"
+          className="mt-8 sm:mt-12 border-t border-[var(--line)]"
         />
 
         {/* Copyright & Legal Links */}
         <motion.div
           variants={itemVariants}
-          className="mt-6 flex flex-col gap-3 md:flex-row md:items-center md:justify-between"
+          className="mt-5 sm:mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between text-center sm:text-left"
         >
-          <p className="text-xs text-[var(--muted)]">
+          <p className="text-[11.5px] sm:text-xs text-[var(--muted)]">
             {currentCopyright}
           </p>
-          <div className="flex flex-wrap items-center gap-5">
+          <div className="flex flex-wrap items-center justify-center sm:justify-start gap-4 sm:gap-5">
             {currentLegalLinks.map((l, i) => (
               <Link
                 key={i}
                 href={l.url}
-                className="text-xs text-[var(--muted)] hover:text-[var(--blue)] transition-colors"
+                className="text-[11.5px] sm:text-xs text-[var(--muted)] hover:text-[var(--blue)] transition-colors"
               >
                 {l.text}
               </Link>
@@ -260,9 +260,9 @@ export default function FooterWithFadedBrand({
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: 'easeOut' }}
         viewport={{ once: true }}
-        className="inset-x-0 mt-8 md:mt-12 pb-2 bg-gradient-to-b from-[var(--ink)]/12 via-[var(--ink)]/6 to-transparent bg-clip-text text-center font-[900] tracking-tighter text-transparent select-none pointer-events-none"
+        className="inset-x-0 mt-6 sm:mt-8 md:mt-12 pb-2 bg-gradient-to-b from-[var(--ink)]/12 via-[var(--ink)]/6 to-transparent bg-clip-text text-center font-[900] tracking-tighter text-transparent select-none pointer-events-none"
         style={{
-          fontSize: 'clamp(3rem, 14vw, 12rem)',
+          fontSize: 'clamp(2.5rem, 13vw, 12rem)',
           lineHeight: 0.85,
         }}
       >

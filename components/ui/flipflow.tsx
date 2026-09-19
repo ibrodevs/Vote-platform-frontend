@@ -31,7 +31,7 @@ const Flow = ({
   <div
     {...props}
     className={cn(
-      'group relative flex h-full w-full overflow-hidden py-1 [--duration:30s] [--gap:14px] gap-[var(--gap,14px)]',
+      'group relative flex h-full w-full overflow-hidden py-1 [--duration:28s] [--gap:10px] sm:[--gap:14px] gap-[var(--gap,10px)]',
       vertical ? 'flex-col' : 'flex-row',
       className,
     )}
@@ -39,7 +39,7 @@ const Flow = ({
     {Array.from({ length: repeat }).map((_, index) => (
       <div
         key={`item-${index}`}
-        className={cn('flex shrink-0 gap-[var(--gap,14px)]', {
+        className={cn('flex shrink-0 gap-[var(--gap,10px)] sm:gap-[var(--gap,14px)]', {
           'group-hover:paused': pauseOnHover,
           'direction-reverse': reverse,
           'animate-canopy-horizontal flex-row': !vertical,
@@ -82,7 +82,7 @@ const Card = ({
 
   return (
     <div
-      className={cn('h-16 sm:h-20 w-44 sm:w-52 shrink-0 cursor-pointer select-none', className)}
+      className={cn('h-14 sm:h-18 w-36 sm:w-48 shrink-0 cursor-pointer select-none', className)}
       onMouseEnter={() => setFlip(true)}
       onMouseLeave={() => setFlip(false)}
       onClick={() => setFlip(prev => !prev)}
@@ -96,16 +96,16 @@ const Card = ({
       >
         {/* Front Face */}
         <motion.div
-          className="absolute inset-0 rounded-[16px] overflow-hidden shadow-sm"
+          className="absolute inset-0 rounded-[14px] sm:rounded-[16px] overflow-hidden shadow-xs"
           style={{ backfaceVisibility: 'hidden' }}
         >
           <div
             className={cn(
-              'h-full w-full rounded-[16px] flex items-center justify-center px-4 text-center transition-all',
+              'h-full w-full rounded-[14px] sm:rounded-[16px] flex items-center justify-center px-3 text-center transition-all',
               colorClass,
             )}
           >
-            <span className="font-extrabold text-base sm:text-lg uppercase tracking-wide truncate max-w-full">
+            <span className="font-extrabold text-[13px] sm:text-base uppercase tracking-wide truncate max-w-full">
               {frontTitle}
             </span>
           </div>
@@ -113,7 +113,7 @@ const Card = ({
 
         {/* Back Face */}
         <motion.div
-          className="absolute inset-0 rounded-[16px] overflow-hidden shadow-sm"
+          className="absolute inset-0 rounded-[14px] sm:rounded-[16px] overflow-hidden shadow-xs"
           style={{
             backfaceVisibility: 'hidden',
             transform: 'rotateX(180deg)',
@@ -121,11 +121,11 @@ const Card = ({
         >
           <div
             className={cn(
-              'h-full w-full rounded-[16px] flex items-center justify-center px-4 text-center transition-all',
+              'h-full w-full rounded-[14px] sm:rounded-[16px] flex items-center justify-center px-3 text-center transition-all',
               backColorClass,
             )}
           >
-            <span className="font-extrabold text-base sm:text-lg uppercase tracking-wide truncate max-w-full">
+            <span className="font-extrabold text-[13px] sm:text-base uppercase tracking-wide truncate max-w-full">
               {backTitle}
             </span>
           </div>

@@ -120,12 +120,12 @@ export function AccordionTrigger({ className, children, ...props }: AccordionTri
         data-state={isOpen ? 'open' : 'closed'}
         onClick={() => context?.onValueChange(itemContext.value)}
         className={cn(
-          'flex flex-1 items-center justify-between py-5 text-left text-[16px] md:text-[17px] font-semibold text-[var(--ink)] transition-all hover:text-[var(--blue)] cursor-pointer',
+          'flex flex-1 items-center justify-between py-3.5 sm:py-5 text-left text-[14.5px] sm:text-[16px] md:text-[17px] font-semibold text-[var(--ink)] transition-all hover:text-[var(--blue)] cursor-pointer gap-3',
           className
         )}
         {...props}
       >
-        <span>{children}</span>
+        <span className="leading-snug">{children}</span>
         <ChevronDown
           className={cn(
             'h-4 w-4 shrink-0 text-[var(--muted)] transition-transform duration-300',
@@ -148,12 +148,12 @@ export function AccordionContent({ className, children, ...props }: AccordionCon
       data-state={isOpen ? 'open' : 'closed'}
       className={cn(
         'grid transition-all duration-300 ease-in-out',
-        isOpen ? 'grid-rows-[1fr] opacity-100 pb-5' : 'grid-rows-[0fr] opacity-0 pb-0',
+        isOpen ? 'grid-rows-[1fr] opacity-100 pb-4 sm:pb-5' : 'grid-rows-[0fr] opacity-0 pb-0',
         className
       )}
       {...props}
     >
-      <div className="overflow-hidden text-[14px] md:text-[15px] leading-relaxed text-[var(--muted)]">
+      <div className="overflow-hidden text-[13px] sm:text-[14px] md:text-[15px] leading-relaxed text-[var(--muted)]">
         {children}
       </div>
     </div>

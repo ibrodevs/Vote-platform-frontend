@@ -171,17 +171,17 @@ export function RecentElections({ lang = 'ru' }: RecentElectionsProps) {
   };
 
   return (
-    <section className="relative py-16 md:py-24 border-b border-[var(--line)] bg-[var(--surface)] transition-colors duration-500 overflow-hidden">
-      <div className="relative z-10 max-w-[1280px] mx-auto px-4 md:px-8">
+    <section className="relative py-10 sm:py-16 md:py-24 border-b border-[var(--line)] bg-[var(--surface)] transition-colors duration-500 overflow-hidden">
+      <div className="relative z-10 max-w-[1280px] mx-auto px-3.5 sm:px-6 md:px-8">
         {/* Section Header */}
-        <div className="max-w-2xl mx-auto text-center mb-12">
-          <Badge variant="blue" className="mb-3">
+        <div className="max-w-2xl mx-auto text-center mb-7 sm:mb-12">
+          <Badge variant="blue" className="mb-2.5 sm:mb-3 text-[11px] sm:text-xs">
             {lang === 'ru' ? 'АКТУАЛЬНЫЕ КАМПАНИИ' : 'АКТУАЛДУУ КАМПАНИЯЛАР'}
           </Badge>
-          <h2 className="text-[28px] sm:text-[34px] md:text-[40px] font-[800] text-[var(--ink)] tracking-tight mb-3">
+          <h2 className="text-[24px] sm:text-[32px] md:text-[40px] font-[800] text-[var(--ink)] tracking-tight mb-2.5 sm:mb-3">
             {lang === 'ru' ? 'Последние выборы' : 'Акыркы шайлоолор'}
           </h2>
-          <p className="text-[15px] text-[var(--muted)] leading-relaxed">
+          <p className="text-[13.5px] sm:text-[15px] text-[var(--muted)] leading-relaxed px-1">
             {lang === 'ru'
               ? 'Интерактивный список избирательных процессов в вузах страны. Выберите кампанию для ознакомления и волеизъявления.'
               : 'Өлкөнүн жогорку окуу жайларындагы активдүү шайлоолордун тизмеси. Катышуу үчүн кампанияны тандаңыз.'}
@@ -189,15 +189,16 @@ export function RecentElections({ lang = 'ru' }: RecentElectionsProps) {
         </div>
 
         {/* 3 Depth Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 md:gap-8 max-w-6xl mx-auto">
           {elections.map((election) => (
-            <div key={election.id} className="h-[440px] w-full">
+            <div key={election.id} className="h-[390px] sm:h-[430px] md:h-[440px] w-full">
               <DepthCard
                 image={election.image}
                 maxRotation={16}
                 maxTranslation={18}
                 borderRadius="20px"
                 spotlight={true}
+                disableOnMobile={true}
                 spotlightColor="rgba(37, 102, 255, 0.35)"
                 href={`/vote/auth?election=${election.id}`}
                 className="border border-black/10 dark:border-white/10 shadow-xl"
@@ -212,16 +213,16 @@ export function RecentElections({ lang = 'ru' }: RecentElectionsProps) {
                 </div>
 
                 {/* Bottom Card Elements */}
-                <div className="space-y-3">
-                  <h3 className="text-xl font-bold text-white leading-snug drop-shadow-md">
+                <div className="space-y-2.5 sm:space-y-3">
+                  <h3 className="text-lg sm:text-xl font-bold text-white leading-snug drop-shadow-md">
                     {lang === 'ky' && election.title_ky ? election.title_ky : election.title}
                   </h3>
 
-                  <p className="text-xs text-white/80 line-clamp-2 leading-relaxed">
+                  <p className="text-[12px] sm:text-xs text-white/80 line-clamp-2 leading-relaxed">
                     {election.description}
                   </p>
 
-                  <div className="pt-3 border-t border-white/15 flex items-center justify-between text-xs text-white/90">
+                  <div className="pt-2.5 sm:pt-3 border-t border-white/15 flex items-center justify-between text-[11.5px] sm:text-xs text-white/90">
                     <div className="flex items-center gap-1.5">
                       <Users className="w-3.5 h-3.5 text-[var(--blue-soft)]" />
                       <span>{election.candidates_count} канд.</span>
@@ -232,7 +233,7 @@ export function RecentElections({ lang = 'ru' }: RecentElectionsProps) {
                     </div>
                   </div>
 
-                  <div className="pt-2 flex items-center justify-between text-sm font-semibold text-[var(--blue-soft)] group-hover:text-white transition-colors">
+                  <div className="pt-1.5 sm:pt-2 flex items-center justify-between text-sm font-semibold text-[var(--blue-soft)] group-hover:text-white transition-colors">
                     <span>
                       {election.status === 'active'
                         ? lang === 'ru' ? 'Голосовать' : 'Добуш берүү'

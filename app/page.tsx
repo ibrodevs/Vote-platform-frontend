@@ -23,7 +23,7 @@ export default function HomePage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[var(--bg)] text-[var(--body)]">
+    <div className="min-h-screen bg-[var(--bg)] text-[var(--body)] overflow-x-hidden">
       {/* 1. Hero Section with Globe */}
       <HeroSectionwithCards lang={lang} />
 
