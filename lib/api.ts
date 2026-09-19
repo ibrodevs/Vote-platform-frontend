@@ -124,6 +124,7 @@ export const api = {
   getAvailableElections: (all: boolean = false) => request<any[]>(`/elections/available/${all ? '?all=true' : ''}`),
   getElectionDetail: (id: string) => request<any>(`/elections/${id}/`),
   getElectionCandidates: (electionId: string) => request<any[]>(`/elections/${electionId}/candidates/`),
+  getCandidateDetails: (candidateId: string) => request<any>(`/candidates/${candidateId}/`),
   castVote: (data: { election_id: string; candidate_id: string }) =>
     request<any>('/voting/cast/', {
       method: 'POST',
@@ -176,13 +177,14 @@ export const api = {
     }),
 
   // Admin Students
-  getAdminStudents: (universityId?: string, params: { page?: number; search?: string; faculty?: string; course?: number; onlyRegistered?: boolean } = {}) => {
+  getAdminStudents: (universityId?: string, params: { page?: number; search?: string; faculty?: string; course?: number; onlyRegistered?: boolean; voted?: string } = {}) => {
     const q = new URLSearchParams();
     if (params.page) q.set('page', String(params.page));
     if (params.search) q.set('search', params.search);
     if (params.faculty) q.set('faculty', params.faculty);
     if (params.course) q.set('course', String(params.course));
     if (params.onlyRegistered) q.set('only_registered', 'true');
+    if (params.voted) q.set('voted', params.voted);
 
     if (universityId && universityId !== 'all') {
       return request<any>(`/admin/universities/${universityId}/students/?${q.toString()}`);

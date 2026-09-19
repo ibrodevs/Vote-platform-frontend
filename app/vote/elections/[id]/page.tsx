@@ -345,12 +345,19 @@ export default function DirectElectionBallotPage() {
                   </div>
 
                   {/* Candidate Avatar / Photo */}
-                  <div className="w-14 h-14 rounded-[14px] bg-[var(--surface-2)] border border-[var(--line)] overflow-hidden shrink-0 flex items-center justify-center text-[var(--blue)] font-bold text-[18px]">
-                    {cand.photo_url || cand.photo ? (
+                  <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-[14px] bg-[var(--surface-2)] border border-[var(--line)] overflow-hidden shrink-0 flex items-center justify-center text-[var(--blue)] font-bold text-[18px]">
+                    {cand.photo || cand.photo_url ? (
                       <img
                         src={getMediaUrl(cand.photo || cand.photo_url)}
                         alt={cand.full_name}
                         className="w-full h-full object-cover"
+                        onError={(e) => {
+                          const target = e.currentTarget;
+                          target.style.display = 'none';
+                          if (target.parentElement) {
+                            target.parentElement.innerHTML = `<span class="text-[var(--blue)] font-bold text-[16px]">${cand.full_name.slice(0, 2).toUpperCase()}</span>`;
+                          }
+                        }}
                       />
                     ) : (
                       cand.full_name.slice(0, 2).toUpperCase()
@@ -358,18 +365,18 @@ export default function DirectElectionBallotPage() {
                   </div>
 
                   {/* Candidate Info */}
-                  <div className="space-y-1">
+                  <div className="space-y-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="text-[12px] font-mono font-semibold text-[var(--muted)]">
+                      <span className="text-[12px] font-mono font-semibold text-[var(--muted)] shrink-0">
                         #{idx + 1}
                       </span>
-                      <h3 className="text-[17px] font-bold text-[var(--ink)]">
+                      <h3 className="text-[16px] sm:text-[17px] font-bold text-[var(--ink)] truncate">
                         {cand.full_name}
                       </h3>
                     </div>
 
-                    <div className="flex flex-wrap items-center gap-x-3 text-[13px] text-[var(--muted)]">
-                      {cand.faculty && <span>{cand.faculty}</span>}
+                    <div className="flex flex-wrap items-center gap-x-2.5 text-[12.5px] sm:text-[13px] text-[var(--muted)]">
+                      {cand.faculty && <span className="truncate">{cand.faculty}</span>}
                       {cand.course && <span>• {cand.course} курс</span>}
                       {cand.position && (
                         <span className="text-[var(--blue)] font-medium">• {cand.position}</span>
@@ -378,26 +385,21 @@ export default function DirectElectionBallotPage() {
                   </div>
                 </div>
 
-                {/* Right program link */}
-                <div className="shrink-0 flex items-center justify-between sm:justify-end gap-3 pt-2 sm:pt-0 border-t sm:border-t-0 border-[var(--line)]">
-                  {(cand.program || cand.short_bio) && (
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setProgramModalCandidate(cand);
-                      }}
-                      className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-[var(--blue)] hover:underline cursor-pointer"
-                    >
-                      <BookOpen className="w-3.5 h-3.5" />
-                      <span>Анкета и программа</span>
-                    </button>
-                  )}
+                {/* Right actions: View profile link + Select button */}
+                <div className="shrink-0 flex items-center justify-between sm:justify-end gap-2.5 pt-2.5 sm:pt-0 border-t sm:border-t-0 border-[var(--line)]">
+                  <Link
+                    href={`/vote/elections/${election.id}/candidate/${cand.id}`}
+                    onClick={(e) => e.stopPropagation()}
+                    className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-[var(--blue)] hover:underline px-2.5 py-1.5 rounded-[9px] hover:bg-[var(--surface-2)] transition-colors cursor-pointer"
+                  >
+                    <BookOpen className="w-3.5 h-3.5" />
+                    <span>Анкета кандидата</span>
+                  </Link>
 
                   <span
-                    className={`text-[13px] font-semibold px-3 py-1.5 rounded-[9px] transition-all ${
+                    className={`text-[13px] font-semibold px-3.5 py-1.5 rounded-[10px] transition-all ${
                       isSelected
-                        ? 'bg-[var(--blue)] text-white'
+                        ? 'bg-[var(--blue)] text-white shadow-sm'
                         : 'bg-[var(--surface-2)] text-[var(--muted)]'
                     }`}
                   >

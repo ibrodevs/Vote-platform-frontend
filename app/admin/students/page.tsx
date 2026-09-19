@@ -23,6 +23,7 @@ export default function AdminStudentsPage() {
   const [search, setSearch] = useState<string>('');
   const [faculty, setFaculty] = useState<string>('');
   const [course, setCourse] = useState<string>('');
+  const [votedFilter, setVotedFilter] = useState<'all' | 'voted' | 'not_voted'>('all');
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   // Registration toggle states
@@ -76,7 +77,8 @@ export default function AdminStudentsPage() {
       search,
       faculty: faculty || undefined,
       course: course ? Number(course) : undefined,
-      onlyRegistered: true
+      onlyRegistered: true,
+      voted: votedFilter === 'all' ? undefined : (votedFilter === 'voted' ? 'true' : 'false')
     })
       .then(res => {
         const list = Array.isArray(res) ? res : (res?.results || []);
@@ -92,7 +94,7 @@ export default function AdminStudentsPage() {
 
   useEffect(() => {
     loadStudents();
-  }, [selectedUniId, page, search, faculty, course]);
+  }, [selectedUniId, page, search, faculty, course, votedFilter]);
 
   // Polling for Upload Batch Status
   useEffect(() => {
@@ -258,7 +260,7 @@ export default function AdminStudentsPage() {
 
       {/* Controls & Filters */}
       <div className="crm-card p-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
           {/* University selector for super_admin */}
           {adminUser?.role === 'super_admin' && (
             <div>
@@ -341,6 +343,25 @@ export default function AdminStudentsPage() {
               <option value="5">5 курс</option>
             </select>
           </div>
+
+          {/* Voting Status Filter */}
+          <div>
+            <label className="block text-[13px] font-semibold text-[var(--ink)] mb-2">
+              Голосование
+            </label>
+            <select
+              value={votedFilter}
+              onChange={e => {
+                setVotedFilter(e.target.value as any);
+                setPage(1);
+              }}
+              className="crm-input"
+            >
+              <option value="all">Все студенты</option>
+              <option value="voted">Проголосовали</option>
+              <option value="not_voted">Не голосовали</option>
+            </select>
+          </div>
         </div>
       </div>
 
@@ -359,8 +380,8 @@ export default function AdminStudentsPage() {
           </button>
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-left">
+        <div className="overflow-x-auto -webkit-overflow-scrolling-touch">
+          <table className="w-full text-left min-w-[680px]">
             <thead>
               <tr>
                 <th>ID Студента</th>
@@ -368,7 +389,7 @@ export default function AdminStudentsPage() {
                 <th>Почта</th>
                 <th>Факультет</th>
                 <th>Курс</th>
-                <th className="text-center">Статус</th>
+                <th className="text-center">Голосование</th>
               </tr>
             </thead>
             <tbody>
@@ -393,8 +414,8 @@ export default function AdminStudentsPage() {
                     <td className="text-[var(--muted)]">{s.faculty || '—'}</td>
                     <td className="font-medium text-[var(--ink)]">{s.course} курс</td>
                     <td className="text-center">
-                      <Badge variant={s.is_active ? 'green' : 'gray'} dot={s.is_active}>
-                        {s.is_active ? 'АКТИВЕН' : 'ОТКЛЮЧЕН'}
+                      <Badge variant={s.has_voted ? 'green' : 'amber'} dot={s.has_voted}>
+                        {s.has_voted ? 'ПРОГОЛОСОВАЛ' : 'НЕ ГОЛОСОВАЛ'}
                       </Badge>
                     </td>
                   </tr>
