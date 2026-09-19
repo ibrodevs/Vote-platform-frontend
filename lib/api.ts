@@ -120,7 +120,8 @@ export const api = {
       body: JSON.stringify(data)
     }),
 
-  // Student Voting
+  // Public & Student Voting
+  getRecentElections: () => request<any[]>('/elections/recent/'),
   getAvailableElections: (all: boolean = false) => request<any[]>(`/elections/available/${all ? '?all=true' : ''}`),
   getElectionDetail: (id: string) => request<any>(`/elections/${id}/`),
   getElectionCandidates: (electionId: string) => request<any[]>(`/elections/${electionId}/candidates/`),

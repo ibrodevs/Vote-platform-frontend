@@ -2,10 +2,12 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { ShieldCheck, Clock, Zap, Search, ArrowRight, Star, Check } from 'lucide-react';
+import { Search, ArrowRight, Star, Check } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { DashboardPreviewCard } from '@/components/ui/DashboardPreviewCard';
+import { HeroSectionwithCards } from '@/components/ui/HeroSectionwithCards';
+import { RecentElections } from '@/components/ui/RecentElections';
 import { api } from '@/lib/api';
 import { translations, Language } from '@/lib/i18n';
 
@@ -63,122 +65,13 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-[var(--bg)] text-[var(--body)]">
-      {/* 1. Hero Section */}
-      <section className="relative border-b border-[var(--line)] pt-12 md:pt-20 pb-16 md:pb-24">
-        <div className="max-w-[1280px] mx-auto px-4 md:px-8 relative z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
-            {/* Left Column: Headlines & Actions */}
-            <div className="lg:col-span-7">
-              {/* Eyebrow Badge */}
-              <div className="mb-5">
-                <Badge variant="blue" dot={true}>
-                  {lang === 'ru' ? 'DOBUSH.KG — ЭЛЕКТРОННОЕ ГОЛОСОВАНИЕ 5.0' : 'DOBUSH.KG — ЭЛЕКТРОНДУК ДОБУШ БЕРҮҮ 5.0'}
-                </Badge>
-              </div>
+      {/* 1. Hero Section with Cards */}
+      <HeroSectionwithCards lang={lang} />
 
-              {/* Display Headline */}
-              <h1 className="text-4xl sm:text-5xl lg:text-[54px] font-[800] text-[var(--ink)] tracking-[-0.03em] leading-[1.15] mb-6">
-                {lang === 'ru' ? (
-                  <>
-                    Студенческие выборы <br />
-                    <span className="text-[var(--blue)]">
-                      прозрачно и анонимно
-                    </span>
-                  </>
-                ) : (
-                  <>
-                    Студенттик шайлоо <br />
-                    <span className="text-[var(--blue)]">
-                      ачык жана жашыруун
-                    </span>
-                  </>
-                )}
-              </h1>
+      {/* 2. Recent Elections with Depth Card */}
+      <RecentElections lang={lang} />
 
-              {/* Subtext */}
-              <p className="text-base sm:text-[17px] text-[var(--muted)] leading-relaxed mb-8 max-w-xl">
-                {lang === 'ru'
-                  ? 'Архитектурное физическое разделение реестра участия избирателей и содержимого бюллетеней на уровне базы данных. Деанонимизация невозможна даже при прямом доступе к серверам.'
-                  : 'Шайлоочулардын катышуу тизмеси жана бюллетендер архитектуралык деңгээлде бири-биринен бөлүнүп сакталат. Серверге толук мүмкүнчүлүк болсо да шайлоочуну аныктоо мүмкүн эмес.'
-                }
-              </p>
 
-              {/* Dual Action CTAs: 46px royal blue button + secondary */}
-              <div className="flex flex-wrap items-center gap-3.5 mb-8">
-                <a href="#universities">
-                  <Button variant="primary" size="md">
-                    {lang === 'ru' ? 'Выбрать университет' : 'Университетти тандоо'}
-                  </Button>
-                </a>
-                <Link href="/admin/login">
-                  <Button variant="secondary" size="md">
-                    {lang === 'ru' ? 'Панель комиссии' : 'Комиссия панели'}
-                  </Button>
-                </Link>
-              </div>
-
-              {/* Trust Signal */}
-              <div className="flex items-center gap-2.5 text-[13px] text-[var(--muted)]">
-                <div className="flex text-[var(--blue)]">
-                  {'★★★★★'}
-                </div>
-                <span>Математическая гарантия тайны голоса (Zero Correlation)</span>
-              </div>
-            </div>
-
-            {/* Right Column: Floating Product Preview Card */}
-            <div className="lg:col-span-5">
-              <DashboardPreviewCard />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 2. Three-Column Stat Block */}
-      <section className="border-b border-[var(--line)] bg-[var(--surface)] py-12">
-        <div className="max-w-[1280px] mx-auto px-4 md:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="crm-card p-6">
-              <div className="flex items-center gap-2 mb-3">
-                <ShieldCheck className="w-5 h-5 text-[var(--blue)]" />
-                <span className="text-[12px] uppercase tracking-wider text-[var(--muted)] font-bold">ТАЙНА БЮЛЛЕТЕНЯ</span>
-              </div>
-              <div className="text-3xl sm:text-4xl font-[800] text-[var(--ink)] tracking-tight mb-1">
-                100%
-              </div>
-              <p className="text-[13.5px] text-[var(--muted)] leading-relaxed">
-                Физическое разделение таблиц <code className="font-mono text-[var(--blue)]">VoteRecord</code> и <code className="font-mono text-[var(--blue)]">Ballot</code> исключает корреляционные атаки
-              </p>
-            </div>
-
-            <div className="crm-card p-6">
-              <div className="flex items-center gap-2 mb-3">
-                <Clock className="w-5 h-5 text-[var(--blue)]" />
-                <span className="text-[12px] uppercase tracking-wider text-[var(--muted)] font-bold">СКОРОСТЬ ВЕРИФИКАЦИИ</span>
-              </div>
-              <div className="text-3xl sm:text-4xl font-[800] text-[var(--ink)] tracking-tight mb-1">
-                &lt; 1 СЕК
-              </div>
-              <p className="text-[13.5px] text-[var(--muted)] leading-relaxed">
-                Доставка одноразового 6-значного OTP-кода через защищенный SMS-шлюз
-              </p>
-            </div>
-
-            <div className="crm-card p-6">
-              <div className="flex items-center gap-2 mb-3">
-                <Zap className="w-5 h-5 text-[var(--blue)]" />
-                <span className="text-[12px] uppercase tracking-wider text-[var(--muted)] font-bold">ЗАЩИТА ОТ ДУБЛЕЙ</span>
-              </div>
-              <div className="text-3xl sm:text-4xl font-[800] text-[var(--ink)] tracking-tight mb-1">
-                0 КОНФЛИКТОВ
-              </div>
-              <p className="text-[13.5px] text-[var(--muted)] leading-relaxed">
-                Атомарная блокировка row-level lock <code className="font-mono text-[var(--blue)]">select_for_update</code> при параллельных запросах
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* 3. University Directory Section */}
       <section id="universities" className="py-16 md:py-24 border-b border-[var(--line)]">
