@@ -24,6 +24,7 @@ export default function ElectionTurnoutPage() {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isFinishing, setIsFinishing] = useState<boolean>(false);
   const [highlightedCandidateId, setHighlightedCandidateId] = useState<string | null>(null);
+  const [adminUser, setAdminUser] = useState<any>(null);
 
   const prevVotesMapRef = useRef<{ [id: string]: number }>({});
 
@@ -63,6 +64,13 @@ export default function ElectionTurnoutPage() {
     if (!token) {
       router.push('/admin/login');
       return;
+    }
+
+    const savedUser = localStorage.getItem('admin_user');
+    if (savedUser) {
+      try {
+        setAdminUser(JSON.parse(savedUser));
+      } catch (e) {}
     }
 
     fetchTurnout();
@@ -137,6 +145,7 @@ export default function ElectionTurnoutPage() {
   }
 
   const leader = candidates.length > 0 ? candidates[0] : null;
+  const isObserver = adminUser?.role === 'observer';
 
   return (
     <div className="space-y-6 max-w-[1280px] mx-auto pb-12">
@@ -176,29 +185,31 @@ export default function ElectionTurnoutPage() {
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2.5 w-full md:w-auto">
-          <Button
-            variant="secondary"
-            size="md"
-            onClick={handleSimulateVote}
-            className="gap-2 text-[13px] flex-1 md:flex-none justify-center"
-            title="Добавить тестовый голос для демонстрации динамической анимации"
-          >
-            <TrendingUp className="w-4 h-4 text-[var(--blue)]" />
-            <span>Тестовый голос</span>
-          </Button>
+        {!isObserver && (
+          <div className="flex flex-wrap items-center gap-2.5 w-full md:w-auto">
+            <Button
+              variant="secondary"
+              size="md"
+              onClick={handleSimulateVote}
+              className="gap-2 text-[13px] flex-1 md:flex-none justify-center"
+              title="Добавить тестовый голос для демонстрации динамической анимации"
+            >
+              <TrendingUp className="w-4 h-4 text-[var(--blue)]" />
+              <span>Тестовый голос</span>
+            </Button>
 
-          <Button
-            variant="primary"
-            size="md"
-            onClick={handleFinishElection}
-            isLoading={isFinishing}
-            className="gap-2 shrink-0 shadow-[var(--shadow-blue-btn)] flex-1 md:flex-none justify-center"
-          >
-            <CheckSquare className="w-4 h-4" />
-            <span>Завершить выборы</span>
-          </Button>
-        </div>
+            <Button
+              variant="primary"
+              size="md"
+              onClick={handleFinishElection}
+              isLoading={isFinishing}
+              className="gap-2 shrink-0 shadow-[var(--shadow-blue-btn)] flex-1 md:flex-none justify-center"
+            >
+              <CheckSquare className="w-4 h-4" />
+              <span>Завершить выборы</span>
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* Big Metric Summary Widgets */}

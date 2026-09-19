@@ -140,6 +140,29 @@ export const api = {
     }),
   adminMe: () => request<any>('/auth/admin/me/'),
 
+  // Admin Staff & Observers Management
+  getAdminUsers: (params: { university?: string; role?: string } = {}) => {
+    const q = new URLSearchParams();
+    if (params.university) q.set('university', params.university);
+    if (params.role) q.set('role', params.role);
+    const qs = q.toString();
+    return request<any[]>(`/auth/admin/users/${qs ? `?${qs}` : ''}`);
+  },
+  createAdminUser: (data: { email: string; password?: string; full_name: string; role: string; university_id?: string }) =>
+    request<any>('/auth/admin/users/', {
+      method: 'POST',
+      body: JSON.stringify(data)
+    }),
+  updateAdminUser: (id: string, data: any) =>
+    request<any>(`/auth/admin/users/${id}/`, {
+      method: 'PATCH',
+      body: JSON.stringify(data)
+    }),
+  deleteAdminUser: (id: string) =>
+    request<any>(`/auth/admin/users/${id}/`, {
+      method: 'DELETE'
+    }),
+
   // Admin Universities & Faculties
   getAdminUniversities: () => request<any>('/admin/universities/'),
   createAdminUniversity: (data: any) =>

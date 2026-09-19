@@ -41,6 +41,7 @@ export function AdminHeader({ onMenuToggle }: AdminHeaderProps) {
     if (pathname.startsWith('/admin/elections')) return { section: 'Управление', page: 'Выборы' };
     if (pathname.startsWith('/admin/candidates')) return { section: 'Управление', page: 'Кандидаты' };
     if (pathname.startsWith('/admin/students')) return { section: 'Управление', page: 'Реестр студентов' };
+    if (pathname.startsWith('/admin/users')) return { section: 'Система', page: 'Сотрудники вузов' };
     if (pathname.startsWith('/admin/universities')) return { section: 'Система', page: 'Университеты' };
     return { section: 'CRM Консоль', page: 'Обзор' };
   };

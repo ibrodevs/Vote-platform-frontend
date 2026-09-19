@@ -144,6 +144,7 @@ export default function AdminStudentsPage() {
 
   const studentsList = Array.isArray(students) ? students : [];
   const universitiesList = Array.isArray(universities) ? universities : [];
+  const isObserver = adminUser?.role === 'observer';
 
   const currentUni = universitiesList.find(u => u.id === selectedUniId);
   const isCurrentRegOpen = selectedUniId === 'all'
@@ -201,44 +202,48 @@ export default function AdminStudentsPage() {
                 {isCurrentRegOpen ? 'ОТКРЫТА' : 'ЗАКРЫТА'}
               </Badge>
             </div>
-            <button
-              onClick={() => setRegConfirmModalOpen(true)}
-              className={`h-[36px] px-3 rounded-[10px] text-[12.5px] font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
-                isCurrentRegOpen
-                  ? 'bg-[var(--red-bg)] text-[var(--red)] hover:bg-[var(--red)] hover:text-white border border-[var(--red)]/20'
-                  : 'bg-[var(--blue-soft)] text-[var(--blue)] hover:bg-[var(--blue)] hover:text-white border border-[var(--blue)]/20'
-              }`}
-              title={isCurrentRegOpen ? 'Закрыть регистрацию студентов' : 'Открыть регистрацию студентов'}
-            >
-              {isCurrentRegOpen ? (
-                <>
-                  <Lock className="w-3.5 h-3.5" />
-                  <span>Закрыть регистрацию</span>
-                </>
-              ) : (
-                <>
-                  <Unlock className="w-3.5 h-3.5" />
-                  <span>Открыть регистрацию</span>
-                </>
-              )}
-            </button>
+            {!isObserver && (
+              <button
+                onClick={() => setRegConfirmModalOpen(true)}
+                className={`h-[36px] px-3 rounded-[10px] text-[12.5px] font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                  isCurrentRegOpen
+                    ? 'bg-[var(--red-bg)] text-[var(--red)] hover:bg-[var(--red)] hover:text-white border border-[var(--red)]/20'
+                    : 'bg-[var(--blue-soft)] text-[var(--blue)] hover:bg-[var(--blue)] hover:text-white border border-[var(--blue)]/20'
+                }`}
+                title={isCurrentRegOpen ? 'Закрыть регистрацию студентов' : 'Открыть регистрацию студентов'}
+              >
+                {isCurrentRegOpen ? (
+                  <>
+                    <Lock className="w-3.5 h-3.5" />
+                    <span>Закрыть регистрацию</span>
+                  </>
+                ) : (
+                  <>
+                    <Unlock className="w-3.5 h-3.5" />
+                    <span>Открыть регистрацию</span>
+                  </>
+                )}
+              </button>
+            )}
           </div>
 
-          <Button
-            variant="primary"
-            size="md"
-            onClick={() => {
-              setSelectedFile(null);
-              setBatchStatus(null);
-              setActiveBatchId(null);
-              setUploadError('');
-              setIsUploadOpen(true);
-            }}
-            className="gap-2 shadow-[var(--shadow-blue-btn)]"
-          >
-            <Upload className="w-4 h-4" />
-            <span>Загрузить список (Excel/CSV)</span>
-          </Button>
+          {!isObserver && (
+            <Button
+              variant="primary"
+              size="md"
+              onClick={() => {
+                setSelectedFile(null);
+                setBatchStatus(null);
+                setActiveBatchId(null);
+                setUploadError('');
+                setIsUploadOpen(true);
+              }}
+              className="gap-2 shadow-[var(--shadow-blue-btn)]"
+            >
+              <Upload className="w-4 h-4" />
+              <span>Загрузить список (Excel/CSV)</span>
+            </Button>
+          )}
         </div>
       </div>
 

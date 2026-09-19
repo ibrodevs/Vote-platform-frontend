@@ -164,6 +164,7 @@ export default function AdminElectionsPage() {
 
   const electionsList = Array.isArray(elections) ? elections : [];
   const universitiesList = Array.isArray(universities) ? universities : [];
+  const isObserver = adminUser?.role === 'observer';
 
   return (
     <div className="space-y-6">
@@ -178,15 +179,17 @@ export default function AdminElectionsPage() {
           </p>
         </div>
 
-        <Button
-          variant="primary"
-          size="md"
-          onClick={openCreateModal}
-          className="gap-2 shadow-[var(--shadow-blue-btn)]"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Создать кампанию</span>
-        </Button>
+        {!isObserver && (
+          <Button
+            variant="primary"
+            size="md"
+            onClick={openCreateModal}
+            className="gap-2 shadow-[var(--shadow-blue-btn)]"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Создать кампанию</span>
+          </Button>
+        )}
       </div>
 
       {/* Elections Grid */}
@@ -201,11 +204,13 @@ export default function AdminElectionsPage() {
             Выборы пока не созданы
           </h3>
           <p className="text-[14px] text-[var(--muted)] mb-5">
-            Нажмите «Создать кампанию», чтобы начать подготовку к голосованию.
+            {isObserver ? 'В вашем университете пока нет созданных избирательных кампаний.' : 'Нажмите «Создать кампанию», чтобы начать подготовку к голосованию.'}
           </p>
-          <Button variant="primary" size="md" onClick={openCreateModal}>
-            Создать выборы
-          </Button>
+          {!isObserver && (
+            <Button variant="primary" size="md" onClick={openCreateModal}>
+              Создать выборы
+            </Button>
+          )}
         </div>
       ) : (
         <div className="space-y-4">
@@ -294,7 +299,7 @@ export default function AdminElectionsPage() {
                   )}
                 </button>
 
-                {(elec.status === 'draft' || elec.status === 'scheduled') && (
+                {!isObserver && (elec.status === 'draft' || elec.status === 'scheduled') && (
                   <Button
                     variant="primary"
                     size="sm"
@@ -315,15 +320,17 @@ export default function AdminElectionsPage() {
                       </Button>
                     </Link>
 
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      onClick={() => openActionModal(elec.id, elec.title, 'finish')}
-                      className="gap-1.5"
-                    >
-                      <CheckSquare className="w-3.5 h-3.5 text-[var(--blue)]" />
-                      <span>Завершить</span>
-                    </Button>
+                    {!isObserver && (
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => openActionModal(elec.id, elec.title, 'finish')}
+                        className="gap-1.5"
+                      >
+                        <CheckSquare className="w-3.5 h-3.5 text-[var(--blue)]" />
+                        <span>Завершить</span>
+                      </Button>
+                    )}
                   </>
                 )}
 
@@ -336,7 +343,7 @@ export default function AdminElectionsPage() {
                   </Link>
                 )}
 
-                {elec.status !== 'finished' && elec.status !== 'cancelled' && (
+                {!isObserver && elec.status !== 'finished' && elec.status !== 'cancelled' && (
                   <button
                     onClick={() => openActionModal(elec.id, elec.title, 'cancel')}
                     className="w-9 h-9 rounded-[10px] flex items-center justify-center text-[var(--muted)] hover:text-[var(--red)] hover:bg-[var(--red-bg)] transition-colors cursor-pointer border border-[var(--field-line)]"

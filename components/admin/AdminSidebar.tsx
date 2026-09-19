@@ -63,6 +63,7 @@ export function AdminSidebar({
   };
 
   const isSuperAdmin = adminUser?.role === 'super_admin';
+  const isObserver = adminUser?.role === 'observer';
 
   const navGroups = [
     {
@@ -93,12 +94,14 @@ export function AdminSidebar({
           icon: Vote,
           badge: null
         },
-        {
-          name: 'Кандидаты',
-          href: '/admin/candidates',
-          icon: Users,
-          badge: null
-        },
+        ...(!isObserver ? [
+          {
+            name: 'Кандидаты',
+            href: '/admin/candidates',
+            icon: Users,
+            badge: null
+          }
+        ] : []),
         {
           name: 'Реестр студентов',
           href: '/admin/students',
@@ -106,6 +109,12 @@ export function AdminSidebar({
           badge: null
         },
         ...(isSuperAdmin ? [
+          {
+            name: 'Сотрудники вузов',
+            href: '/admin/users',
+            icon: Users,
+            badge: 'ROOT'
+          },
           {
             name: 'Университеты',
             href: '/admin/universities',
@@ -181,25 +190,27 @@ export function AdminSidebar({
                 {adminUser?.university_details?.name || 'Все университеты'}
               </span>
             </div>
-            <Badge variant={isSuperAdmin ? 'blue' : 'gray'}>
-              {isSuperAdmin ? 'SUPER' : adminUser?.university_details?.code?.toUpperCase() || 'UNI'}
+            <Badge variant={isSuperAdmin ? 'blue' : isObserver ? 'amber' : 'gray'}>
+              {isSuperAdmin ? 'SUPER' : isObserver ? 'НАБЛЮДАТЕЛЬ' : adminUser?.university_details?.code?.toUpperCase() || 'UNI'}
             </Badge>
           </div>
         )}
 
         {/* Quick Action */}
-        <div className="p-4 border-b border-[var(--line)]">
-          <Link href="/admin/elections" className="w-full block">
-            <Button
-              variant="primary"
-              size="md"
-              className={`w-full gap-2 justify-center shadow-[var(--shadow-blue-btn)] ${isCollapsed ? 'px-0' : ''}`}
-            >
-              <Plus className="w-4 h-4 shrink-0" />
-              {!isCollapsed && <span>Создать кампанию</span>}
-            </Button>
-          </Link>
-        </div>
+        {!isObserver && (
+          <div className="p-4 border-b border-[var(--line)]">
+            <Link href="/admin/elections" className="w-full block">
+              <Button
+                variant="primary"
+                size="md"
+                className={`w-full gap-2 justify-center shadow-[var(--shadow-blue-btn)] ${isCollapsed ? 'px-0' : ''}`}
+              >
+                <Plus className="w-4 h-4 shrink-0" />
+                {!isCollapsed && <span>Создать кампанию</span>}
+              </Button>
+            </Link>
+          </div>
+        )}
 
         {/* Nav Links */}
         <div className="flex-1 overflow-y-auto px-3 py-4 space-y-6">
