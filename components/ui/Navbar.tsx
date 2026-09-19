@@ -16,14 +16,12 @@ export function Navbar() {
   const [lang, setLang] = useState<Language>('ru');
   const [isDark, setIsDark] = useState(false);
   const [isStudentLoggedIn, setIsStudentLoggedIn] = useState(false);
-  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
       setIsStudentLoggedIn(Boolean(sessionStorage.getItem('student_token')));
-      setIsAdminLoggedIn(Boolean(localStorage.getItem('admin_token')));
     }
 
     const savedLang = (localStorage.getItem('app_lang') as Language) || 'ru';
@@ -175,21 +173,12 @@ export function Navbar() {
               </button>
             </div>
           ) : (
-            <>
-              <Link href="/vote/auth">
-                <Button variant="secondary" size="sm" className="gap-1.5">
-                  <User className="w-3.5 h-3.5" />
-                  <span>{lang === 'ru' ? 'Голосование' : 'Добуш берүү'}</span>
-                </Button>
-              </Link>
-
-              {/* Admin Access (Hidden for students) */}
-              <Link href={isAdminLoggedIn ? "/admin/dashboard" : "/admin/login"}>
-                <Button variant="primary" size="sm" className="gap-2 shadow-[var(--shadow-blue-btn)]">
-                  <span>{lang === 'ru' ? 'Панель управления' : 'Башкаруу панели'}</span>
-                </Button>
-              </Link>
-            </>
+            <Link href="/vote/auth">
+              <Button variant="primary" size="sm" className="gap-1.5 shadow-[var(--shadow-blue-btn)]">
+                <User className="w-3.5 h-3.5" />
+                <span>{lang === 'ru' ? 'Голосование' : 'Добуш берүү'}</span>
+              </Button>
+            </Link>
           )}
         </div>
 
@@ -340,17 +329,6 @@ export function Navbar() {
                   <span>{lang === 'ru' ? 'Войти в голосование / Регистрация' : 'Добуш берүүгө кирүү / Катталуу'}</span>
                 </div>
                 <ArrowRight className="w-4 h-4" />
-              </Link>
-
-              <Link
-                href={isAdminLoggedIn ? "/admin/dashboard" : "/admin/login"}
-                className="flex items-center justify-between w-full h-[46px] px-4 rounded-[12px] bg-[var(--surface-2)] border border-[var(--line)] text-[var(--ink)] font-bold text-[14px] hover:bg-[var(--hover)] transition-colors"
-              >
-                <div className="flex items-center gap-2.5">
-                  <Shield className="w-4 h-4 text-[var(--muted)]" />
-                  <span>{lang === 'ru' ? 'Панель управления (Admin)' : 'Башкаруу панели (Admin)'}</span>
-                </div>
-                <ArrowRight className="w-4 h-4 text-[var(--muted)]" />
               </Link>
             </div>
           )}

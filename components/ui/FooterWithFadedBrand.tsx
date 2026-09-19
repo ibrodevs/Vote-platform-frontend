@@ -131,11 +131,11 @@ export default function FooterWithFadedBrand({
       ],
     },
     {
-      heading: lang === 'ru' ? 'Управление' : 'Башкаруу',
+      heading: lang === 'ru' ? 'Документы' : 'Документтер',
       links: [
-        { text: lang === 'ru' ? 'Панель администратора' : 'Администратор панели', url: '/admin/dashboard' },
-        { text: lang === 'ru' ? 'Мониторинг явки' : 'Катышуу мониторинги', url: '/admin/elections' },
-        { text: lang === 'ru' ? 'Вход для комиссии' : 'Комиссия үчүн кирүү', url: '/admin/login' },
+        { text: lang === 'ru' ? 'Регламент голосования' : 'Добуш берүү регламенти', url: '/regulations' },
+        { text: lang === 'ru' ? 'Политика конфиденциальности' : 'Купуялык саясаты', url: '/privacy' },
+        { text: lang === 'ru' ? 'Тайна волеизъявления' : 'Добуш берүүнүн купуялуулугу', url: '/secrecy' },
       ],
     },
   ];
