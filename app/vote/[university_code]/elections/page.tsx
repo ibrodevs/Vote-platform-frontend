@@ -72,7 +72,7 @@ export default function StudentElectionsListPage() {
                 </Badge>
               </div>
               <p className="text-[13px] text-[var(--muted)] mt-0.5">
-                ID: {studentData?.student_id} • {studentData?.faculty} • {studentData?.course} курс
+                ID: {studentData?.student_id} • {studentData?.course} курс
               </p>
             </div>
           </div>

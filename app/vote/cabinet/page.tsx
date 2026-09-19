@@ -44,6 +44,14 @@ export default function StudentCabinetPage() {
       } catch (e) {}
     }
 
+    const cachedElections = sessionStorage.getItem('cached_student_elections');
+    if (cachedElections) {
+      try {
+        setElections(JSON.parse(cachedElections));
+        setIsLoading(false);
+      } catch (e) {}
+    }
+
     // Refresh profile and load elections
     Promise.all([
       api.getStudentProfile().catch(() => null),
@@ -58,7 +66,11 @@ export default function StudentCabinetPage() {
             sessionStorage.setItem('student_university', JSON.stringify(profileRes.university));
           }
         }
-        setElections(Array.isArray(electionsRes) ? electionsRes : []);
+        const resolvedList = Array.isArray(electionsRes) ? electionsRes : [];
+        setElections(resolvedList);
+        try {
+          sessionStorage.setItem('cached_student_elections', JSON.stringify(resolvedList));
+        } catch (e) {}
       })
       .catch(err => {
         console.error('Failed to load cabinet data', err);
@@ -171,12 +183,6 @@ export default function StudentCabinetPage() {
 
                 {/* Info Chips */}
                 <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-[12px] sm:text-[13px]">
-                  {student?.faculty && (
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[8px] bg-[var(--surface-2)] border border-[var(--line)] text-[var(--muted)]">
-                      <School className="w-3.5 h-3.5 text-[var(--blue)] shrink-0" />
-                      <span className="font-semibold text-[var(--ink)]">{student.faculty}</span>
-                    </span>
-                  )}
                   {student?.email && (
                     <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[8px] bg-[var(--surface-2)] border border-[var(--line)] text-[var(--muted)]">
                       <Mail className="w-3.5 h-3.5 text-[var(--blue)] shrink-0" />

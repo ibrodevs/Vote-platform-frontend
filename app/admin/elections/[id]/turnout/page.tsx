@@ -184,7 +184,7 @@ export default function ElectionTurnoutPage() {
             className="gap-2 text-[13px] flex-1 md:flex-none justify-center"
             title="Добавить тестовый голос для демонстрации динамической анимации"
           >
-            <Flame className="w-4 h-4 text-amber-500" />
+            <TrendingUp className="w-4 h-4 text-[var(--blue)]" />
             <span>Тестовый голос</span>
           </Button>
 
@@ -257,12 +257,12 @@ export default function ElectionTurnoutPage() {
           </div>
         </div>
 
-        {/* Current Leader Card */}
-        <div className="crm-card p-6 sm:p-7 flex flex-col justify-between border-[var(--blue)]/30 bg-gradient-to-br from-[var(--surface)] to-[var(--blue-soft)]/40">
+        {/* Leading Candidate Card */}
+        <div className="crm-card p-6 sm:p-7 flex flex-col justify-between border-[var(--blue)]/30 bg-[var(--surface)]">
           <div>
             <div className="flex items-center justify-between text-[12px] text-[var(--blue)] font-bold uppercase tracking-wider mb-2">
-              <span>ЛИДЕР ГОНКИ</span>
-              <Trophy className="w-4 h-4 text-amber-500" />
+              <span>ТЕКУЩЕЕ 1-Е МЕСТО</span>
+              <Award className="w-4 h-4 text-[var(--blue)]" />
             </div>
             <div className="text-[17px] font-bold text-[var(--ink)] truncate mb-1">
               {leader ? leader.full_name : 'Ожидание голосов'}
@@ -271,9 +271,9 @@ export default function ElectionTurnoutPage() {
               {leader ? `${leader.votes} голосов (${leader.percent}%)` : '—'}
             </p>
           </div>
-          <div className="pt-3 border-t border-[var(--line)] text-[12px] text-amber-600 font-bold flex items-center gap-1">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>1-е место в рейтинге</span>
+          <div className="pt-3 border-t border-[var(--line)] text-[12px] text-[var(--blue)] font-bold flex items-center gap-1.5">
+            <CheckSquare className="w-3.5 h-3.5" />
+            <span>Наибольшее число голосов</span>
           </div>
         </div>
       </div>
@@ -326,22 +326,22 @@ export default function ElectionTurnoutPage() {
                   {/* Top Race Info Row */}
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-3">
                     <div className="flex items-center gap-3.5 min-w-0">
-                      {/* Rank Medal / Badge */}
-                      <div className="w-10 h-10 rounded-[12px] shrink-0 flex items-center justify-center font-bold text-[15px] border shadow-xs transition-colors duration-500">
+                      {/* Rank Badge */}
+                      <div className="w-10 h-10 rounded-[12px] shrink-0 flex items-center justify-center font-bold text-[14px] font-mono shadow-xs">
                         {isFirst ? (
-                          <div className="w-full h-full rounded-[12px] bg-amber-500 text-white flex items-center justify-center text-[16px]">
-                            🥇
+                          <div className="w-full h-full rounded-[12px] bg-[var(--blue)] text-white flex items-center justify-center font-bold">
+                            #1
                           </div>
                         ) : isSecond ? (
-                          <div className="w-full h-full rounded-[12px] bg-slate-300 text-slate-800 flex items-center justify-center text-[16px]">
-                            🥈
+                          <div className="w-full h-full rounded-[12px] bg-[var(--surface-2)] text-[var(--ink)] border border-[var(--line)] flex items-center justify-center font-bold">
+                            #2
                           </div>
                         ) : isThird ? (
-                          <div className="w-full h-full rounded-[12px] bg-amber-700 text-white flex items-center justify-center text-[16px]">
-                            🥉
+                          <div className="w-full h-full rounded-[12px] bg-[var(--surface-2)] text-[var(--ink)] border border-[var(--line)] flex items-center justify-center font-bold">
+                            #3
                           </div>
                         ) : (
-                          <div className="w-full h-full rounded-[12px] bg-[var(--surface-2)] text-[var(--muted)] border border-[var(--line)] flex items-center justify-center font-mono text-[14px]">
+                          <div className="w-full h-full rounded-[12px] bg-[var(--surface-2)] text-[var(--muted)] border border-[var(--line)] flex items-center justify-center font-medium">
                             #{index + 1}
                           </div>
                         )}
@@ -369,25 +369,15 @@ export default function ElectionTurnoutPage() {
 
                       {/* Candidate Details */}
                       <div className="min-w-0">
-                        <div className="flex items-center gap-2">
-                          <h3 className="text-[16px] sm:text-[17px] font-bold text-[var(--ink)] truncate">
-                            {cand.full_name}
-                          </h3>
-                          {isFirst && (
-                            <span className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 text-[11px] font-bold uppercase tracking-wider">
-                              <Sparkles className="w-3 h-3" />
-                              Лидер
-                            </span>
-                          )}
-                        </div>
+                        <h3 className="text-[16px] sm:text-[17px] font-bold text-[var(--ink)] truncate">
+                          {cand.full_name}
+                        </h3>
 
-                        <div className="flex flex-wrap items-center gap-x-2.5 text-[12.5px] text-[var(--muted)]">
-                          {cand.faculty && <span className="truncate">{cand.faculty}</span>}
-                          {cand.course && <span>• {cand.course} курс</span>}
-                          {cand.position && (
-                            <span className="text-[var(--blue)] font-medium truncate">• {cand.position}</span>
-                          )}
-                        </div>
+                        {cand.position && (
+                          <div className="text-[12.5px] text-[var(--blue)] font-medium truncate">
+                            {cand.position}
+                          </div>
+                        )}
                       </div>
                     </div>
 
@@ -407,7 +397,7 @@ export default function ElectionTurnoutPage() {
                       <div className="min-w-[64px] text-right">
                         <span className={`inline-block text-[13px] font-bold px-2.5 py-1 rounded-[8px] transition-all ${
                           isFirst
-                            ? 'bg-amber-500 text-white shadow-xs'
+                            ? 'bg-[var(--blue)] text-white shadow-xs'
                             : 'bg-[var(--surface-2)] text-[var(--ink)] border border-[var(--line)]'
                         }`}>
                           {cand.percent}%
@@ -419,11 +409,7 @@ export default function ElectionTurnoutPage() {
                   {/* Animated Progress Track */}
                   <div className="w-full bg-[var(--surface-2)] rounded-full h-3 overflow-hidden border border-[var(--line)]">
                     <div
-                      className={`h-full rounded-full transition-all duration-700 ease-out ${
-                        isFirst
-                          ? 'bg-gradient-to-r from-[var(--blue)] to-amber-500'
-                          : 'bg-[var(--blue)]'
-                      }`}
+                      className="h-full rounded-full transition-all duration-700 ease-out bg-[var(--blue)]"
                       style={{ width: `${Math.min(cand.percent || 0, 100)}%` }}
                     />
                   </div>

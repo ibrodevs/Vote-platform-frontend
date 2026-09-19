@@ -52,7 +52,40 @@ export default function DirectElectionBallotPage() {
       } catch (e) {}
     }
 
-    // 1. Fetch Election details & Candidates
+    let hasCached = false;
+    const cachedElectionStr = sessionStorage.getItem(`cached_election_${electionId}`);
+    if (cachedElectionStr) {
+      try {
+        const cached = JSON.parse(cachedElectionStr);
+        setElection(cached);
+        if (cached.candidates?.length) {
+          setCandidates(cached.candidates);
+        }
+        if (cached.has_voted) {
+          setHasVoted(true);
+        }
+        hasCached = true;
+      } catch (e) {}
+    }
+
+    const cachedCandidatesStr = sessionStorage.getItem(`cached_candidates_${electionId}`);
+    if (cachedCandidatesStr) {
+      try {
+        const cands = JSON.parse(cachedCandidatesStr);
+        if (cands?.length) {
+          setCandidates(cands);
+          hasCached = true;
+        }
+      } catch (e) {}
+    }
+
+    if (hasCached) {
+      setIsLoading(false);
+    } else {
+      setIsLoading(true);
+    }
+
+    // 1. Fetch Election details & Candidates in background
     Promise.all([
       api.getElectionDetail(electionId),
       api.getElectionCandidates(electionId).catch(() => []),
@@ -60,7 +93,16 @@ export default function DirectElectionBallotPage() {
     ])
       .then(([electionData, candidatesData, statusRes]) => {
         setElection(electionData);
-        setCandidates(candidatesData || electionData.candidates || []);
+        const resolvedCandidates = (candidatesData && candidatesData.length > 0)
+          ? candidatesData
+          : (electionData.candidates || []);
+        setCandidates(resolvedCandidates);
+
+        try {
+          sessionStorage.setItem(`cached_election_${electionId}`, JSON.stringify(electionData));
+          sessionStorage.setItem(`cached_candidates_${electionId}`, JSON.stringify(resolvedCandidates));
+        } catch (e) {}
+
         if (statusRes?.has_voted || electionData?.has_voted) {
           setHasVoted(true);
           setVotedAt((statusRes as any)?.voted_at || null);
@@ -68,7 +110,9 @@ export default function DirectElectionBallotPage() {
       })
       .catch(err => {
         console.error('Failed to load election data', err);
-        setErrorMsg('Не удалось загрузить данные выборов');
+        if (!hasCached) {
+          setErrorMsg('Не удалось загрузить данные выборов');
+        }
       })
       .finally(() => setIsLoading(false));
   }, [electionId, router]);
@@ -90,6 +134,16 @@ export default function DirectElectionBallotPage() {
       setIsConfirmOpen(false);
       setIsSuccess(true);
       setHasVoted(true);
+
+      // Update cached election status
+      try {
+        const cachedElectionStr = sessionStorage.getItem(`cached_election_${electionId}`);
+        if (cachedElectionStr) {
+          const cachedElection = JSON.parse(cachedElectionStr);
+          cachedElection.has_voted = true;
+          sessionStorage.setItem(`cached_election_${electionId}`, JSON.stringify(cachedElection));
+        }
+      } catch (e) {}
 
       // Trigger Confetti
       try {
@@ -375,13 +429,11 @@ export default function DirectElectionBallotPage() {
                       </h3>
                     </div>
 
-                    <div className="flex flex-wrap items-center gap-x-2.5 text-[12.5px] sm:text-[13px] text-[var(--muted)]">
-                      {cand.faculty && <span className="truncate">{cand.faculty}</span>}
-                      {cand.course && <span>• {cand.course} курс</span>}
-                      {cand.position && (
-                        <span className="text-[var(--blue)] font-medium">• {cand.position}</span>
-                      )}
-                    </div>
+                    {cand.position && (
+                      <div className="text-[12.5px] sm:text-[13px] text-[var(--blue)] font-medium">
+                        {cand.position}
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -462,9 +514,11 @@ export default function DirectElectionBallotPage() {
               <h4 className="font-bold text-[16px] text-[var(--ink)]">
                 {programModalCandidate?.full_name}
               </h4>
-              <p className="text-[13px] text-[var(--muted)]">
-                {programModalCandidate?.faculty} • {programModalCandidate?.course} курс
-              </p>
+              {programModalCandidate?.position && (
+                <p className="text-[13px] text-[var(--blue)] font-medium">
+                  {programModalCandidate.position}
+                </p>
+              )}
             </div>
           </div>
 

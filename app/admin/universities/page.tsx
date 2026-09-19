@@ -23,8 +23,6 @@ export default function AdminUniversitiesPage() {
   const [code, setCode] = useState('');
   const [isActive, setIsActive] = useState(true);
   const [isRegistrationOpen, setIsRegistrationOpen] = useState(true);
-  const [faculties, setFaculties] = useState<string[]>([]);
-  const [newFacultyInput, setNewFacultyInput] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
@@ -76,8 +74,6 @@ export default function AdminUniversitiesPage() {
     setCode('');
     setIsActive(true);
     setIsRegistrationOpen(true);
-    setFaculties([]);
-    setNewFacultyInput('');
     setErrorMsg('');
     setIsModalOpen(true);
   };
@@ -89,25 +85,8 @@ export default function AdminUniversitiesPage() {
     setCode(uni.code);
     setIsActive(uni.is_active);
     setIsRegistrationOpen(uni.is_registration_open !== false);
-    const existingFacs = Array.isArray(uni.faculties)
-      ? uni.faculties.map((f: any) => (typeof f === 'string' ? f : f.name))
-      : [];
-    setFaculties(existingFacs);
-    setNewFacultyInput('');
     setErrorMsg('');
     setIsModalOpen(true);
-  };
-
-  const handleAddFaculty = () => {
-    const val = newFacultyInput.trim();
-    if (val && !faculties.includes(val)) {
-      setFaculties([...faculties, val]);
-      setNewFacultyInput('');
-    }
-  };
-
-  const handleRemoveFaculty = (facNameToRemove: string) => {
-    setFaculties(faculties.filter(f => f !== facNameToRemove));
   };
 
   const handleSave = async (e: React.FormEvent) => {
@@ -121,8 +100,7 @@ export default function AdminUniversitiesPage() {
         name_ky: nameKy,
         code,
         is_active: isActive,
-        is_registration_open: isRegistrationOpen,
-        faculties_input: faculties
+        is_registration_open: isRegistrationOpen
       };
 
       if (editingUni) {
@@ -340,64 +318,6 @@ export default function AdminUniversitiesPage() {
             />
           </div>
 
-          {/* Faculties Management */}
-          <div className="pt-2 border-t border-[var(--line)]">
-            <label className="block text-[13px] font-semibold text-[var(--ink)] mb-2">
-              Факультеты университета
-            </label>
-            <p className="text-[12px] text-[var(--muted)] mb-3">
-              Студенты смогут выбрать свой факультет из этого списка при регистрации.
-            </p>
-
-            <div className="flex gap-2 mb-3">
-              <input
-                type="text"
-                value={newFacultyInput}
-                onChange={e => setNewFacultyInput(e.target.value)}
-                onKeyDown={e => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                    handleAddFaculty();
-                  }
-                }}
-                placeholder="Название факультета (нажмите Enter или Добавить)"
-                className="crm-input flex-1"
-              />
-              <Button
-                type="button"
-                variant="secondary"
-                size="md"
-                onClick={handleAddFaculty}
-              >
-                <Plus className="w-4 h-4" />
-                <span>Добавить</span>
-              </Button>
-            </div>
-
-            {faculties.length > 0 ? (
-              <div className="flex flex-wrap gap-2 max-h-36 overflow-y-auto p-2.5 bg-[var(--surface-2)] rounded-[12px] border border-[var(--line)]">
-                {faculties.map((fac, idx) => (
-                  <span
-                    key={idx}
-                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-[8px] bg-[var(--surface)] border border-[var(--line)] text-[13px] text-[var(--ink)] font-medium shadow-xs"
-                  >
-                    <span>{fac}</span>
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveFaculty(fac)}
-                      className="text-[var(--muted)] hover:text-[var(--red)] cursor-pointer"
-                    >
-                      <X className="w-3.5 h-3.5" />
-                    </button>
-                  </span>
-                ))}
-              </div>
-            ) : (
-              <div className="text-[12.5px] text-[var(--muted)] italic p-2 bg-[var(--surface-2)] rounded-[8px] border border-[var(--line)] text-center">
-                Факультеты еще не добавлены. Введите название выше.
-              </div>
-            )}
-          </div>
 
           <div className="flex flex-col gap-2.5 pt-2">
             <div className="flex items-center gap-2.5">

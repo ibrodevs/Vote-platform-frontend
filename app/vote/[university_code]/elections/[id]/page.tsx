@@ -267,9 +267,6 @@ export default function ElectionBallotPage() {
                     <p className="text-[13.5px] text-[var(--blue)] font-bold mb-1">
                       {cand.position}
                     </p>
-                    <p className="text-[13px] text-[var(--muted)]">
-                      {cand.faculty} • {cand.course} курс
-                    </p>
 
                     {cand.short_bio && (
                       <p className="text-[13px] text-[var(--muted)] mt-2.5 line-clamp-3 leading-relaxed">
@@ -350,7 +347,7 @@ export default function ElectionBallotPage() {
                   {programModalCandidate.full_name}
                 </h4>
                 <p className="text-[13.5px] text-[var(--blue)] font-bold">
-                  {programModalCandidate.position} • {programModalCandidate.faculty}
+                  {programModalCandidate.position || 'Кандидат'}
                 </p>
               </div>
             </div>

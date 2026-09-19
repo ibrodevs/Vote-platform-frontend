@@ -353,37 +353,6 @@ function StudentAuthContent() {
                 </div>
               </div>
 
-              <div>
-                <label className="block text-[13px] font-semibold text-[var(--ink)] mb-1.5">
-                  Факультет {facultiesList.length > 0 ? '*' : ''}
-                </label>
-                <div className="relative">
-                  <GraduationCap className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--muted)]" />
-                  {facultiesList.length > 0 ? (
-                    <select
-                      value={faculty}
-                      onChange={e => setFaculty(e.target.value)}
-                      className="crm-input pl-10 font-medium"
-                      required
-                    >
-                      <option value="">Выберите факультет...</option>
-                      {facultiesList.map((fac: any) => (
-                        <option key={fac.id || fac.name} value={fac.name}>
-                          {fac.name}
-                        </option>
-                      ))}
-                    </select>
-                  ) : (
-                    <input
-                      type="text"
-                      value={faculty}
-                      onChange={e => setFaculty(e.target.value)}
-                      placeholder="Например, Информационные технологии"
-                      className="crm-input pl-10"
-                    />
-                  )}
-                </div>
-              </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>

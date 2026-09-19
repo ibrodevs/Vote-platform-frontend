@@ -160,7 +160,7 @@ export default function ElectionResultsPage() {
                   {winner.full_name}
                 </h3>
                 <p className="text-[14px] text-[var(--muted)] mt-0.5">
-                  {winner.position} • {winner.faculty}
+                  {winner.position || 'Кандидат'}
                 </p>
               </div>
             </div>
@@ -250,7 +250,7 @@ export default function ElectionResultsPage() {
                       {c.full_name}
                     </h5>
                     <p className="text-[13px] text-[var(--muted)]">
-                      {c.faculty} • {c.position}
+                      {c.position || 'Кандидат'}
                     </p>
 
                     {/* Percentage Progress Bar */}

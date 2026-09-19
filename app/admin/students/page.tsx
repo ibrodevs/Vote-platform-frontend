@@ -21,7 +21,6 @@ export default function AdminStudentsPage() {
   const [totalStudents, setTotalStudents] = useState<number>(0);
   const [page, setPage] = useState<number>(1);
   const [search, setSearch] = useState<string>('');
-  const [faculty, setFaculty] = useState<string>('');
   const [course, setCourse] = useState<string>('');
   const [votedFilter, setVotedFilter] = useState<'all' | 'voted' | 'not_voted'>('all');
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -75,7 +74,6 @@ export default function AdminStudentsPage() {
     api.getAdminStudents(selectedUniId === 'all' ? undefined : selectedUniId, {
       page,
       search,
-      faculty: faculty || undefined,
       course: course ? Number(course) : undefined,
       onlyRegistered: true,
       voted: votedFilter === 'all' ? undefined : (votedFilter === 'voted' ? 'true' : 'false')
@@ -94,7 +92,7 @@ export default function AdminStudentsPage() {
 
   useEffect(() => {
     loadStudents();
-  }, [selectedUniId, page, search, faculty, course, votedFilter]);
+  }, [selectedUniId, page, search, course, votedFilter]);
 
   // Polling for Upload Batch Status
   useEffect(() => {
@@ -305,22 +303,6 @@ export default function AdminStudentsPage() {
             </div>
           </div>
 
-          {/* Faculty */}
-          <div>
-            <label className="block text-[13px] font-semibold text-[var(--ink)] mb-2">
-              Факультет
-            </label>
-            <input
-              type="text"
-              value={faculty}
-              onChange={e => {
-                setFaculty(e.target.value);
-                setPage(1);
-              }}
-              placeholder="Все факультеты"
-              className="crm-input"
-            />
-          </div>
 
           {/* Course */}
           <div>
@@ -387,7 +369,6 @@ export default function AdminStudentsPage() {
                 <th>ID Студента</th>
                 <th>ФИО</th>
                 <th>Почта</th>
-                <th>Факультет</th>
                 <th>Курс</th>
                 <th className="text-center">Голосование</th>
               </tr>
@@ -395,13 +376,13 @@ export default function AdminStudentsPage() {
             <tbody>
               {isLoading ? (
                 <tr>
-                  <td colSpan={6} className="py-12 text-center text-[var(--muted)]">
+                  <td colSpan={5} className="py-12 text-center text-[var(--muted)]">
                     Загрузка записей...
                   </td>
                 </tr>
               ) : studentsList.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="py-12 text-center text-[var(--muted)]">
+                  <td colSpan={5} className="py-12 text-center text-[var(--muted)]">
                     Студенты не найдены.
                   </td>
                 </tr>
@@ -411,7 +392,6 @@ export default function AdminStudentsPage() {
                     <td className="font-mono font-bold text-[var(--ink)]">{s.student_id}</td>
                     <td className="font-medium text-[var(--ink)]">{s.full_name}</td>
                     <td className="text-[var(--body)] font-medium">{s.email || '—'}</td>
-                    <td className="text-[var(--muted)]">{s.faculty || '—'}</td>
                     <td className="font-medium text-[var(--ink)]">{s.course} курс</td>
                     <td className="text-center">
                       <Badge variant={s.has_voted ? 'green' : 'amber'} dot={s.has_voted}>
