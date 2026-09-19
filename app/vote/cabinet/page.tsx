@@ -122,10 +122,12 @@ export default function StudentCabinetPage() {
       <header className="gtop w-full border-b border-[var(--line)] bg-[var(--surface)] sticky top-0 z-30">
         <div className="max-w-[1200px] mx-auto px-3.5 sm:px-6 md:px-8 h-[56px] sm:h-[62px] flex items-center justify-between gap-3">
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-            <Link href="/" className="flex items-center gap-2">
-              <div className="w-[28px] h-[28px] sm:w-[32px] sm:h-[32px] rounded-[9px] bg-[var(--blue)] flex items-center justify-center text-white shadow-[var(--shadow-blue-btn)]">
-                <Vote className="w-4 h-4" />
-              </div>
+            <Link href="/" className="flex items-center gap-2.5">
+              <img
+                src="/logo.png"
+                alt="Dobush.kg Logo"
+                className="w-[28px] h-[28px] sm:w-[32px] sm:h-[32px] object-contain rounded-[8px]"
+              />
               <span className="text-[17px] sm:text-[19px] font-[800] tracking-[-0.02em] text-[var(--ink)]">
                 Dobush<span className="text-[var(--blue)]">.kg</span>
               </span>

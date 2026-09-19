@@ -234,8 +234,12 @@ function StudentAuthContent() {
         <div className="crm-card p-7 sm:p-9 shadow-[var(--shadow-modal)]">
           {/* Header */}
           <div className="text-center mb-6">
-            <div className="w-12 h-12 rounded-[14px] bg-[var(--blue-soft)] text-[var(--blue)] flex items-center justify-center mx-auto mb-3">
-              <GraduationCap className="w-6 h-6" />
+            <div className="w-[52px] h-[52px] mx-auto mb-3 flex items-center justify-center">
+              <img
+                src="/logo.png"
+                alt="Dobush.kg Logo"
+                className="w-[52px] h-[52px] object-contain rounded-[12px]"
+              />
             </div>
             <h1 className="text-[24px] font-[800] text-[var(--ink)] tracking-tight mb-1">
               Личный кабинет студента

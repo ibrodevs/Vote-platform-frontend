@@ -5,6 +5,11 @@ import { AppShell } from "@/components/ui/AppShell";
 export const metadata: Metadata = {
   title: "Dobush.kg — Платформа студенческих выборов",
   description: "Корпоративная система электронного студенческого голосования с физическим разделением реестра явки и урны бюллетеней.",
+  icons: {
+    icon: "/logo.png",
+    shortcut: "/logo.png",
+    apple: "/logo.png",
+  },
 };
 
 export default function RootLayout({

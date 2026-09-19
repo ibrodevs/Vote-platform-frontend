@@ -89,10 +89,12 @@ export default function AdminLoginPage() {
 
         {/* Brand Header */}
         <div className="text-center mb-8">
-          <div className="w-[44px] h-[44px] rounded-[12px] bg-[var(--blue)] text-white flex items-center justify-center mx-auto mb-4 shadow-[var(--shadow-blue-btn)]">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-            </svg>
+          <div className="w-[52px] h-[52px] mx-auto mb-4 flex items-center justify-center">
+            <img
+              src="/logo.png"
+              alt="Dobush.kg Logo"
+              className="w-[52px] h-[52px] object-contain rounded-[12px]"
+            />
           </div>
           <h1 className="text-[28px] font-[800] text-[var(--ink)] tracking-tight mb-2">
             Dobush<span className="text-[var(--blue)]">.kg</span>

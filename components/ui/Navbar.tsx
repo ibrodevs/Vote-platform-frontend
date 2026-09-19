@@ -90,11 +90,11 @@ export function Navbar() {
       <div className="max-w-[1280px] mx-auto px-3.5 sm:px-6 md:px-8 h-[56px] sm:h-[62px] flex items-center justify-between gap-2">
         {/* Brand mark & Logo */}
         <Link href="/" className="flex items-center gap-2.5 shrink-0 group">
-          <div className="w-[28px] h-[28px] sm:w-[32px] sm:h-[32px] rounded-[9px] bg-[var(--blue)] flex items-center justify-center text-white shadow-[var(--shadow-blue-btn)] transition-transform group-hover:scale-105">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-            </svg>
-          </div>
+          <img
+            src="/logo.png"
+            alt="Dobush.kg Logo"
+            className="w-[28px] h-[28px] sm:w-[32px] sm:h-[32px] object-contain rounded-[8px] transition-transform group-hover:scale-105"
+          />
           <span className="text-[18px] sm:text-[20px] font-[800] tracking-[-0.025em] text-[var(--ink)]">
             Dobush<span className="text-[var(--blue)]">.kg</span>
           </span>

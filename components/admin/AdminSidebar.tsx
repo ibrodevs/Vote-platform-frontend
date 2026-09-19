@@ -171,11 +171,11 @@ export function AdminSidebar({
         {/* Brand Header */}
         <div className="p-5 border-b border-[var(--line)] flex items-center justify-between min-h-[73px]">
           <Link href="/admin/dashboard" className="flex items-center gap-3 overflow-hidden">
-            <div className="w-[28px] h-[28px] rounded-[8px] bg-[var(--blue)] flex items-center justify-center text-white shrink-0 shadow-[var(--shadow-blue-btn)]">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-              </svg>
-            </div>
+            <img
+              src="/logo.png"
+              alt="Dobush.kg Logo"
+              className="w-[30px] h-[30px] object-contain rounded-[8px] shrink-0"
+            />
             {!isCollapsed && (
               <div className="leading-tight truncate">
                 <div className="text-[19px] font-[800] tracking-[-0.02em] text-[var(--ink)]">

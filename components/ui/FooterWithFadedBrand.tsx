@@ -168,13 +168,25 @@ export default function FooterWithFadedBrand({
         viewport={{ once: true }}
         className="relative z-10 max-w-[1280px] mx-auto px-6 pt-16 pb-8 md:px-12 md:pt-18"
       >
-        {/* Tagline */}
+        {/* Brand & Tagline */}
         <motion.div
           variants={itemVariants}
-          className="flex items-center gap-2 mb-10 text-xs font-semibold tracking-[0.2em] uppercase text-[var(--muted)]"
+          className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-10 pb-6 border-b border-[var(--line)]/60"
         >
-          <span className="h-2 w-2 rounded-full bg-[var(--blue)] shrink-0" />
-          <span>{defaultTagline}</span>
+          <Link href="/" className="flex items-center gap-2.5">
+            <img
+              src="/logo.png"
+              alt="Dobush.kg Logo"
+              className="w-[28px] h-[28px] object-contain rounded-[7px]"
+            />
+            <span className="text-[18px] font-[800] tracking-[-0.025em] text-[var(--ink)]">
+              Dobush<span className="text-[var(--blue)]">.kg</span>
+            </span>
+          </Link>
+          <div className="flex items-center gap-2 text-xs font-semibold tracking-[0.2em] uppercase text-[var(--muted)]">
+            <span className="h-2 w-2 rounded-full bg-[var(--blue)] shrink-0" />
+            <span>{defaultTagline}</span>
+          </div>
         </motion.div>
 
         {/* Links Grid & Socials */}
