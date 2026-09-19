@@ -38,8 +38,12 @@ export default function AdminCandidatesPage() {
   const [modalUniId, setModalUniId] = useState('');
   const [modalElectionId, setModalElectionId] = useState('');
   const [fullName, setFullName] = useState('');
+  const [position, setPosition] = useState('Кандидат');
+  const [positionKy, setPositionKy] = useState('Талапкер');
   const [shortBio, setShortBio] = useState('');
+  const [shortBioKy, setShortBioKy] = useState('');
   const [program, setProgram] = useState('');
+  const [programKy, setProgramKy] = useState('');
 
   // Photo upload & preview
   const [photoFile, setPhotoFile] = useState<File | null>(null);
@@ -192,8 +196,12 @@ export default function AdminCandidatesPage() {
     setModalElectionId(filtered[0]?.id || selectedElectionId || '');
 
     setFullName('');
+    setPosition('Кандидат');
+    setPositionKy('Талапкер');
     setShortBio('');
+    setShortBioKy('');
     setProgram('');
+    setProgramKy('');
     setPhotoFile(null);
     setPhotoPreview('');
     setPhotoUrlInput('');
@@ -210,8 +218,12 @@ export default function AdminCandidatesPage() {
     setModalElectionId(cand.election || selectedElectionId || '');
 
     setFullName(cand.full_name || '');
+    setPosition(cand.position || 'Кандидат');
+    setPositionKy(cand.position_ky || 'Талапкер');
     setShortBio(cand.short_bio || '');
+    setShortBioKy(cand.short_bio_ky || '');
     setProgram(cand.program || '');
+    setProgramKy(cand.program_ky || '');
     setPhotoFile(null);
     setPhotoPreview(getMediaUrl(cand.photo || cand.photo_url) || '');
     setPhotoUrlInput(cand.photo_url || '');
@@ -260,12 +272,12 @@ export default function AdminCandidatesPage() {
       setErrorMsg('Укажите ФИО кандидата');
       return;
     }
-    if (shortBio.trim().length > 100) {
-      setErrorMsg('Краткая биография не должна превышать 100 символов');
+    if (shortBio.trim().length > 100 || shortBioKy.trim().length > 100) {
+      setErrorMsg('Краткая биография на RU и KY не должна превышать 100 символов');
       return;
     }
-    if (program.trim().length > 100) {
-      setErrorMsg('Предвыборная программа не должна превышать 100 символов');
+    if (program.trim().length > 100 || programKy.trim().length > 100) {
+      setErrorMsg('Предвыборная программа на RU и KY не должна превышать 100 символов');
       return;
     }
 
@@ -279,10 +291,13 @@ export default function AdminCandidatesPage() {
         formData.append('election', modalElectionId);
         formData.append('university', modalUniId);
         formData.append('full_name', fullName.trim());
+        formData.append('position', position.trim());
+        formData.append('position_ky', positionKy.trim());
         formData.append('short_bio', shortBio.trim());
+        formData.append('short_bio_ky', shortBioKy.trim());
         formData.append('program', program.trim());
+        formData.append('program_ky', programKy.trim());
         formData.append('photo', photoFile);
-        formData.append('position', 'Кандидат');
         formData.append('faculty', '');
         formData.append('course', '1');
 
@@ -297,9 +312,12 @@ export default function AdminCandidatesPage() {
           election: modalElectionId,
           university: modalUniId,
           full_name: fullName.trim(),
+          position: position.trim(),
+          position_ky: positionKy.trim(),
           short_bio: shortBio.trim(),
+          short_bio_ky: shortBioKy.trim(),
           program: program.trim(),
-          position: 'Кандидат',
+          program_ky: programKy.trim(),
           faculty: '',
           course: 1
         };
@@ -751,44 +769,114 @@ export default function AdminCandidatesPage() {
             )}
           </div>
 
-          {/* 5. Краткая биография (макс. 100 символов) */}
-          <div>
-            <div className="flex items-center justify-between mb-1.5">
-              <label className="text-[13px] font-semibold text-[var(--ink)]">
-                Краткая биография
+          {/* 5. Должность (RU & KY) */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-[13px] font-semibold text-[var(--ink)] mb-1.5">
+                Должность / статус (RU)
               </label>
-              <span className={`text-[12px] font-mono ${shortBio.length >= 95 ? 'text-[var(--red)] font-bold' : 'text-[var(--muted)]'}`}>
-                {shortBio.length}/100
-              </span>
+              <input
+                type="text"
+                value={position}
+                onChange={e => setPosition(e.target.value)}
+                placeholder="Кандидат / Студент 3 курса"
+                className="crm-input"
+              />
             </div>
-            <textarea
-              rows={3}
-              maxLength={100}
-              value={shortBio}
-              onChange={e => setShortBio(e.target.value)}
-              placeholder="Краткие сведения о кандидате, опыт, статус (до 100 символов)..."
-              className="w-full bg-[var(--surface)] border border-[var(--field-line)] rounded-[12px] p-3 text-[14px] text-[var(--ink)] placeholder-[var(--muted-2)] focus:outline-none focus:border-[var(--blue)] focus:ring-2 focus:ring-[var(--blue)]/20 transition-all font-sans resize-none"
-            />
+            <div>
+              <label className="block text-[13px] font-semibold text-[var(--ink)] mb-1.5">
+                Кызмат орду / статусу (KY)
+              </label>
+              <input
+                type="text"
+                value={positionKy}
+                onChange={e => setPositionKy(e.target.value)}
+                placeholder="Талапкер / 3-курстун студенти"
+                className="crm-input"
+              />
+            </div>
           </div>
 
-          {/* 6. Предвыборная программа (макс. 100 символов) */}
-          <div>
-            <div className="flex items-center justify-between mb-1.5">
-              <label className="text-[13px] font-semibold text-[var(--ink)]">
-                Предвыборная программа
-              </label>
-              <span className={`text-[12px] font-mono ${program.length >= 95 ? 'text-[var(--red)] font-bold' : 'text-[var(--muted)]'}`}>
-                {program.length}/100
-              </span>
+          {/* 6. Краткая биография (RU & KY) */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="text-[13px] font-semibold text-[var(--ink)]">
+                  Краткая биография (RU)
+                </label>
+                <span className={`text-[12px] font-mono ${shortBio.length >= 95 ? 'text-[var(--red)] font-bold' : 'text-[var(--muted)]'}`}>
+                  {shortBio.length}/100
+                </span>
+              </div>
+              <textarea
+                rows={3}
+                maxLength={100}
+                value={shortBio}
+                onChange={e => setShortBio(e.target.value)}
+                placeholder="Краткие сведения о кандидате (до 100 символов)..."
+                className="w-full bg-[var(--surface)] border border-[var(--field-line)] rounded-[12px] p-3 text-[13px] text-[var(--ink)] placeholder-[var(--muted-2)] focus:outline-none focus:border-[var(--blue)] focus:ring-2 focus:ring-[var(--blue)]/20 transition-all font-sans resize-none"
+              />
             </div>
-            <textarea
-              rows={3}
-              maxLength={100}
-              value={program}
-              onChange={e => setProgram(e.target.value)}
-              placeholder="Главные цели и тезисы программы кандидата (до 100 символов)..."
-              className="w-full bg-[var(--surface)] border border-[var(--field-line)] rounded-[12px] p-3 text-[14px] text-[var(--ink)] placeholder-[var(--muted-2)] focus:outline-none focus:border-[var(--blue)] focus:ring-2 focus:ring-[var(--blue)]/20 transition-all font-sans resize-none"
-            />
+
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="text-[13px] font-semibold text-[var(--ink)]">
+                  Кыскача өмүр баяны (KY)
+                </label>
+                <span className={`text-[12px] font-mono ${shortBioKy.length >= 95 ? 'text-[var(--red)] font-bold' : 'text-[var(--muted)]'}`}>
+                  {shortBioKy.length}/100
+                </span>
+              </div>
+              <textarea
+                rows={3}
+                maxLength={100}
+                value={shortBioKy}
+                onChange={e => setShortBioKy(e.target.value)}
+                placeholder="Талапкер жөнүндө кыскача маалымат (100 белгиге чейин)..."
+                className="w-full bg-[var(--surface)] border border-[var(--field-line)] rounded-[12px] p-3 text-[13px] text-[var(--ink)] placeholder-[var(--muted-2)] focus:outline-none focus:border-[var(--blue)] focus:ring-2 focus:ring-[var(--blue)]/20 transition-all font-sans resize-none"
+              />
+            </div>
+          </div>
+
+          {/* 7. Предвыборная программа (RU & KY) */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="text-[13px] font-semibold text-[var(--ink)]">
+                  Предвыборная программа (RU)
+                </label>
+                <span className={`text-[12px] font-mono ${program.length >= 95 ? 'text-[var(--red)] font-bold' : 'text-[var(--muted)]'}`}>
+                  {program.length}/100
+                </span>
+              </div>
+              <textarea
+                rows={3}
+                maxLength={100}
+                value={program}
+                onChange={e => setProgram(e.target.value)}
+                placeholder="Главные тезисы программы (до 100 символов)..."
+                className="w-full bg-[var(--surface)] border border-[var(--field-line)] rounded-[12px] p-3 text-[13px] text-[var(--ink)] placeholder-[var(--muted-2)] focus:outline-none focus:border-[var(--blue)] focus:ring-2 focus:ring-[var(--blue)]/20 transition-all font-sans resize-none"
+              />
+            </div>
+
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="text-[13px] font-semibold text-[var(--ink)]">
+                  Шайлоо программасы (KY)
+                </label>
+                <span className={`text-[12px] font-mono ${programKy.length >= 95 ? 'text-[var(--red)] font-bold' : 'text-[var(--muted)]'}`}>
+                  {programKy.length}/100
+                </span>
+              </div>
+              <textarea
+                rows={3}
+                maxLength={100}
+                value={programKy}
+                onChange={e => setProgramKy(e.target.value)}
+                placeholder="Программанын негизги пункттары (100 белгиге чейин)..."
+                className="w-full bg-[var(--surface)] border border-[var(--field-line)] rounded-[12px] p-3 text-[13px] text-[var(--ink)] placeholder-[var(--muted-2)] focus:outline-none focus:border-[var(--blue)] focus:ring-2 focus:ring-[var(--blue)]/20 transition-all font-sans resize-none"
+              />
+            </div>
           </div>
 
           {/* Form Actions */}

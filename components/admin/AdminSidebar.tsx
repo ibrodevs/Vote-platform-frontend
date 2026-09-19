@@ -7,7 +7,7 @@ import {
   LayoutDashboard, Vote, Users, GraduationCap, Building2,
   Activity, ShieldCheck, ExternalLink, LogOut,
   Plus, X, ChevronLeft, ChevronRight, School,
-  Newspaper, HelpCircle, Sparkles
+  Newspaper, HelpCircle, Sparkles, FileText
 } from 'lucide-react';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
@@ -145,6 +145,12 @@ export function AdminSidebar({
             name: 'Последние выборы',
             href: '/admin/recent-elections',
             icon: Sparkles,
+            badge: 'ROOT'
+          },
+          {
+            name: 'Регламенты и документы',
+            href: '/admin/legal-pages',
+            icon: FileText,
             badge: 'ROOT'
           }
         ] : [])

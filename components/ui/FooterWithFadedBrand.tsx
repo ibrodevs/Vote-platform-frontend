@@ -141,9 +141,9 @@ export default function FooterWithFadedBrand({
   ];
 
   const defaultLegalLinks = [
-    { text: lang === 'ru' ? 'Регламент голосования' : 'Добуш берүү тартиби', url: '/news' },
-    { text: lang === 'ru' ? 'Политика конфиденциальности' : 'Купуялуулук саясаты', url: '/news' },
-    { text: lang === 'ru' ? 'Тайна волеизъявления' : 'Эрк билдирүүнүн купуялуулугу', url: '/news' },
+    { text: lang === 'ru' ? 'Регламент голосования' : 'Добуш берүү регламенти', url: '/regulations' },
+    { text: lang === 'ru' ? 'Политика конфиденциальности' : 'Купуялык саясаты', url: '/privacy' },
+    { text: lang === 'ru' ? 'Тайна волеизъявления' : 'Добуш берүүнүн купуялуулугу', url: '/secrecy' },
   ];
 
   const currentColumns = columns || defaultColumns;
@@ -189,96 +189,41 @@ export default function FooterWithFadedBrand({
           </div>
         </motion.div>
 
-        {/* Links Grid & Socials */}
-        <div className="flex flex-col gap-10 md:flex-row md:justify-between md:items-start">
-          <div className="grid grid-cols-2 gap-x-10 gap-y-8 md:grid-cols-3 md:gap-x-16 lg:gap-x-24">
-            {currentColumns.map((col, ci) => (
-              <motion.div key={ci} variants={itemVariants}>
-                <p className="text-[11px] font-bold tracking-widest uppercase mb-4 text-[var(--muted)]">
-                  {col.heading}
-                </p>
-                <ul className="flex flex-col gap-3">
-                  {col.links.map((link, li) => {
-                    const isExternal = link.external || link.url.startsWith('mailto:') || link.url.startsWith('http');
-                    return (
-                      <li key={li}>
-                        {isExternal ? (
-                          <a
-                            href={link.url}
-                            target={link.url.startsWith('http') ? '_blank' : undefined}
-                            rel={link.url.startsWith('http') ? 'noopener noreferrer' : undefined}
-                            className="text-sm font-medium text-[var(--body)] hover:text-[var(--blue)] transition-colors duration-200 inline-block"
-                          >
-                            {link.text}
-                          </a>
-                        ) : (
-                          <Link
-                            href={link.url}
-                            className="text-sm font-medium text-[var(--body)] hover:text-[var(--blue)] transition-colors duration-200 inline-block"
-                          >
-                            {link.text}
-                          </Link>
-                        )}
-                      </li>
-                    );
-                  })}
-                </ul>
-              </motion.div>
-            ))}
-          </div>
-
-          {/* Social Icons */}
-          <motion.div variants={itemVariants} className="md:text-right">
-            <p className="text-[11px] font-bold tracking-widest uppercase mb-4 text-[var(--muted)]">
-              {lang === 'ru' ? 'Мы в соцсетях' : 'Биз социалдык тармактарда'}
-            </p>
-            <div className="flex items-center gap-3 md:justify-end">
-              {socials.telegram && (
-                <a
-                  href={socials.telegram}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Telegram"
-                  className="flex items-center justify-center w-10 h-10 rounded-full bg-[var(--bg)] border border-[var(--line)] text-[var(--muted)] hover:text-white hover:bg-[var(--blue)] hover:border-[var(--blue)] transition-all duration-200 shadow-sm"
-                >
-                  <TelegramIcon className="w-4 h-4" />
-                </a>
-              )}
-              {socials.github && (
-                <a
-                  href={socials.github}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="GitHub"
-                  className="flex items-center justify-center w-10 h-10 rounded-full bg-[var(--bg)] border border-[var(--line)] text-[var(--muted)] hover:text-white hover:bg-[var(--ink)] hover:border-[var(--ink)] transition-all duration-200 shadow-sm"
-                >
-                  <GithubIcon className="w-4 h-4" />
-                </a>
-              )}
-              {socials.twitter && (
-                <a
-                  href={socials.twitter}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Twitter / X"
-                  className="flex items-center justify-center w-10 h-10 rounded-full bg-[var(--bg)] border border-[var(--line)] text-[var(--muted)] hover:text-white hover:bg-[var(--blue)] hover:border-[var(--blue)] transition-all duration-200 shadow-sm"
-                >
-                  <TwitterIcon className="w-3.5 h-3.5" />
-                </a>
-              )}
-              {socials.linkedin && (
-                <a
-                  href={socials.linkedin}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="LinkedIn"
-                  className="flex items-center justify-center w-10 h-10 rounded-full bg-[var(--bg)] border border-[var(--line)] text-[var(--muted)] hover:text-white hover:bg-[#0077b5] hover:border-[#0077b5] transition-all duration-200 shadow-sm"
-                >
-                  <LinkedinIcon className="w-3.5 h-3.5" />
-                </a>
-              )}
-            </div>
-          </motion.div>
+        {/* Links Grid */}
+        <div className="grid grid-cols-2 gap-x-10 gap-y-8 md:grid-cols-3 md:gap-x-16 lg:gap-x-24">
+          {currentColumns.map((col, ci) => (
+            <motion.div key={ci} variants={itemVariants}>
+              <p className="text-[11px] font-bold tracking-widest uppercase mb-4 text-[var(--muted)]">
+                {col.heading}
+              </p>
+              <ul className="flex flex-col gap-3">
+                {col.links.map((link, li) => {
+                  const isExternal = link.external || link.url.startsWith('mailto:') || link.url.startsWith('http');
+                  return (
+                    <li key={li}>
+                      {isExternal ? (
+                        <a
+                          href={link.url}
+                          target={link.url.startsWith('http') ? '_blank' : undefined}
+                          rel={link.url.startsWith('http') ? 'noopener noreferrer' : undefined}
+                          className="text-sm font-medium text-[var(--body)] hover:text-[var(--blue)] transition-colors duration-200 inline-block"
+                        >
+                          {link.text}
+                        </a>
+                      ) : (
+                        <Link
+                          href={link.url}
+                          className="text-sm font-medium text-[var(--body)] hover:text-[var(--blue)] transition-colors duration-200 inline-block"
+                        >
+                          {link.text}
+                        </Link>
+                      )}
+                    </li>
+                  );
+                })}
+              </ul>
+            </motion.div>
+          ))}
         </div>
 
         {/* Divider */}

@@ -98,13 +98,13 @@ export default function AdminFaqsPage() {
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!question.trim() || !answer.trim()) {
-      setErrorMsg('Пожалуйста, заполните вопрос и ответ');
+    if (!question.trim() || !questionKy.trim() || !answer.trim() || !answerKy.trim()) {
+      setErrorMsg('Пожалуйста, заполните вопрос и ответ на обоих языках (RU и KY)');
       return;
     }
 
-    setErrorMsg('');
     setIsSaving(true);
+    setErrorMsg('');
 
     try {
       const payload = {
@@ -320,10 +320,11 @@ export default function AdminFaqsPage() {
 
           <div>
             <label className="block text-xs font-bold text-[var(--ink)] mb-1">
-              Вопрос (KY)
+              Вопрос (KY) *
             </label>
             <input
               type="text"
+              required
               value={questionKy}
               onChange={(e) => setQuestionKy(e.target.value)}
               placeholder="Суроо кыргыз тилинде"
@@ -348,10 +349,11 @@ export default function AdminFaqsPage() {
 
           <div>
             <label className="block text-xs font-bold text-[var(--ink)] mb-1">
-              Ответ (KY)
+              Ответ (KY) *
             </label>
             <textarea
               rows={4}
+              required
               value={answerKy}
               onChange={(e) => setAnswerKy(e.target.value)}
               placeholder="Кыргыз тилиндеги жооп..."

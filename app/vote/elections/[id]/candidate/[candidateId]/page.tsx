@@ -19,6 +19,7 @@ export default function CandidateProfilePage() {
   const electionId = String(params.id || '');
   const candidateId = String(params.candidateId || '');
 
+  const [lang, setLang] = useState<'ru' | 'ky'>('ru');
   const [candidate, setCandidate] = useState<any>(null);
   const [election, setElection] = useState<any>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -29,6 +30,17 @@ export default function CandidateProfilePage() {
   const [isSuccess, setIsSuccess] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string>('');
   const [imgError, setImgError] = useState<boolean>(false);
+
+  useEffect(() => {
+    const currentLang = (localStorage.getItem('app_lang') as 'ru' | 'ky') || 'ru';
+    setLang(currentLang);
+
+    const onLangChange = () => {
+      setLang((localStorage.getItem('app_lang') as 'ru' | 'ky') || 'ru');
+    };
+    window.addEventListener('languageChange', onLangChange);
+    return () => window.removeEventListener('languageChange', onLangChange);
+  }, []);
 
   useEffect(() => {
     let hasCachedData = false;
@@ -98,10 +110,10 @@ export default function CandidateProfilePage() {
               sessionStorage.setItem(`cached_candidate_${candidateId}`, JSON.stringify(found));
             } catch (e) {}
           } else if (!hasCachedData) {
-            setErrorMsg('Кандидат не найден');
+            setErrorMsg(lang === 'ru' ? 'Кандидат не найден' : 'Талапкер табылган жок');
           }
         } else if (!hasCachedData) {
-          setErrorMsg('Кандидат не найден');
+          setErrorMsg(lang === 'ru' ? 'Кандидат не найден' : 'Талапкер табылган жок');
         }
 
         if (statusRes?.has_voted || elecRes?.has_voted) {
@@ -111,11 +123,53 @@ export default function CandidateProfilePage() {
       .catch((err) => {
         console.error('Failed to load candidate details', err);
         if (!hasCachedData) {
-          setErrorMsg('Ошибка при загрузке анкеты кандидата');
+          setErrorMsg(lang === 'ru' ? 'Ошибка при загрузке анкеты кандидата' : 'Талапкердин анкетасын жүктөөдө ката кетти');
         }
       })
       .finally(() => setIsLoading(false));
-  }, [electionId, candidateId]);
+  }, [electionId, candidateId, lang]);
+
+  const t = {
+    loading: lang === 'ru' ? 'Загрузка анкеты кандидата...' : 'Талапкердин анкетасы жүктөлүүдө...',
+    pleaseWait: lang === 'ru' ? 'Пожалуйста, подождите' : 'Сураныч, күтө туруңуз',
+    notFoundTitle: lang === 'ru' ? 'Анкета не найдена' : 'Анкета табылган жок',
+    notFoundDesc: lang === 'ru' ? 'Запрошенный кандидат не существует или был удален.' : 'Суралган талапкер жок же өчүрүлгөн.',
+    backToVote: lang === 'ru' ? 'Вернуться к голосованию' : 'Добуш берүүгө кайтуу',
+    backToBallot: lang === 'ru' ? 'Назад к бюллетеню' : 'Бюллетенге кайтуу',
+    back: lang === 'ru' ? 'Назад' : 'Артка',
+    candidateBadge: lang === 'ru' ? 'АНКЕТА КАНДИДАТА' : 'ТАЛАПКЕРДИН АНКЕТАСЫ',
+    ballotNumber: (n: number) => lang === 'ru' ? `Номер в бюллетене: #${n}` : `Бюллетендеги номери: #${n}`,
+    defaultPosition: lang === 'ru' ? 'Кандидат' : 'Талапкер',
+    alreadyVotedAlert: lang === 'ru' ? 'Ваш голос в этих выборах уже зафиксирован' : 'Бул шайлоодогу сиздин добушуңуз буга чейин катталган',
+    voteForCandidate: lang === 'ru' ? 'Проголосовать за кандидата' : 'Талапкерге добуш берүү',
+    toCandidatesList: lang === 'ru' ? 'К списку кандидатов' : 'Талапкерлердин тизмесине',
+    shortBioTitle: lang === 'ru' ? 'Краткая биография' : 'Кыскача өмүр баяны',
+    emptyBio: lang === 'ru' ? 'Краткая биография не заполнена кандидатом.' : 'Кыскача өмүр баяны талапкер тарабынан толтурулган эмес.',
+    programTitle: lang === 'ru' ? 'Предвыборная программа' : 'Шайлоо алдындагы программасы',
+    emptyProgram: lang === 'ru' ? 'Предвыборная программа не заполнена кандидатом.' : 'Шайлоо алдындагы программа талапкер тарабынан толтурулган эмес.',
+    secrecyNotice: lang === 'ru'
+      ? 'Голосование в платформе Dobush.kg является полностью тайным и анонимным. Информация о вашем голосе физически отделена от персонального аккаунта студента.'
+      : 'Dobush.kg платформасында добуш берүү толугу менен жашыруун жана анонимдүү. Сиздин добушуңуз тууралуу маалымат студенттин жеке аккаунтунан физикалык жактан бөлүнгөн.',
+    bottomCandidateLabel: lang === 'ru' ? 'Кандидат' : 'Талапкер',
+    bottomBallotBtn: lang === 'ru' ? 'Бюллетень' : 'Бюллетень',
+    voteAlreadyAccepted: lang === 'ru' ? 'Голос уже принят' : 'Добуш кабыл алынган',
+    voteActionBtn: lang === 'ru' ? 'Проголосовать' : 'Добуш берүү',
+    confirmTitle: lang === 'ru' ? 'Подтверждение выбора' : 'Тандоону тастыктоо',
+    confirmText: (name: string) => lang === 'ru'
+      ? <>Вы отдаете свой голос за кандидата <strong className="text-[var(--blue)] font-bold">{name}</strong>.</>
+      : <>Сиз талапкер <strong className="text-[var(--blue)] font-bold">{name}</strong> үчүн добуш берип жатасыз.</>,
+    confirmPoint1: lang === 'ru' ? '• Ваш выбор будет зашифрован и записан в протокол.' : '• Тандооңуз шифрленип, протоколго жазылат.',
+    confirmPoint2: lang === 'ru' ? '• Изменить решение после подтверждения невозможно.' : '• Тастыктагандан кийин чечимди өзгөртүү мүмкүн эмес.',
+    cancelBtn: lang === 'ru' ? 'Отмена' : 'Жокко чыгаруу',
+    confirmVoteBtn: lang === 'ru' ? 'Подтвердить голос' : 'Добушту тастыктоо',
+    successTitle: lang === 'ru' ? 'Голос успешно принят!' : 'Добуш ийгиликтүү кабыл алынды!',
+    thanksForVoting: lang === 'ru' ? 'Спасибо за участие!' : 'Катышканыңыз үчүн рахмат!',
+    successDesc: (name: string) => lang === 'ru'
+      ? <>Ваш голос за кандидата <strong className="text-[var(--ink)]">{name}</strong> успешно зарегистрирован в реестре.</>
+      : <>Талапкер <strong className="text-[var(--ink)]">{name}</strong> үчүн добушуңуз реестрде ийгиликтүү катталды.</>,
+    returnToBallot: lang === 'ru' ? 'Вернуться к бюллетеню' : 'Бюллетенге кайтуу',
+    voteErrorMsg: lang === 'ru' ? 'Ошибка при фиксации голоса. Попробуйте еще раз.' : 'Добуш жазууда ката кетти. Кайра аракет кылыңыз.',
+  };
 
   const handleVoteClick = () => {
     if (!isStudentLoggedIn) {
@@ -162,7 +216,7 @@ export default function CandidateProfilePage() {
         });
       } catch (e) {}
     } catch (err: any) {
-      setErrorMsg(err.message || 'Ошибка при фиксации голоса. Попробуйте еще раз.');
+      setErrorMsg(err.message || t.voteErrorMsg);
       setIsConfirmOpen(false);
     } finally {
       setIsSubmitting(false);
@@ -174,8 +228,8 @@ export default function CandidateProfilePage() {
       <div className="min-h-screen bg-[var(--bg)] flex items-center justify-center p-4">
         <div className="crm-card p-10 text-center max-w-sm w-full">
           <div className="w-10 h-10 border-3 border-[var(--blue)] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-[15px] font-bold text-[var(--ink)]">Загрузка анкеты кандидата...</p>
-          <p className="text-[13px] text-[var(--muted)] mt-1">Пожалуйста, подождите</p>
+          <p className="text-[15px] font-bold text-[var(--ink)]">{t.loading}</p>
+          <p className="text-[13px] text-[var(--muted)] mt-1">{t.pleaseWait}</p>
         </div>
       </div>
     );
@@ -188,13 +242,13 @@ export default function CandidateProfilePage() {
           <div className="w-12 h-12 rounded-[14px] bg-[var(--red-bg)] text-[var(--red)] flex items-center justify-center mx-auto mb-4">
             <User className="w-6 h-6" />
           </div>
-          <h2 className="text-[20px] font-bold text-[var(--ink)] mb-2">Анкета не найдена</h2>
+          <h2 className="text-[20px] font-bold text-[var(--ink)] mb-2">{t.notFoundTitle}</h2>
           <p className="text-[14px] text-[var(--muted)] mb-6">
-            {errorMsg || 'Запрошенный кандидат не существует или был удален.'}
+            {errorMsg || t.notFoundDesc}
           </p>
           <Link href={`/vote/elections/${electionId}`}>
             <Button variant="primary" className="w-full justify-center">
-              Вернуться к голосованию
+              {t.backToVote}
             </Button>
           </Link>
         </div>
@@ -206,6 +260,16 @@ export default function CandidateProfilePage() {
     ? getMediaUrl(candidate.photo || candidate.photo_url)
     : null;
 
+  const candPosition = lang === 'ky' && candidate?.position_ky ? candidate.position_ky : (candidate?.position || t.defaultPosition);
+  const candBio = lang === 'ky' && candidate?.short_bio_ky ? candidate.short_bio_ky : candidate?.short_bio;
+  const candProgram = lang === 'ky' && candidate?.program_ky ? candidate.program_ky : candidate?.program;
+  const electionTitle = lang === 'ky' && (candidate?.election_title_ky || election?.title_ky)
+    ? (candidate?.election_title_ky || election?.title_ky)
+    : (candidate?.election_title || election?.title);
+  const uniName = lang === 'ky' && (candidate?.university_name_ky || election?.university_name_ky || election?.university_details?.name_ky)
+    ? (candidate?.university_name_ky || election?.university_name_ky || election?.university_details?.name_ky)
+    : (candidate?.university_name || election?.university_name || election?.university_details?.name);
+
   return (
     <div className="min-h-screen bg-[var(--bg)] text-[var(--ink)] pb-28 sm:pb-36">
       {/* Top Sticky Header */}
@@ -216,13 +280,13 @@ export default function CandidateProfilePage() {
             className="inline-flex items-center gap-2 text-[13.5px] font-semibold text-[var(--muted)] hover:text-[var(--ink)] transition-colors cursor-pointer group"
           >
             <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
-            <span className="hidden sm:inline">Назад к бюллетеню</span>
-            <span className="sm:hidden">Назад</span>
+            <span className="hidden sm:inline">{t.backToBallot}</span>
+            <span className="sm:hidden">{t.back}</span>
           </Link>
 
           <div className="flex items-center gap-2">
             <Badge variant="blue" dot={true}>
-              АНКЕТА КАНДИДАТА
+              {t.candidateBadge}
             </Badge>
           </div>
         </div>
@@ -261,11 +325,11 @@ export default function CandidateProfilePage() {
             <div className="flex-1 space-y-3 min-w-0">
               <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
                 <Badge variant="blue">
-                  {candidate.position || 'Кандидат'}
+                  {candPosition}
                 </Badge>
                 {candidate.order !== undefined && (
                   <Badge variant="gray">
-                    Номер в бюллетене: #{candidate.order + 1}
+                    {t.ballotNumber(candidate.order + 1)}
                   </Badge>
                 )}
               </div>
@@ -276,16 +340,16 @@ export default function CandidateProfilePage() {
 
               {/* University & Election context */}
               <div className="flex flex-col gap-1 text-[13.5px] text-[var(--muted)]">
-                {(candidate.election_title || election?.title) && (
+                {electionTitle && (
                   <div className="flex items-center justify-center sm:justify-start gap-2 font-medium text-[var(--ink)]">
                     <Vote className="w-4 h-4 text-[var(--blue)] shrink-0" />
-                    <span className="truncate">{candidate.election_title || election?.title}</span>
+                    <span className="truncate">{electionTitle}</span>
                   </div>
                 )}
-                {(candidate.university_name || election?.university_name || election?.university_details?.name) && (
+                {uniName && (
                   <div className="flex items-center justify-center sm:justify-start gap-2">
                     <School className="w-4 h-4 text-[var(--muted)] shrink-0" />
-                    <span className="truncate">{candidate.university_name || election?.university_name || election?.university_details?.name}</span>
+                    <span className="truncate">{uniName}</span>
                   </div>
                 )}
               </div>
@@ -295,7 +359,7 @@ export default function CandidateProfilePage() {
                 {hasVoted ? (
                   <div className="inline-flex items-center gap-2 px-4 py-2.5 rounded-[12px] bg-[var(--green-bg)] text-[var(--green)] border border-[var(--green)]/25 text-[13.5px] font-bold">
                     <CheckCircle2 className="w-4 h-4 shrink-0" />
-                    <span>Ваш голос в этих выборах уже зафиксирован</span>
+                    <span>{t.alreadyVotedAlert}</span>
                   </div>
                 ) : (
                   <Button
@@ -305,13 +369,13 @@ export default function CandidateProfilePage() {
                     className="gap-2 shadow-[var(--shadow-blue-btn)]"
                   >
                     <Vote className="w-4 h-4" />
-                    <span>Проголосовать за кандидата</span>
+                    <span>{t.voteForCandidate}</span>
                   </Button>
                 )}
 
                 <Link href={`/vote/elections/${electionId}`}>
                   <Button variant="secondary" size="lg">
-                    К списку кандидатов
+                    {t.toCandidatesList}
                   </Button>
                 </Link>
               </div>
@@ -326,15 +390,15 @@ export default function CandidateProfilePage() {
               <User className="w-4 h-4" />
             </div>
             <h2 className="text-[18px] font-bold text-[var(--ink)]">
-              Краткая биография
+              {t.shortBioTitle}
             </h2>
           </div>
 
           <div className="text-[14.5px] sm:text-[15px] text-[var(--body)] leading-relaxed pt-1 whitespace-pre-wrap">
-            {candidate.short_bio ? (
-              candidate.short_bio
+            {candBio ? (
+              candBio
             ) : (
-              <span className="text-[var(--muted)] italic">Краткая биография не заполнена кандидатом.</span>
+              <span className="text-[var(--muted)] italic">{t.emptyBio}</span>
             )}
           </div>
         </div>
@@ -346,15 +410,15 @@ export default function CandidateProfilePage() {
               <BookOpen className="w-4 h-4" />
             </div>
             <h2 className="text-[18px] font-bold text-[var(--ink)]">
-              Предвыборная программа
+              {t.programTitle}
             </h2>
           </div>
 
           <div className="text-[14.5px] sm:text-[15px] text-[var(--body)] leading-relaxed pt-1 whitespace-pre-wrap">
-            {candidate.program ? (
-              candidate.program
+            {candProgram ? (
+              candProgram
             ) : (
-              <span className="text-[var(--muted)] italic">Предвыборная программа не заполнена кандидатом.</span>
+              <span className="text-[var(--muted)] italic">{t.emptyProgram}</span>
             )}
           </div>
         </div>
@@ -363,7 +427,7 @@ export default function CandidateProfilePage() {
         <div className="p-4 rounded-[14px] bg-[var(--surface-2)] border border-[var(--line)] flex items-start gap-3 text-[13px] text-[var(--muted)]">
           <ShieldCheck className="w-5 h-5 text-[var(--blue)] shrink-0 mt-0.5" />
           <p>
-            Голосование в платформе Dobush.kg является полностью тайным и анонимным. Информация о вашем голосе физически отделена от персонального аккаунта студента.
+            {t.secrecyNotice}
           </p>
         </div>
       </main>
@@ -373,7 +437,7 @@ export default function CandidateProfilePage() {
         <div className="max-w-[900px] mx-auto flex items-center justify-between gap-4">
           <div className="min-w-0 hidden sm:block">
             <p className="text-[12px] uppercase tracking-wider text-[var(--muted)] font-bold">
-              Кандидат
+              {t.bottomCandidateLabel}
             </p>
             <p className="text-[15px] font-bold text-[var(--ink)] truncate">
               {candidate.full_name}
@@ -383,14 +447,14 @@ export default function CandidateProfilePage() {
           <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
             <Link href={`/vote/elections/${electionId}`} className="hidden sm:inline-block">
               <Button variant="secondary" size="lg">
-                Бюллетень
+                {t.bottomBallotBtn}
               </Button>
             </Link>
 
             {hasVoted ? (
               <div className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 rounded-[12px] bg-[var(--green-bg)] text-[var(--green)] border border-[var(--green)]/25 text-[14px] font-bold">
                 <CheckCircle2 className="w-4 h-4" />
-                <span>Голос уже принят</span>
+                <span>{t.voteAlreadyAccepted}</span>
               </div>
             ) : (
               <Button
@@ -400,7 +464,7 @@ export default function CandidateProfilePage() {
                 className="w-full sm:w-auto gap-2 shadow-[var(--shadow-blue-btn)] justify-center"
               >
                 <Vote className="w-4 h-4" />
-                <span>Проголосовать</span>
+                <span>{t.voteActionBtn}</span>
               </Button>
             )}
           </div>
@@ -411,17 +475,16 @@ export default function CandidateProfilePage() {
       <Modal
         isOpen={isConfirmOpen}
         onClose={() => !isSubmitting && setIsConfirmOpen(false)}
-        title="Подтверждение выбора"
+        title={t.confirmTitle}
         maxWidth="sm"
       >
         <div className="space-y-4">
           <p className="text-[14.5px] text-[var(--ink)] leading-relaxed">
-            Вы отдаете свой голос за кандидата{' '}
-            <strong className="text-[var(--blue)] font-bold">{candidate?.full_name}</strong>.
+            {t.confirmText(candidate?.full_name)}
           </p>
           <div className="p-3.5 rounded-[12px] bg-[var(--surface-2)] border border-[var(--line)] text-[12.5px] text-[var(--muted)] space-y-1">
-            <p>• Ваш выбор будет зашифрован и записан в протокол.</p>
-            <p>• Изменить решение после подтверждения невозможно.</p>
+            <p>{t.confirmPoint1}</p>
+            <p>{t.confirmPoint2}</p>
           </div>
 
           <div className="flex gap-3 pt-2">
@@ -431,7 +494,7 @@ export default function CandidateProfilePage() {
               disabled={isSubmitting}
               className="flex-1 justify-center"
             >
-              Отмена
+              {t.cancelBtn}
             </Button>
             <Button
               variant="primary"
@@ -439,7 +502,7 @@ export default function CandidateProfilePage() {
               isLoading={isSubmitting}
               className="flex-1 justify-center shadow-[var(--shadow-blue-btn)]"
             >
-              Подтвердить голос
+              {t.confirmVoteBtn}
             </Button>
           </div>
         </div>
@@ -449,7 +512,7 @@ export default function CandidateProfilePage() {
       <Modal
         isOpen={isSuccess}
         onClose={() => router.push(`/vote/elections/${electionId}`)}
-        title="Голос успешно принят!"
+        title={t.successTitle}
         maxWidth="sm"
       >
         <div className="space-y-4 text-center py-2">
@@ -458,10 +521,10 @@ export default function CandidateProfilePage() {
           </div>
           <div className="space-y-1">
             <h3 className="text-[18px] font-bold text-[var(--ink)]">
-              Спасибо за участие!
+              {t.thanksForVoting}
             </h3>
             <p className="text-[13.5px] text-[var(--muted)] leading-relaxed">
-              Ваш голос за кандидата <strong className="text-[var(--ink)]">{candidate?.full_name}</strong> успешно зарегистрирован в реестре.
+              {t.successDesc(candidate?.full_name)}
             </p>
           </div>
           <div className="pt-2">
@@ -470,7 +533,7 @@ export default function CandidateProfilePage() {
               onClick={() => router.push(`/vote/elections/${electionId}`)}
               className="w-full justify-center shadow-[var(--shadow-blue-btn)]"
             >
-              Вернуться к бюллетеню
+              {t.returnToBallot}
             </Button>
           </div>
         </div>

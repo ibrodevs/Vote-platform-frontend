@@ -92,7 +92,10 @@ export default function AdminElectionsPage() {
 
   const handleCreateSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedUniId || !title.trim()) return;
+    if (!selectedUniId || !title.trim() || !titleKy.trim()) {
+      setErrorMsg('Пожалуйста, заполните название на русском и кыргызском языках');
+      return;
+    }
 
     setErrorMsg('');
     setIsSaving(true);
@@ -101,7 +104,7 @@ export default function AdminElectionsPage() {
       await api.createElection({
         university: selectedUniId,
         title: title.trim(),
-        title_ky: titleKy.trim() || title.trim(),
+        title_ky: titleKy.trim(),
         description: description.trim(),
         description_ky: descriptionKy.trim(),
         status: 'draft',
@@ -407,7 +410,7 @@ export default function AdminElectionsPage() {
 
           <div>
             <label className="block text-[13px] font-semibold text-[var(--ink)] mb-2">
-              Шайлоонун аталышы (KY)
+              Шайлоонун аталышы (KY) *
             </label>
             <input
               type="text"
@@ -415,6 +418,7 @@ export default function AdminElectionsPage() {
               onChange={e => setTitleKy(e.target.value)}
               placeholder="Студенттик Сенаттын Президентин шайлоо 2026..."
               className="crm-input"
+              required
             />
           </div>
 

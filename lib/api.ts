@@ -342,4 +342,14 @@ export const api = {
       method: 'PATCH',
       body: data instanceof FormData ? data : JSON.stringify(data)
     }),
+
+  // Public & Admin Static Pages (Regulations, Privacy, Secrecy)
+  getStaticPage: (slug: string) => request<any>(`/pages/${slug}/`),
+  getAdminStaticPages: () => request<any[]>('/admin/content/pages/'),
+  updateAdminStaticPage: (slug: string, data: any) =>
+    request<any>(`/admin/content/pages/${slug}/`, {
+      method: 'PATCH',
+      body: JSON.stringify(data)
+    }),
 };
+

@@ -20,6 +20,7 @@ export default function DirectElectionBallotPage() {
   const router = useRouter();
   const electionId = String(params.id || '');
 
+  const [lang, setLang] = useState<'ru' | 'ky'>('ru');
   const [student, setStudent] = useState<any>(null);
   const [election, setElection] = useState<any>(null);
   const [candidates, setCandidates] = useState<any[]>([]);
@@ -36,6 +37,17 @@ export default function DirectElectionBallotPage() {
   const [programModalCandidate, setProgramModalCandidate] = useState<any>(null);
   const [isConfirmOpen, setIsConfirmOpen] = useState<boolean>(false);
   const [isSuccess, setIsSuccess] = useState<boolean>(false);
+
+  useEffect(() => {
+    const currentLang = (localStorage.getItem('app_lang') as 'ru' | 'ky') || 'ru';
+    setLang(currentLang);
+
+    const onLangChange = () => {
+      setLang((localStorage.getItem('app_lang') as 'ru' | 'ky') || 'ru');
+    };
+    window.addEventListener('languageChange', onLangChange);
+    return () => window.removeEventListener('languageChange', onLangChange);
+  }, []);
 
   useEffect(() => {
     const token = sessionStorage.getItem('student_token');
@@ -111,11 +123,64 @@ export default function DirectElectionBallotPage() {
       .catch(err => {
         console.error('Failed to load election data', err);
         if (!hasCached) {
-          setErrorMsg('Не удалось загрузить данные выборов');
+          setErrorMsg(lang === 'ru' ? 'Не удалось загрузить данные выборов' : 'Шайлоо маалыматтарын жүктөө мүмкүн болбоду');
         }
       })
       .finally(() => setIsLoading(false));
-  }, [electionId, router]);
+  }, [electionId, router, lang]);
+
+  const t = {
+    loadingBallot: lang === 'ru' ? 'Загрузка избирательного бюллетеня...' : 'Шайлоо бюллетени жүктөлүүдө...',
+    electionNotFound: lang === 'ru' ? 'Выборы не найдены' : 'Шайлоо табылган жок',
+    electionNotFoundDesc: lang === 'ru' ? 'Запрошенное голосование не существует или было удалено.' : 'Суралган шайлоо жок же өчүрүлгөн.',
+    toCabinet: lang === 'ru' ? 'В личный кабинет' : 'Жеке кабинетке',
+    notAvailableForUni: lang === 'ru' ? 'Недоступно для вашего университета' : 'Сиздин университетиңиз үчүн жеткиликтүү эмес',
+    notAvailableDesc: (uni: string) => lang === 'ru'
+      ? `Вы зарегистрированы в другом учебном заведении. Данное голосование проводится исключительно для студентов ${uni}.`
+      : `Сиз башка окуу жайында катталгансыз. Бул добуш берүү ${uni} студенттери үчүн гана өткөрүлөт.`,
+    goToOwnCabinet: lang === 'ru' ? 'Перейти в свой личный кабинет' : 'Өзүңүздүн жеке кабинетиңизге өтүү',
+    badgeAccepted: lang === 'ru' ? 'БЮЛЛЕТЕНЬ ПРИНЯТ' : 'БЮЛЛЕТЕНЬ КАБЫЛ АЛЫНДЫ',
+    voteAcceptedTitle: lang === 'ru' ? 'Ваш голос принят!' : 'Сиздин добушуңуз кабыл алынды!',
+    alreadyVotedTitle: lang === 'ru' ? 'Вы уже проголосовали' : 'Сиз добуш бердиңиз',
+    voteAcceptedDesc: lang === 'ru' ? 'Бюллетень успешно обезличен и сохранен в криптографическом реестре.' : 'Бюллетень ийгиликтүү жашырылып, криптографиялык реестрге сакталды.',
+    alreadyVotedDesc: lang === 'ru' ? 'Ваш электронный бюллетень по этой кампании уже был учтен ранее.' : 'Бул кампания боюнча электрондук бюллетениңиз буга чейин эсепке алынган.',
+    campaignLabel: lang === 'ru' ? 'Кампания:' : 'Кампания:',
+    ballotStatusLabel: lang === 'ru' ? 'Статус бюллетеня:' : 'Бюллетендин абалы:',
+    ballotStatusVal: lang === 'ru' ? 'ОБЕЗЛИЧЕН И УЧТЕН' : 'ЖАШЫРЫЛДЫ ЖАНА ЭСЕПКЕ АЛЫНДЫ',
+    timeLabel: lang === 'ru' ? 'Время фиксации:' : 'Катталган убактысы:',
+    secrecyLabel: lang === 'ru' ? 'Тайна голосования' : 'Добуш берүү купуялуулугу',
+    protectionVal: lang === 'ru' ? '100% защита' : '100% корголгон',
+    returnToCabinet: lang === 'ru' ? 'Вернуться в личный кабинет' : 'Жеке кабинетке кайтуу',
+    electionFinished: lang === 'ru' ? 'ВЫБОРЫ ЗАВЕРШЕНЫ' : 'ШАЙЛОО АЯКТАДЫ',
+    votingNotActive: lang === 'ru' ? 'ГОЛОСОВАНИЕ НЕ АКТИВНО' : 'ДОБУШ БЕРҮҮ АКТИВДҮҮ ЭМЕС',
+    votingEndedDesc: lang === 'ru' ? 'Прием голосов по данной кампании официально окончен.' : 'Бул кампания боюнча добуштарды кабыл алуу расмий аяктады.',
+    votingNotStartedDesc: lang === 'ru' ? 'Голосование еще не началось.' : 'Добуш берүү али баштала элек.',
+    backToCabinet: lang === 'ru' ? 'В кабинет' : 'Кабинетке',
+    votingActiveBadge: lang === 'ru' ? 'ГОЛОСОВАНИЕ ИДЕТ' : 'ДОБУШ БЕРҮҮ ЖҮРҮҮДӨ',
+    privacyNote: lang === 'ru' ? 'Электронный бюллетень защищен. Выберите одного кандидата и подтвердите свой выбор.' : 'Электрондук бюллетень корголгон. Бир талапкерди тандап, тандооңузду тастыктаңыз.',
+    candidatesList: (n: number) => lang === 'ru' ? `Список кандидатов (${n})` : `Талапкерлердин тизмеси (${n})`,
+    selectedOne: lang === 'ru' ? '1 выбран' : '1 тандалды',
+    selectCandidate: lang === 'ru' ? 'Выберите кандидата' : 'Талапкерди тандаңыз',
+    candidateProfile: lang === 'ru' ? 'Анкета кандидата' : 'Талапкердин анкетасы',
+    selected: lang === 'ru' ? 'Выбран' : 'Тандалды',
+    select: lang === 'ru' ? 'Выбрать' : 'Тандоо',
+    selectFromListPrompt: lang === 'ru' ? 'Выберите кандидата из списка выше для подачи голоса' : 'Добуш берүү үчүн жогорудагы тизмеден талапкерди тандаңыз',
+    castVoteBtn: lang === 'ru' ? 'Подать голос' : 'Добуш берүү',
+    candidateProgramTitle: (name: string) => lang === 'ru' ? `Программа кандидата: ${name}` : `Талапкердин программасы: ${name}`,
+    shortBioLabel: lang === 'ru' ? 'Краткая биография' : 'Кыскача өмүр баяны',
+    programLabel: lang === 'ru' ? 'Предвыборная программа' : 'Шайлоо алдындагы программасы',
+    emptyBioProgram: lang === 'ru' ? 'Кандидат пока не заполнил биографию и предвыборную программу.' : 'Талапкер өмүр баянын жана программасын толтурган эмес.',
+    closeBtn: lang === 'ru' ? 'Закрыть' : 'Жабуу',
+    selectCandidateBtn: lang === 'ru' ? 'Выбрать кандидата' : 'Талапкерди тандоо',
+    confirmTitle: lang === 'ru' ? 'Подтверждение голоса' : 'Добушту тастыктоо',
+    confirmQuestion: lang === 'ru' ? 'Вы уверены в своем выборе?' : 'Тандооңузга ишенесизби?',
+    confirmAboutTo: lang === 'ru' ? 'Вы собираетесь отдать электронный голос за кандидата:' : 'Сиз талапкерге электрондук добуш берип жатасыз:',
+    confirmWarning: lang === 'ru' ? 'Внимание: согласно регламенту электронного голосования, изменить выбор после подтверждения невозможно.' : 'Көңүл буруңуз: электрондук добуш берүү регламентине ылайык, тастыктагандан кийин тандоону өзгөртүү мүмкүн эмес.',
+    cancelBtn: lang === 'ru' ? 'Отмена' : 'Жокко чыгаруу',
+    confirmBtn: lang === 'ru' ? 'Подтвердить' : 'Тастыктоо',
+    sending: lang === 'ru' ? 'Отправка...' : 'Жөнөтүлүүдө...',
+    voteError: lang === 'ru' ? 'Ошибка при записи голоса. Попробуйте еще раз.' : 'Добуш жазууда ката кетти. Кайра аракет кылыңыз.',
+  };
 
   const selectedCandidate = candidates.find(c => c.id === selectedCandidateId);
 
@@ -158,7 +223,7 @@ export default function DirectElectionBallotPage() {
       if (err instanceof ApiError) {
         setErrorMsg(err.message);
       } else {
-        setErrorMsg('Ошибка при записи голоса. Попробуйте еще раз.');
+        setErrorMsg(t.voteError);
       }
       setIsConfirmOpen(false);
     } finally {
@@ -169,7 +234,7 @@ export default function DirectElectionBallotPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-[var(--bg)] flex items-center justify-center text-[var(--muted)] text-[14px]">
-        Загрузка избирательного бюллетеня...
+        {t.loadingBallot}
       </div>
     );
   }
@@ -179,17 +244,23 @@ export default function DirectElectionBallotPage() {
       <div className="min-h-screen bg-[var(--bg)] flex flex-col items-center justify-center p-4">
         <div className="max-w-md w-full text-center p-8 bg-[var(--surface)] border border-[var(--line)] rounded-[20px] shadow-[var(--shadow-card)] space-y-4">
           <AlertCircle className="w-10 h-10 text-[var(--red)] mx-auto" />
-          <h2 className="text-[20px] font-bold text-[var(--ink)]">Выборы не найдены</h2>
+          <h2 className="text-[20px] font-bold text-[var(--ink)]">{t.electionNotFound}</h2>
           <p className="text-[14px] text-[var(--muted)]">
-            Запрошенное голосование не существует или было удалено.
+            {t.electionNotFoundDesc}
           </p>
           <Link href="/vote/cabinet">
-            <Button variant="primary">В личный кабинет</Button>
+            <Button variant="primary">{t.toCabinet}</Button>
           </Link>
         </div>
       </div>
     );
   }
+
+  const electionTitle = lang === 'ky' && election.title_ky ? election.title_ky : election.title;
+  const electionDesc = lang === 'ky' && election.description_ky ? election.description_ky : election.description;
+  const uniName = lang === 'ky' && (election.university_name_ky || election.university_details?.name_ky)
+    ? (election.university_name_ky || election.university_details?.name_ky)
+    : (election.university_name || election.university_details?.name || student?.university?.name || '');
 
   // Check university match if student is loaded
   const studentUniId = student?.university?.id || student?.university_id || student?.university;
@@ -202,14 +273,13 @@ export default function DirectElectionBallotPage() {
           <div className="w-12 h-12 rounded-full bg-[var(--amber-bg)] text-[var(--amber)] flex items-center justify-center mx-auto">
             <AlertCircle className="w-6 h-6" />
           </div>
-          <h2 className="text-[20px] font-bold text-[var(--ink)]">Недоступно для вашего университета</h2>
+          <h2 className="text-[20px] font-bold text-[var(--ink)]">{t.notAvailableForUni}</h2>
           <p className="text-[14px] text-[var(--muted)] leading-relaxed">
-            Вы зарегистрированы в другом учебном заведении. Данное голосование проводится исключительно для студентов{' '}
-            <span className="font-semibold text-[var(--ink)]">{election?.university_name || 'другого университета'}</span>.
+            {t.notAvailableDesc(uniName || (lang === 'ky' ? 'башка университеттин' : 'другого университета'))}
           </p>
           <div className="pt-2">
             <Link href="/vote/cabinet">
-              <Button variant="primary">Перейти в свой личный кабинет</Button>
+              <Button variant="primary">{t.goToOwnCabinet}</Button>
             </Link>
           </div>
         </div>
@@ -228,49 +298,47 @@ export default function DirectElectionBallotPage() {
 
           <div>
             <Badge variant="green" dot={true}>
-              БЮЛЛЕТЕНЬ ПРИНЯТ
+              {t.badgeAccepted}
             </Badge>
           </div>
 
           <div className="space-y-1.5">
             <h1 className="text-[24px] font-[800] text-[var(--ink)] tracking-tight">
-              {isSuccess ? 'Ваш голос принят!' : 'Вы уже проголосовали'}
+              {isSuccess ? t.voteAcceptedTitle : t.alreadyVotedTitle}
             </h1>
             <p className="text-[14px] text-[var(--muted)] leading-relaxed">
-              {isSuccess
-                ? 'Бюллетень успешно обезличен и сохранен в криптографическом реестре.'
-                : 'Ваш электронный бюллетень по этой кампании уже был учтен ранее.'}
+              {isSuccess ? t.voteAcceptedDesc : t.alreadyVotedDesc}
             </p>
           </div>
 
           <div className="p-4 rounded-[14px] bg-[var(--surface-2)] border border-[var(--line)] text-left text-[13px] text-[var(--muted)] space-y-2.5">
             <div className="flex justify-between">
-              <span>Кампания:</span>
-              <span className="text-[var(--ink)] font-bold truncate max-w-[200px]">{election.title}</span>
+              <span>{t.campaignLabel}</span>
+              <span className="text-[var(--ink)] font-bold truncate max-w-[200px]">{electionTitle}</span>
             </div>
             <div className="flex justify-between">
-              <span>Статус бюллетеня:</span>
-              <span className="text-[var(--green)] font-bold">ОБЕЗЛИЧЕН И УЧТЕН</span>
+              <span>{t.ballotStatusLabel}</span>
+              <span className="text-[var(--green)] font-bold">{t.ballotStatusVal}</span>
             </div>
             {votedAt && (
               <div className="flex justify-between">
-                <span>Время фиксации:</span>
-                <span className="text-[var(--ink)] font-mono">{new Date(votedAt).toLocaleString('ru-RU')}</span>
+                <span>{t.timeLabel}</span>
+                <span className="text-[var(--ink)] font-mono">{new Date(votedAt).toLocaleString(lang === 'ky' ? 'ky-KG' : 'ru-RU')}</span>
               </div>
             )}
             <div className="flex justify-between items-center pt-1 border-t border-[var(--line)] text-[12px]">
               <span className="flex items-center gap-1 text-[var(--blue)]">
                 <ShieldCheck className="w-3.5 h-3.5" />
-                Тайна голосования
+                {t.secrecyLabel}
               </span>
-              <span className="text-[var(--green)] font-semibold">100% защита</span>
+              <span className="text-[var(--green)] font-semibold">{t.protectionVal}</span>
             </div>
           </div>
 
           <div className="pt-2">
             <Link href="/vote/cabinet" className="block w-full">
               <Button variant="primary" className="w-full justify-center">
-                Вернуться в личный кабинет
+                {t.returnToCabinet}
               </Button>
             </Link>
           </div>
@@ -288,16 +356,14 @@ export default function DirectElectionBallotPage() {
             <Clock className="w-6 h-6" />
           </div>
           <Badge variant="gray">
-            {election.status === 'finished' ? 'ВЫБОРЫ ЗАВЕРШЕНЫ' : 'ГОЛОСОВАНИЕ НЕ АКТИВНО'}
+            {election.status === 'finished' ? t.electionFinished : t.votingNotActive}
           </Badge>
-          <h2 className="text-[20px] font-bold text-[var(--ink)]">{election.title}</h2>
+          <h2 className="text-[20px] font-bold text-[var(--ink)]">{electionTitle}</h2>
           <p className="text-[14px] text-[var(--muted)]">
-            {election.status === 'finished'
-              ? 'Прием голосов по данной кампании официально окончен.'
-              : 'Голосование еще не началось.'}
+            {election.status === 'finished' ? t.votingEndedDesc : t.votingNotStartedDesc}
           </p>
           <Link href="/vote/cabinet">
-            <Button variant="secondary">В личный кабинет</Button>
+            <Button variant="secondary">{t.toCabinet}</Button>
           </Link>
         </div>
       </div>
@@ -314,12 +380,12 @@ export default function DirectElectionBallotPage() {
             className="inline-flex items-center gap-2 text-[13.5px] font-semibold text-[var(--muted)] hover:text-[var(--ink)] transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span>В кабинет</span>
+            <span>{t.backToCabinet}</span>
           </Link>
 
           <div className="flex items-center gap-2">
             <Badge variant="blue" dot={true}>
-              ГОЛОСОВАНИЕ ИДЕТ
+              {t.votingActiveBadge}
             </Badge>
           </div>
         </div>
@@ -331,16 +397,16 @@ export default function DirectElectionBallotPage() {
         <div className="bg-[var(--surface)] border border-[var(--line)] rounded-[18px] sm:rounded-[22px] p-4 sm:p-7 shadow-[var(--shadow-card)] space-y-3">
           <div className="flex flex-wrap items-center gap-2 text-[13px] text-[var(--blue)] font-medium">
             <School className="w-4 h-4" />
-            <span>{election.university_name || student?.university?.name}</span>
+            <span>{uniName}</span>
           </div>
 
           <h1 className="text-[20px] sm:text-[28px] font-[800] tracking-tight text-[var(--ink)] leading-snug">
-            {election.title}
+            {electionTitle}
           </h1>
 
-          {election.description && (
+          {electionDesc && (
             <p className="text-[13.5px] sm:text-[14px] text-[var(--muted)] leading-relaxed">
-              {election.description}
+              {electionDesc}
             </p>
           )}
 
@@ -348,7 +414,7 @@ export default function DirectElectionBallotPage() {
           <div className="pt-3.5 border-t border-[var(--line)] flex items-center gap-2 text-[12px] sm:text-[13px] text-[var(--muted)]">
             <ShieldCheck className="w-4 h-4 text-[var(--blue)] shrink-0" />
             <span>
-              Электронный бюллетень защищен. Выберите одного кандидата и подтвердите свой выбор.
+              {t.privacyNote}
             </span>
           </div>
         </div>
@@ -364,10 +430,10 @@ export default function DirectElectionBallotPage() {
         {/* Candidates List Header */}
         <div className="flex items-center justify-between pt-1">
           <h2 className="text-[17px] sm:text-[18px] font-[800] text-[var(--ink)]">
-            Список кандидатов ({candidates.length})
+            {t.candidatesList(candidates.length)}
           </h2>
           <span className="text-[12.5px] sm:text-[13px] text-[var(--muted)]">
-            {selectedCandidateId ? '1 выбран' : 'Выберите кандидата'}
+            {selectedCandidateId ? t.selectedOne : t.selectCandidate}
           </span>
         </div>
 
@@ -375,6 +441,7 @@ export default function DirectElectionBallotPage() {
         <div className="space-y-3">
           {candidates.map((cand, idx) => {
             const isSelected = selectedCandidateId === cand.id;
+            const candPosition = lang === 'ky' && cand.position_ky ? cand.position_ky : cand.position;
 
             return (
               <div
@@ -429,9 +496,9 @@ export default function DirectElectionBallotPage() {
                       </h3>
                     </div>
 
-                    {cand.position && (
+                    {candPosition && (
                       <div className="text-[12.5px] sm:text-[13px] text-[var(--blue)] font-medium">
-                        {cand.position}
+                        {candPosition}
                       </div>
                     )}
                   </div>
@@ -445,7 +512,7 @@ export default function DirectElectionBallotPage() {
                     className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-[var(--blue)] hover:underline px-2.5 py-1.5 rounded-[9px] hover:bg-[var(--surface-2)] transition-colors cursor-pointer"
                   >
                     <BookOpen className="w-3.5 h-3.5" />
-                    <span>Анкета кандидата</span>
+                    <span>{t.candidateProfile}</span>
                   </Link>
 
                   <span
@@ -455,7 +522,7 @@ export default function DirectElectionBallotPage() {
                         : 'bg-[var(--surface-2)] text-[var(--muted)]'
                     }`}
                   >
-                    {isSelected ? 'Выбран' : 'Выбрать'}
+                    {isSelected ? t.selected : t.select}
                   </span>
                 </div>
               </div>
@@ -470,10 +537,11 @@ export default function DirectElectionBallotPage() {
           <div className="text-[13.5px] text-[var(--muted)] text-center sm:text-left">
             {selectedCandidate ? (
               <span>
-                Ваш текущий выбор: <strong className="text-[var(--ink)]">{selectedCandidate.full_name}</strong>
+                {lang === 'ru' ? 'Ваш текущий выбор: ' : 'Учурдагы тандооңуз: '}
+                <strong className="text-[var(--ink)]">{selectedCandidate.full_name}</strong>
               </span>
             ) : (
-              <span>Выберите кандидата из списка выше для подачи голоса</span>
+              <span>{t.selectFromListPrompt}</span>
             )}
           </div>
 
@@ -484,7 +552,7 @@ export default function DirectElectionBallotPage() {
             onClick={() => setIsConfirmOpen(true)}
             className="w-full sm:w-auto gap-2 shadow-[var(--shadow-blue-btn)]"
           >
-            <span>Подать голос</span>
+            <span>{t.castVoteBtn}</span>
             <ArrowRight className="w-4 h-4" />
           </Button>
         </div>
@@ -494,7 +562,7 @@ export default function DirectElectionBallotPage() {
       <Modal
         isOpen={Boolean(programModalCandidate)}
         onClose={() => setProgramModalCandidate(null)}
-        title={`Программа кандидата: ${programModalCandidate?.full_name || ''}`}
+        title={t.candidateProgramTitle(programModalCandidate?.full_name || '')}
         maxWidth="lg"
       >
         <div className="space-y-4">
@@ -514,40 +582,40 @@ export default function DirectElectionBallotPage() {
               <h4 className="font-bold text-[16px] text-[var(--ink)]">
                 {programModalCandidate?.full_name}
               </h4>
-              {programModalCandidate?.position && (
+              {(programModalCandidate?.position_ky || programModalCandidate?.position) && (
                 <p className="text-[13px] text-[var(--blue)] font-medium">
-                  {programModalCandidate.position}
+                  {lang === 'ky' && programModalCandidate?.position_ky ? programModalCandidate.position_ky : programModalCandidate.position}
                 </p>
               )}
             </div>
           </div>
 
           <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-2 text-[14px] text-[var(--ink)] leading-relaxed">
-            {programModalCandidate?.short_bio && (
+            {(programModalCandidate?.short_bio_ky || programModalCandidate?.short_bio) && (
               <div className="p-3.5 rounded-[12px] bg-[var(--surface-2)] border border-[var(--line)] space-y-1">
                 <span className="text-[12px] font-bold uppercase tracking-wider text-[var(--muted)]">
-                  Краткая биография
+                  {t.shortBioLabel}
                 </span>
                 <p className="text-[13.5px] text-[var(--ink)] whitespace-pre-wrap">
-                  {programModalCandidate.short_bio}
+                  {lang === 'ky' && programModalCandidate.short_bio_ky ? programModalCandidate.short_bio_ky : programModalCandidate.short_bio}
                 </p>
               </div>
             )}
 
-            {programModalCandidate?.program && (
+            {(programModalCandidate?.program_ky || programModalCandidate?.program) && (
               <div className="p-3.5 rounded-[12px] bg-[var(--blue-soft)] border border-[var(--blue)]/20 space-y-1">
                 <span className="text-[12px] font-bold uppercase tracking-wider text-[var(--blue)]">
-                  Предвыборная программа
+                  {t.programLabel}
                 </span>
                 <p className="text-[13.5px] text-[var(--ink)] whitespace-pre-wrap">
-                  {programModalCandidate.program}
+                  {lang === 'ky' && programModalCandidate.program_ky ? programModalCandidate.program_ky : programModalCandidate.program}
                 </p>
               </div>
             )}
 
-            {!programModalCandidate?.short_bio && !programModalCandidate?.program && (
+            {!programModalCandidate?.short_bio && !programModalCandidate?.short_bio_ky && !programModalCandidate?.program && !programModalCandidate?.program_ky && (
               <p className="text-[13.5px] text-[var(--muted)] italic text-center py-4">
-                Кандидат пока не заполнил биографию и предвыборную программу.
+                {t.emptyBioProgram}
               </p>
             )}
           </div>
@@ -557,7 +625,7 @@ export default function DirectElectionBallotPage() {
               variant="secondary"
               onClick={() => setProgramModalCandidate(null)}
             >
-              Закрыть
+              {t.closeBtn}
             </Button>
             <Button
               variant="primary"
@@ -566,7 +634,7 @@ export default function DirectElectionBallotPage() {
                 setProgramModalCandidate(null);
               }}
             >
-              Выбрать кандидата
+              {t.selectCandidateBtn}
             </Button>
           </div>
         </div>
@@ -576,7 +644,7 @@ export default function DirectElectionBallotPage() {
       <Modal
         isOpen={isConfirmOpen}
         onClose={() => !isSubmitting && setIsConfirmOpen(false)}
-        title="Подтверждение голоса"
+        title={t.confirmTitle}
         maxWidth="sm"
       >
         <div className="space-y-5 text-center py-2">
@@ -586,10 +654,10 @@ export default function DirectElectionBallotPage() {
 
           <div className="space-y-2">
             <h4 className="text-[18px] font-bold text-[var(--ink)]">
-              Вы уверены в своем выборе?
+              {t.confirmQuestion}
             </h4>
             <p className="text-[13.5px] text-[var(--muted)] leading-relaxed">
-              Вы собираетесь отдать электронный голос за кандидата:
+              {t.confirmAboutTo}
             </p>
             <div className="p-3.5 rounded-[12px] bg-[var(--surface-2)] border border-[var(--line)] font-bold text-[16px] text-[var(--ink)]">
               {selectedCandidate?.full_name}
@@ -597,7 +665,7 @@ export default function DirectElectionBallotPage() {
           </div>
 
           <p className="text-[12px] text-[var(--muted)] bg-[var(--amber-bg)] text-[var(--amber)] p-3 rounded-[10px] text-left">
-            Внимание: согласно регламенту электронного голосования, изменить выбор после подтверждения невозможно.
+            {t.confirmWarning}
           </p>
 
           <div className="flex gap-3 pt-2">
@@ -607,7 +675,7 @@ export default function DirectElectionBallotPage() {
               onClick={() => setIsConfirmOpen(false)}
               disabled={isSubmitting}
             >
-              Отмена
+              {t.cancelBtn}
             </Button>
             <Button
               variant="primary"
@@ -615,7 +683,7 @@ export default function DirectElectionBallotPage() {
               onClick={handleCastVote}
               disabled={isSubmitting}
             >
-              {isSubmitting ? 'Отправка...' : 'Подтвердить'}
+              {isSubmitting ? t.sending : t.confirmBtn}
             </Button>
           </div>
         </div>

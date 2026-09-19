@@ -16,9 +16,21 @@ function StudentAuthContent() {
   const searchParams = useSearchParams();
   const targetElectionId = searchParams.get('election') || '';
 
+  const [lang, setLang] = useState<'ru' | 'ky'>('ru');
   const [mode, setMode] = useState<'register' | 'login'>('register');
   const [universities, setUniversities] = useState<any[]>([]);
   const [electionInfo, setElectionInfo] = useState<any>(null);
+
+  useEffect(() => {
+    const currentLang = (localStorage.getItem('app_lang') as 'ru' | 'ky') || 'ru';
+    setLang(currentLang);
+
+    const onLangChange = () => {
+      setLang((localStorage.getItem('app_lang') as 'ru' | 'ky') || 'ru');
+    };
+    window.addEventListener('languageChange', onLangChange);
+    return () => window.removeEventListener('languageChange', onLangChange);
+  }, []);
 
   // Registration Form State
   const [fullName, setFullName] = useState('');
@@ -36,6 +48,46 @@ function StudentAuthContent() {
 
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+
+  const t = {
+    backToHome: lang === 'ru' ? 'На главную' : 'Башкы бетке',
+    voterPortal: lang === 'ru' ? 'ПОРТАЛ ИЗБИРАТЕЛЯ' : 'ШАЙЛООЧУ ПОРТАЛЫ',
+    voteByLink: lang === 'ru' ? 'Голосование по ссылке:' : 'Шилтеме боюнча добуш берүү:',
+    studentCabinet: lang === 'ru' ? 'Личный кабинет студента' : 'Студенттин жеке кабинети',
+    registerSubtitle: lang === 'ru' ? 'Зарегистрируйтесь для участия в студенческих выборах' : 'Студенттик шайлоого катышуу үчүн катталыңыз',
+    loginSubtitle: lang === 'ru' ? 'Войдите в свой профиль по email и паролю' : 'Email жана сырсөзүңүз аркылуу профилиңизге кириңиз',
+    tabRegister: lang === 'ru' ? 'Регистрация' : 'Катталуу',
+    tabLogin: lang === 'ru' ? 'Вход' : 'Кирүү',
+    closed: lang === 'ru' ? 'Закрыта' : 'Жабык',
+    regClosedTitle: lang === 'ru' ? 'Регистрация новых студентов закрыта' : 'Жаңы студенттерди каттоо жабылган',
+    regClosedDesc: (uniName: string) => lang === 'ru'
+      ? `Администрация университета ${uniName} временно приостановила регистрацию новых избирателей. Если у вас уже есть аккаунт, перейдите на вкладку «Вход».`
+      : `${uniName} университетинин администрациясы жаңы шайлоочуларды каттоону убактылуу токтотту. Эгер сизде каттоо эсеби болсо, «Кирүү» өтмөгүнө өтүңүз.`,
+    goToLogin: lang === 'ru' ? 'Перейти ко входу по email и паролю →' : 'Email жана сырсөз аркылуу кирүүгө өтүү →',
+    fullNameLabel: lang === 'ru' ? 'ФИО студента *' : 'Студенттин аты-жөнү *',
+    fullNamePlaceholder: 'Азамат Исаков',
+    universityLabel: lang === 'ru' ? 'Университет *' : 'Университет *',
+    courseLabel: lang === 'ru' ? 'Курс *' : 'Курс *',
+    courseOption: (n: number) => lang === 'ru' ? `${n} курс` : `${n}-курс`,
+    groupLabel: lang === 'ru' ? 'Группа *' : 'Топ *',
+    groupPlaceholder: 'ПИ-1-21',
+    emailLabel: lang === 'ru' ? 'Электронная почта *' : 'Электрондук почта *',
+    passwordLabel: lang === 'ru' ? 'Пароль *' : 'Сырсөз *',
+    passwordPlaceholder: lang === 'ru' ? 'Минимум 6 символов' : 'Кеминде 6 белги',
+    registerClosedBtn: lang === 'ru' ? 'Регистрация закрыта' : 'Каттоо жабык',
+    registerBtn: lang === 'ru' ? 'Зарегистрироваться и продолжить' : 'Катталуу жана улантуу',
+    loginBtn: lang === 'ru' ? 'Войти в кабинет' : 'Кабинетке кирүү',
+    alreadyHaveAccount: lang === 'ru' ? 'Уже есть аккаунт?' : 'Каттоо эсебиңиз барбы?',
+    loginLink: lang === 'ru' ? 'Войти' : 'Кирүү',
+    noAccountYet: lang === 'ru' ? 'Еще нет аккаунта?' : 'Каттоо эсебиңиз жокпу?',
+    registerLink: lang === 'ru' ? 'Зарегистрироваться' : 'Катталуу',
+    loading: lang === 'ru' ? 'Загрузка...' : 'Жүктөлүүдө...',
+    errorFillAll: lang === 'ru' ? 'Пожалуйста, заполните все обязательные поля' : 'Бардык талап кылынган талааларды толтуруңуз',
+    errorRegClosed: lang === 'ru' ? 'Регистрация новых студентов в выбранном университете закрыта администратором. Вы можете войти в существующий аккаунт.' : 'Тандалган университетте жаңы студенттерди каттоо жабылган. Сиз болгон аккаунтуңузга кире аласыз.',
+    errorRegFailed: lang === 'ru' ? 'Ошибка при регистрации. Проверьте введенные данные.' : 'Каттоодо ката кетти. Маалыматтарды текшериңиз.',
+    errorEnterCredentials: lang === 'ru' ? 'Введите email и пароль' : 'Email жана сырсөздү киргизиңиз',
+    errorInvalidCredentials: lang === 'ru' ? 'Неверный email или пароль' : 'Email же сырсөз туура эмес',
+  };
 
   useEffect(() => {
     const uniParam = searchParams.get('university') || searchParams.get('university_id') || searchParams.get('uni');
@@ -114,12 +166,12 @@ function StudentAuthContent() {
     setErrorMsg('');
 
     if (isRegistrationClosed) {
-      setErrorMsg('Регистрация новых студентов в выбранном университете закрыта администратором. Вы можете войти в существующий аккаунт.');
+      setErrorMsg(t.errorRegClosed);
       return;
     }
 
     if (!fullName.trim() || !selectedUniversityId || !group.trim() || !email.trim() || !password) {
-      setErrorMsg('Пожалуйста, заполните все обязательные поля');
+      setErrorMsg(t.errorFillAll);
       return;
     }
 
@@ -149,7 +201,7 @@ function StudentAuthContent() {
       if (err instanceof ApiError) {
         setErrorMsg(err.message);
       } else {
-        setErrorMsg('Ошибка при регистрации. Проверьте введенные данные.');
+        setErrorMsg(t.errorRegFailed);
       }
     } finally {
       setIsLoading(false);
@@ -161,7 +213,7 @@ function StudentAuthContent() {
     setErrorMsg('');
 
     if (!loginEmail.trim() || !loginPassword) {
-      setErrorMsg('Введите email и пароль');
+      setErrorMsg(t.errorEnterCredentials);
       return;
     }
 
@@ -186,12 +238,14 @@ function StudentAuthContent() {
       if (err instanceof ApiError) {
         setErrorMsg(err.message);
       } else {
-        setErrorMsg('Неверный email или пароль');
+        setErrorMsg(t.errorInvalidCredentials);
       }
     } finally {
       setIsLoading(false);
     }
   };
+
+  const uniDisplayName = currentSelectedUni ? (lang === 'ky' && currentSelectedUni.name_ky ? currentSelectedUni.name_ky : currentSelectedUni.name) : '';
 
   return (
     <div className="min-h-screen bg-[var(--bg)] flex items-center justify-center p-4 py-12">
@@ -203,10 +257,10 @@ function StudentAuthContent() {
             className="inline-flex items-center gap-2 text-[13.5px] font-medium text-[var(--muted)] hover:text-[var(--ink)] transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span>На главную</span>
+            <span>{t.backToHome}</span>
           </Link>
           <Badge variant="blue" dot={true}>
-            ПОРТАЛ ИЗБИРАТЕЛЯ
+            {t.voterPortal}
           </Badge>
         </div>
 
@@ -218,13 +272,13 @@ function StudentAuthContent() {
             </div>
             <div>
               <div className="text-[11px] uppercase font-bold text-[var(--blue)] tracking-wider">
-                Голосование по ссылке:
+                {t.voteByLink}
               </div>
               <div className="text-[15px] font-bold text-[var(--ink)]">
-                {electionInfo.title}
+                {lang === 'ky' && electionInfo.title_ky ? electionInfo.title_ky : electionInfo.title}
               </div>
               <div className="text-[12px] text-[var(--muted)]">
-                {electionInfo.university_details?.name}
+                {lang === 'ky' && electionInfo.university_details?.name_ky ? electionInfo.university_details.name_ky : electionInfo.university_details?.name}
               </div>
             </div>
           </div>
@@ -242,13 +296,10 @@ function StudentAuthContent() {
               />
             </div>
             <h1 className="text-[24px] font-[800] text-[var(--ink)] tracking-tight mb-1">
-              Личный кабинет студента
+              {t.studentCabinet}
             </h1>
             <p className="text-[13.5px] text-[var(--muted)]">
-              {mode === 'register'
-                ? 'Зарегистрируйтесь для участия в студенческих выборах'
-                : 'Войдите в свой профиль по email и паролю'
-              }
+              {mode === 'register' ? t.registerSubtitle : t.loginSubtitle}
             </p>
           </div>
 
@@ -263,10 +314,10 @@ function StudentAuthContent() {
                   : 'text-[var(--muted)] hover:text-[var(--ink)]'
               }`}
             >
-              <span>Регистрация</span>
+              <span>{t.tabRegister}</span>
               {isRegistrationClosed && (
                 <span className="text-[10px] uppercase font-bold px-1.5 py-0.5 rounded-[5px] bg-[var(--red-bg)] text-[var(--red)] border border-[var(--red)]/20">
-                  Закрыта
+                  {t.closed}
                 </span>
               )}
             </button>
@@ -279,7 +330,7 @@ function StudentAuthContent() {
                   : 'text-[var(--muted)] hover:text-[var(--ink)]'
               }`}
             >
-              Вход
+              {t.tabLogin}
             </button>
           </div>
 
@@ -288,11 +339,10 @@ function StudentAuthContent() {
             <div className="mb-5 p-4 rounded-[14px] bg-[var(--amber-bg)] border border-[var(--amber)]/30 text-[var(--amber)] text-[13px] space-y-2.5">
               <div className="flex items-center gap-2 font-bold text-[14px]">
                 <Lock className="w-4 h-4 shrink-0" />
-                <span>Регистрация новых студентов закрыта</span>
+                <span>{t.regClosedTitle}</span>
               </div>
               <p className="leading-relaxed">
-                Администрация университета <strong>{currentSelectedUni?.name}</strong> временно приостановила регистрацию новых избирателей.
-                Если у вас уже есть аккаунт, перейдите на вкладку <strong>«Вход»</strong>.
+                {t.regClosedDesc(uniDisplayName)}
               </p>
               <div className="pt-1">
                 <Button
@@ -302,7 +352,7 @@ function StudentAuthContent() {
                   onClick={() => { setMode('login'); setErrorMsg(''); }}
                   className="font-bold gap-1.5 shadow-xs"
                 >
-                  Перейти ко входу по email и паролю →
+                  {t.goToLogin}
                 </Button>
               </div>
             </div>
@@ -321,7 +371,7 @@ function StudentAuthContent() {
             <form onSubmit={handleRegister} className="space-y-4">
               <div>
                 <label className="block text-[13px] font-semibold text-[var(--ink)] mb-1.5">
-                  ФИО студента *
+                  {t.fullNameLabel}
                 </label>
                 <div className="relative">
                   <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--muted)]" />
@@ -329,7 +379,7 @@ function StudentAuthContent() {
                     type="text"
                     value={fullName}
                     onChange={e => setFullName(e.target.value)}
-                    placeholder="Азамат Исаков"
+                    placeholder={t.fullNamePlaceholder}
                     className="crm-input pl-10"
                     required
                   />
@@ -338,7 +388,7 @@ function StudentAuthContent() {
 
               <div>
                 <label className="block text-[13px] font-semibold text-[var(--ink)] mb-1.5">
-                  Университет *
+                  {t.universityLabel}
                 </label>
                 <div className="relative">
                   <School className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--muted)]" />
@@ -350,18 +400,17 @@ function StudentAuthContent() {
                   >
                     {universities.map(u => (
                       <option key={u.id} value={u.id}>
-                        {u.name} ({u.code.toUpperCase()})
+                        {(lang === 'ky' && u.name_ky ? u.name_ky : u.name)} ({u.code.toUpperCase()})
                       </option>
                     ))}
                   </select>
                 </div>
               </div>
 
-
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-[13px] font-semibold text-[var(--ink)] mb-1.5">
-                    Курс *
+                    {t.courseLabel}
                   </label>
                   <select
                     value={course}
@@ -369,18 +418,17 @@ function StudentAuthContent() {
                     className="crm-input font-medium"
                     required
                   >
-                    <option value="1">1 курс</option>
-                    <option value="2">2 курс</option>
-                    <option value="3">3 курс</option>
-                    <option value="4">4 курс</option>
-                    <option value="5">5 курс</option>
-                    <option value="6">6 курс</option>
+                    {[1, 2, 3, 4, 5, 6].map(c => (
+                      <option key={c} value={c}>
+                        {t.courseOption(c)}
+                      </option>
+                    ))}
                   </select>
                 </div>
 
                 <div>
                   <label className="block text-[13px] font-semibold text-[var(--ink)] mb-1.5">
-                    Группа *
+                    {t.groupLabel}
                   </label>
                   <div className="relative">
                     <Users className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--muted)]" />
@@ -388,7 +436,7 @@ function StudentAuthContent() {
                       type="text"
                       value={group}
                       onChange={e => setGroup(e.target.value)}
-                      placeholder="ПИ-1-21"
+                      placeholder={t.groupPlaceholder}
                       className="crm-input pl-10 uppercase"
                       required
                     />
@@ -398,7 +446,7 @@ function StudentAuthContent() {
 
               <div>
                 <label className="block text-[13px] font-semibold text-[var(--ink)] mb-1.5">
-                  Электронная почта *
+                  {t.emailLabel}
                 </label>
                 <div className="relative">
                   <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--muted)]" />
@@ -415,7 +463,7 @@ function StudentAuthContent() {
 
               <div>
                 <label className="block text-[13px] font-semibold text-[var(--ink)] mb-1.5">
-                  Пароль *
+                  {t.passwordLabel}
                 </label>
                 <div className="relative">
                   <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--muted)]" />
@@ -423,7 +471,7 @@ function StudentAuthContent() {
                     type="password"
                     value={password}
                     onChange={e => setPassword(e.target.value)}
-                    placeholder="Минимум 6 символов"
+                    placeholder={t.passwordPlaceholder}
                     className="crm-input pl-10"
                     minLength={6}
                     required
@@ -439,7 +487,7 @@ function StudentAuthContent() {
                 disabled={isRegistrationClosed || isLoading}
                 className={`w-full justify-center mt-2 text-[15px] ${isRegistrationClosed ? 'opacity-60 cursor-not-allowed' : ''}`}
               >
-                {isRegistrationClosed ? 'Регистрация закрыта' : 'Зарегистрироваться и продолжить'}
+                {isRegistrationClosed ? t.registerClosedBtn : t.registerBtn}
               </Button>
             </form>
           )}
@@ -449,7 +497,7 @@ function StudentAuthContent() {
             <form onSubmit={handleLogin} className="space-y-4">
               <div>
                 <label className="block text-[13px] font-semibold text-[var(--ink)] mb-1.5">
-                  Электронная почта
+                  {t.emailLabel}
                 </label>
                 <div className="relative">
                   <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--muted)]" />
@@ -466,7 +514,7 @@ function StudentAuthContent() {
 
               <div>
                 <label className="block text-[13px] font-semibold text-[var(--ink)] mb-1.5">
-                  Пароль
+                  {t.passwordLabel}
                 </label>
                 <div className="relative">
                   <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--muted)]" />
@@ -488,7 +536,7 @@ function StudentAuthContent() {
                 isLoading={isLoading}
                 className="w-full justify-center mt-2 text-[15px]"
               >
-                Войти в кабинет
+                {t.loginBtn}
               </Button>
             </form>
           )}
@@ -497,9 +545,9 @@ function StudentAuthContent() {
           <div className="mt-8 pt-5 border-t border-[var(--line)] text-center">
             <span className="text-[12px] text-[var(--muted)]">
               {mode === 'register' ? (
-                <>Уже есть аккаунт? <button type="button" onClick={() => setMode('login')} className="text-[var(--blue)] font-bold hover:underline cursor-pointer">Войти</button></>
+                <>{t.alreadyHaveAccount} <button type="button" onClick={() => setMode('login')} className="text-[var(--blue)] font-bold hover:underline cursor-pointer">{t.loginLink}</button></>
               ) : (
-                <>Еще нет аккаунта? <button type="button" onClick={() => setMode('register')} className="text-[var(--blue)] font-bold hover:underline cursor-pointer">Зарегистрироваться</button></>
+                <>{t.noAccountYet} <button type="button" onClick={() => setMode('register')} className="text-[var(--blue)] font-bold hover:underline cursor-pointer">{t.registerLink}</button></>
               )}
             </span>
           </div>
@@ -513,7 +561,7 @@ export default function StudentAuthPage() {
   return (
     <Suspense fallback={
       <div className="min-h-screen bg-[var(--bg)] flex items-center justify-center p-4">
-        <div className="text-[14px] text-[var(--muted)]">Загрузка...</div>
+        <div className="text-[14px] text-[var(--muted)]">Жүктөлүүдө...</div>
       </div>
     }>
       <StudentAuthContent />

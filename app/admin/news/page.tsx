@@ -126,8 +126,8 @@ export default function AdminNewsPage() {
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title.trim() || !content.trim()) {
-      setErrorMsg('Заполните заголовок и содержание новости');
+    if (!title.trim() || !titleKy.trim() || !content.trim() || !contentKy.trim()) {
+      setErrorMsg('Заполните заголовок и содержание новости на обоих языках (RU и KY)');
       return;
     }
 
@@ -423,10 +423,11 @@ export default function AdminNewsPage() {
             </div>
             <div>
               <label className="block text-xs font-bold text-[var(--ink)] mb-1">
-                Заголовок (KY)
+                Заголовок (KY) *
               </label>
               <input
                 type="text"
+                required
                 value={titleKy}
                 onChange={(e) => setTitleKy(e.target.value)}
                 placeholder="Кыргызча аталышы"
@@ -523,10 +524,11 @@ export default function AdminNewsPage() {
             </div>
             <div>
               <label className="block text-xs font-bold text-[var(--ink)] mb-1">
-                Полный текст статьи (KY)
+                Полный текст статьи (KY) *
               </label>
               <textarea
                 rows={7}
+                required
                 value={contentKy}
                 onChange={(e) => setContentKy(e.target.value)}
                 placeholder="Макаланын негизги тексти"

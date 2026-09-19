@@ -15,12 +15,24 @@ import { api, ApiError, getMediaUrl } from '@/lib/api';
 export default function StudentCabinetPage() {
   const router = useRouter();
 
+  const [lang, setLang] = useState<'ru' | 'ky'>('ru');
   const [student, setStudent] = useState<any>(null);
   const [university, setUniversity] = useState<any>(null);
   const [elections, setElections] = useState<any[]>([]);
   const [activeFilter, setActiveFilter] = useState<'all' | 'active' | 'completed'>('all');
   const [isLoading, setIsLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState('');
+
+  useEffect(() => {
+    const currentLang = (localStorage.getItem('app_lang') as 'ru' | 'ky') || 'ru';
+    setLang(currentLang);
+
+    const onLangChange = () => {
+      setLang((localStorage.getItem('app_lang') as 'ru' | 'ky') || 'ru');
+    };
+    window.addEventListener('languageChange', onLangChange);
+    return () => window.removeEventListener('languageChange', onLangChange);
+  }, []);
 
   useEffect(() => {
     const token = sessionStorage.getItem('student_token');
@@ -79,6 +91,40 @@ export default function StudentCabinetPage() {
       .finally(() => setIsLoading(false));
   }, [router]);
 
+  const t = {
+    loadingCabinet: lang === 'ru' ? 'Загрузка личного кабинета...' : 'Жеке кабинет жүктөлүүдө...',
+    voterCabinet: lang === 'ru' ? 'Кабинет избирателя' : 'Шайлоочунун кабинети',
+    logout: lang === 'ru' ? 'Выйти' : 'Чыгуу',
+    logoutTitle: lang === 'ru' ? 'Выйти из аккаунта' : 'Аккаунттан чыгуу',
+    active: lang === 'ru' ? 'АКТИВЕН' : 'АКТИВДҮҮ',
+    student: lang === 'ru' ? 'Студент' : 'Студент',
+    group: (g: string) => lang === 'ru' ? `Группа ${g}` : `Топ ${g}`,
+    course: (c: number) => lang === 'ru' ? `${c} курс` : `${c}-курс`,
+    university: lang === 'ru' ? 'ВУЗ:' : 'ЖОЖ:',
+    activeElections: lang === 'ru' ? 'Активных выборов' : 'Активдүү шайлоолор',
+    youParticipated: lang === 'ru' ? 'Вы приняли участие' : 'Сиз катыштыңыз',
+    cryptoSecurity: lang === 'ru' ? 'Анонимное волеизъявление защищено двухконтурным шифрованием' : 'Анонимдүү добуш берүү эки контурлуу шифрлөө менен корголгон',
+    voteImpersonal: lang === 'ru' ? 'Ваш голос строго обезличен' : 'Сиздин добушуңуз толугу менен жашыруун',
+    electionCampaigns: lang === 'ru' ? 'Избирательные кампании' : 'Шайлоо өнөктүктөрү',
+    availableElectionsDesc: lang === 'ru' ? 'Доступные голосования для вашего университета' : 'Университетиңиз үчүн жеткиликтүү добуш берүүлөр',
+    filterAll: (n: number) => lang === 'ru' ? `Все (${n})` : `Баары (${n})`,
+    filterActive: (n: number) => lang === 'ru' ? `Идет голосование (${n})` : `Добуш берүү жүрүүдө (${n})`,
+    filterCompleted: lang === 'ru' ? 'Завершенные' : 'Аяктагандар',
+    noCampaigns: lang === 'ru' ? 'Нет доступных кампаний в этой категории' : 'Бул категорияда жеткиликтүү кампаниялар жок',
+    noCampaignsDesc: lang === 'ru' ? 'Когда администрация вашего университета запустит новое голосование, оно немедленно появится здесь.' : 'Университетиңиздин администрациясы жаңы шайлоону баштаганда, ал дароо бул жерде пайда болот.',
+    badgeAccepted: lang === 'ru' ? 'БЮЛЛЕТЕНЬ ПРИНЯТ' : 'БЮЛЛЕТЕНЬ КАБЫЛ АЛЫНДЫ',
+    badgeVotingActive: lang === 'ru' ? 'ГОЛОСОВАНИЕ ИДЕТ' : 'ДОБУШ БЕРҮҮ ЖҮРҮҮДӨ',
+    badgeFinished: lang === 'ru' ? 'ВЫБОРЫ ЗАВЕРШЕНЫ' : 'ШАЙЛОО АЯКТАДЫ',
+    badgePending: lang === 'ru' ? 'ОЖИДАНИЕ' : 'КҮТҮҮДӨ',
+    until: (d: string) => lang === 'ru' ? `до ${d}` : `${d} чейин`,
+    alreadyVoted: lang === 'ru' ? 'Вы уже проголосовали' : 'Сиз добуш бердиңиз',
+    voteNotCounted: lang === 'ru' ? 'Ваш голос еще не учтен' : 'Сиздин добушуңуз каттала элек',
+    campaignClosed: lang === 'ru' ? 'Кампания закрыта' : 'Кампания жабык',
+    voteBtn: lang === 'ru' ? 'Проголосовать' : 'Добуш берүү',
+    ballotBtn: lang === 'ru' ? 'Бюллетень' : 'Бюллетень',
+    detailsBtn: lang === 'ru' ? 'Подробнее' : 'Кененирээк',
+  };
+
   const handleLogout = () => {
     sessionStorage.removeItem('student_token');
     sessionStorage.removeItem('student_data');
@@ -111,7 +157,7 @@ export default function StudentCabinetPage() {
   if (isLoading && !student) {
     return (
       <div className="min-h-screen bg-[var(--bg)] flex items-center justify-center text-[var(--muted)] text-[14px]">
-        Загрузка личного кабинета...
+        {t.loadingCabinet}
       </div>
     );
   }
@@ -133,25 +179,29 @@ export default function StudentCabinetPage() {
               </span>
             </Link>
             <span className="hidden sm:inline-block text-[var(--muted)] text-[13px] border-l border-[var(--line)] pl-3 ml-1 font-medium">
-              Кабинет избирателя
+              {t.voterCabinet}
             </span>
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3">
-            {university?.name && (
+            {(university?.name || student?.university?.name) && (
               <div className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-[9px] bg-[var(--surface-2)] border border-[var(--line)] text-[12px] sm:text-[13px] text-[var(--ink)] font-medium max-w-[150px] sm:max-w-[220px]">
                 <School className="w-3.5 h-3.5 text-[var(--blue)] shrink-0" />
-                <span className="truncate">{university.name}</span>
+                <span className="truncate">
+                  {lang === 'ky' && (university?.name_ky || student?.university?.name_ky)
+                    ? (university?.name_ky || student?.university?.name_ky)
+                    : (university?.name || student?.university?.name)}
+                </span>
               </div>
             )}
 
             <button
               onClick={handleLogout}
               className="inline-flex items-center gap-1.5 h-[34px] sm:h-[38px] px-2.5 sm:px-3.5 rounded-[10px] bg-[var(--surface-2)] hover:bg-[var(--red-bg)] text-[var(--muted)] hover:text-[var(--red)] border border-[var(--field-line)] hover:border-[var(--red)]/30 text-[12.5px] sm:text-[13px] font-semibold transition-all cursor-pointer"
-              title="Выйти из аккаунта"
+              title={t.logoutTitle}
             >
               <LogOut className="w-3.5 h-3.5 shrink-0" />
-              <span className="hidden xs:inline">Выйти</span>
+              <span className="hidden xs:inline">{t.logout}</span>
             </button>
           </div>
         </div>
@@ -176,10 +226,10 @@ export default function StudentCabinetPage() {
               <div className="space-y-2 flex-1 min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
                   <h1 className="text-[19px] sm:text-[24px] font-[800] tracking-tight text-[var(--ink)] truncate">
-                    {student?.full_name || 'Студент'}
+                    {student?.full_name || t.student}
                   </h1>
                   <Badge variant="green" dot={true}>
-                    АКТИВЕН
+                    {t.active}
                   </Badge>
                 </div>
 
@@ -194,13 +244,13 @@ export default function StudentCabinetPage() {
                   {student?.group && (
                     <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[8px] bg-[var(--surface-2)] border border-[var(--line)] text-[var(--muted)]">
                       <Users className="w-3.5 h-3.5 text-[var(--blue)] shrink-0" />
-                      <span>Группа {student.group}</span>
+                      <span>{t.group(student.group)}</span>
                     </span>
                   )}
                   {student?.course && (
                     <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[8px] bg-[var(--surface-2)] border border-[var(--line)] text-[var(--muted)]">
                       <GraduationCap className="w-3.5 h-3.5 text-[var(--blue)] shrink-0" />
-                      <span>{student.course} курс</span>
+                      <span>{t.course(student.course)}</span>
                     </span>
                   )}
                   {student?.student_id && (
@@ -211,7 +261,11 @@ export default function StudentCabinetPage() {
                 </div>
 
                 <div className="text-[12.5px] sm:text-[13px] text-[var(--muted)] pt-0.5">
-                  ВУЗ: <span className="font-semibold text-[var(--ink)]">{university?.name || student?.university?.name || '—'}</span>
+                  {t.university} <span className="font-semibold text-[var(--ink)]">
+                    {lang === 'ky' && (university?.name_ky || student?.university?.name_ky)
+                      ? (university?.name_ky || student?.university?.name_ky)
+                      : (university?.name || student?.university?.name || '—')}
+                  </span>
                 </div>
               </div>
             </div>
@@ -219,11 +273,11 @@ export default function StudentCabinetPage() {
             {/* Quick Stats Grid */}
             <div className="grid grid-cols-2 md:grid-cols-1 gap-2.5 sm:gap-3 shrink-0 border-t md:border-t-0 md:border-l border-[var(--line)] pt-3.5 md:pt-0 md:pl-6">
               <div className="p-3 sm:p-3.5 rounded-[12px] bg-[var(--surface-2)] border border-[var(--line)]">
-                <div className="text-[11.5px] sm:text-[12px] text-[var(--muted)] font-medium">Активных выборов</div>
+                <div className="text-[11.5px] sm:text-[12px] text-[var(--muted)] font-medium">{t.activeElections}</div>
                 <div className="text-[18px] sm:text-[22px] font-[800] text-[var(--ink)] mt-0.5">{activeCount}</div>
               </div>
               <div className="p-3 sm:p-3.5 rounded-[12px] bg-[var(--surface-2)] border border-[var(--line)]">
-                <div className="text-[11.5px] sm:text-[12px] text-[var(--muted)] font-medium">Вы приняли участие</div>
+                <div className="text-[11.5px] sm:text-[12px] text-[var(--muted)] font-medium">{t.youParticipated}</div>
                 <div className="text-[18px] sm:text-[22px] font-[800] text-[var(--green)] mt-0.5">{votedCount}</div>
               </div>
             </div>
@@ -234,11 +288,11 @@ export default function StudentCabinetPage() {
             <div className="flex items-center gap-2 text-[var(--blue)]">
               <ShieldCheck className="w-4 h-4 shrink-0" />
               <span className="font-medium">
-                Анонимное волеизъявление защищено двухконтурным шифрованием
+                {t.cryptoSecurity}
               </span>
             </div>
             <span className="text-[11.5px] opacity-80">
-              Ваш голос строго обезличен
+              {t.voteImpersonal}
             </span>
           </div>
         </div>
@@ -248,10 +302,10 @@ export default function StudentCabinetPage() {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
             <div>
               <h2 className="text-[19px] sm:text-[22px] font-[800] text-[var(--ink)] tracking-tight">
-                Избирательные кампании
+                {t.electionCampaigns}
               </h2>
               <p className="text-[13px] sm:text-[13.5px] text-[var(--muted)]">
-                Доступные голосования для вашего университета
+                {t.availableElectionsDesc}
               </p>
             </div>
 
@@ -265,7 +319,7 @@ export default function StudentCabinetPage() {
                     : 'text-[var(--muted)] hover:text-[var(--ink)]'
                 }`}
               >
-                Все ({elections.length})
+                {t.filterAll(elections.length)}
               </button>
               <button
                 onClick={() => setActiveFilter('active')}
@@ -275,7 +329,7 @@ export default function StudentCabinetPage() {
                     : 'text-[var(--muted)] hover:text-[var(--ink)]'
                 }`}
               >
-                Идет голосование ({activeCount})
+                {t.filterActive(activeCount)}
               </button>
               <button
                 onClick={() => setActiveFilter('completed')}
@@ -285,7 +339,7 @@ export default function StudentCabinetPage() {
                     : 'text-[var(--muted)] hover:text-[var(--ink)]'
                 }`}
               >
-                Завершенные
+                {t.filterCompleted}
               </button>
             </div>
           </div>
@@ -297,10 +351,10 @@ export default function StudentCabinetPage() {
                 <Vote className="w-6 h-6" />
               </div>
               <h3 className="text-[16px] font-bold text-[var(--ink)]">
-                Нет доступных кампаний в этой категории
+                {t.noCampaigns}
               </h3>
               <p className="text-[13px] sm:text-[13.5px] text-[var(--muted)] max-w-md mx-auto">
-                Когда администрация вашего университета запустит новое голосование, оно немедленно появится здесь.
+                {t.noCampaignsDesc}
               </p>
             </div>
           ) : (
@@ -309,6 +363,8 @@ export default function StudentCabinetPage() {
                 const isActive = elec.status === 'active';
                 const isFinished = elec.status === 'finished' || elec.status === 'completed';
                 const hasVoted = Boolean(elec.has_voted);
+                const title = lang === 'ky' && elec.title_ky ? elec.title_ky : elec.title;
+                const desc = lang === 'ky' && elec.description_ky ? elec.description_ky : elec.description;
 
                 return (
                   <div
@@ -321,37 +377,37 @@ export default function StudentCabinetPage() {
                         {isActive ? (
                           hasVoted ? (
                             <Badge variant="green" dot={true}>
-                              БЮЛЛЕТЕНЬ ПРИНЯТ
+                              {t.badgeAccepted}
                             </Badge>
                           ) : (
                             <Badge variant="blue" dot={true}>
-                              ГОЛОСОВАНИЕ ИДЕТ
+                              {t.badgeVotingActive}
                             </Badge>
                           )
                         ) : isFinished ? (
                           <Badge variant="gray">
-                            ВЫБОРЫ ЗАВЕРШЕНЫ
+                            {t.badgeFinished}
                           </Badge>
                         ) : (
                           <Badge variant="amber">
-                            {elec.status?.toUpperCase() || 'ОЖИДАНИЕ'}
+                            {elec.status?.toUpperCase() || t.badgePending}
                           </Badge>
                         )}
 
                         <span className="text-[12px] text-[var(--muted)] flex items-center gap-1 ml-auto">
                           <Clock className="w-3.5 h-3.5 shrink-0" />
-                          до {new Date(elec.ends_at).toLocaleDateString('ru-RU')}
+                          {t.until(new Date(elec.ends_at).toLocaleDateString(lang === 'ky' ? 'ky-KG' : 'ru-RU'))}
                         </span>
                       </div>
 
                       {/* Title & Description */}
                       <h3 className="text-[17px] sm:text-[18px] font-bold text-[var(--ink)] leading-snug mb-1.5">
-                        {elec.title}
+                        {title}
                       </h3>
 
-                      {elec.description && (
+                      {desc && (
                         <p className="text-[13px] sm:text-[13.5px] text-[var(--muted)] line-clamp-2 leading-relaxed mb-4">
-                          {elec.description}
+                          {desc}
                         </p>
                       )}
                     </div>
@@ -362,28 +418,28 @@ export default function StudentCabinetPage() {
                         {hasVoted ? (
                           <span className="text-[var(--green)] font-semibold flex items-center gap-1.5">
                             <CheckCircle2 className="w-4 h-4 shrink-0" />
-                            Вы уже проголосовали
+                            {t.alreadyVoted}
                           </span>
                         ) : isActive ? (
                           <span className="text-[var(--blue)] font-medium">
-                            Ваш голос еще не учтен
+                            {t.voteNotCounted}
                           </span>
                         ) : (
-                          <span>Кампания закрыта</span>
+                          <span>{t.campaignClosed}</span>
                         )}
                       </div>
 
                       {isActive && !hasVoted ? (
                         <Link href={`/vote/elections/${elec.id}`} className="w-full sm:w-auto">
                           <Button variant="primary" size="sm" className="w-full sm:w-auto justify-center gap-2 shadow-[var(--shadow-blue-btn)] h-[42px] sm:h-[38px]">
-                            <span>Проголосовать</span>
+                            <span>{t.voteBtn}</span>
                             <ArrowRight className="w-3.5 h-3.5" />
                           </Button>
                         </Link>
                       ) : (
                         <Link href={`/vote/elections/${elec.id}`} className="w-full sm:w-auto">
                           <Button variant="secondary" size="sm" className="w-full sm:w-auto justify-center gap-1.5 h-[42px] sm:h-[38px]">
-                            <span>{hasVoted ? 'Бюллетень' : 'Подробнее'}</span>
+                            <span>{hasVoted ? t.ballotBtn : t.detailsBtn}</span>
                             <ChevronRight className="w-3.5 h-3.5" />
                           </Button>
                         </Link>
