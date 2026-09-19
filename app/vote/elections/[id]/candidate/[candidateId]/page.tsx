@@ -6,7 +6,7 @@ import Link from 'next/link';
 import confetti from 'canvas-confetti';
 import {
   ArrowLeft, School, BookOpen,
-  User, CheckCircle2, ShieldCheck, Vote, AlertCircle
+  User, CheckCircle2, ShieldCheck, Vote, AlertCircle, Clock
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
@@ -256,6 +256,47 @@ export default function CandidateProfilePage() {
     );
   }
 
+  const getUniId = (objOrId: any) => {
+    if (!objOrId) return '';
+    if (typeof objOrId === 'string') return objOrId;
+    return objOrId.id || objOrId.uuid || objOrId.pk || '';
+  };
+
+  const studentDataStr = typeof window !== 'undefined' ? sessionStorage.getItem('student_data') : null;
+  const student = studentDataStr ? JSON.parse(studentDataStr) : null;
+  const electionUniId = getUniId(election?.university) || getUniId(election?.university_details) || getUniId(candidate?.university);
+  const studentUniId = getUniId(student?.university) || getUniId(student?.university_details) || student?.university_id;
+  const isDifferentUni = Boolean(electionUniId && studentUniId && String(electionUniId) !== String(studentUniId));
+
+  if (isDifferentUni) {
+    return (
+      <div className="min-h-screen bg-[var(--bg)] flex flex-col items-center justify-center p-4">
+        <div className="max-w-md w-full text-center p-8 bg-[var(--surface)] border border-[var(--line)] rounded-[20px] shadow-[var(--shadow-card)] space-y-4">
+          <div className="w-12 h-12 rounded-full bg-[var(--amber-bg)] text-[var(--amber)] flex items-center justify-center mx-auto">
+            <AlertCircle className="w-6 h-6" />
+          </div>
+          <h2 className="text-[20px] font-bold text-[var(--ink)]">
+            {lang === 'ru' ? 'Недоступно для вашего университета' : 'Сиздин университетиңиз үчүн жеткиликтүү эмес'}
+          </h2>
+          <p className="text-[14px] text-[var(--muted)] leading-relaxed">
+            {lang === 'ru'
+              ? 'Данный кандидат баллотируется на выборах другого университета. Голосование доступно только студентам этого учебного заведения.'
+              : 'Бул талапкер башка университеттин шайлоосуна катышууда. Добуш берүү ошол окуу жайынын студенттерине гана жеткиликтүү.'}
+          </p>
+          <div className="pt-2">
+            <Link href="/vote/cabinet">
+              <Button variant="primary">
+                {lang === 'ru' ? 'В личный кабинет' : 'Жеке кабинетке'}
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const isTimeExpired = (election?.ends_at && new Date(election.ends_at) <= new Date()) || election?.status === 'finished';
+
   const photoSrc = !imgError && (candidate?.photo || candidate?.photo_url)
     ? getMediaUrl(candidate.photo || candidate.photo_url)
     : null;
@@ -294,6 +335,23 @@ export default function CandidateProfilePage() {
 
       {/* Main Content Container */}
       <main className="max-w-[900px] mx-auto px-4 sm:px-8 pt-6 sm:pt-10 space-y-6">
+        {/* Expired banner if voting closed */}
+        {isTimeExpired && (
+          <div className="p-4 rounded-[14px] bg-[var(--red-bg)] border border-[var(--red)]/25 text-[var(--red)] text-[14px] flex items-center gap-3">
+            <Clock className="w-5 h-5 shrink-0" />
+            <div className="space-y-0.5">
+              <span className="font-bold block">
+                {lang === 'ru' ? 'Время голосования истекло' : 'Добуш берүү убактысы аяктады'}
+              </span>
+              <span className="text-[13px] opacity-90 block">
+                {lang === 'ru'
+                  ? 'Прием голосов по данной кампании официально окончен. Голосование за кандидата недоступно.'
+                  : 'Бул кампания боюнча добуштарды кабыл алуу расмий аяктады. Талапкерге добуш берүү жеткиликсиз.'}
+              </span>
+            </div>
+          </div>
+        )}
+
         {/* Error notification banner if any */}
         {errorMsg && (
           <div className="p-4 rounded-[14px] bg-[var(--red-bg)] border border-[var(--red)]/20 text-[var(--red)] text-[14px] flex items-center gap-3">

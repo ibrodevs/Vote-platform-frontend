@@ -87,6 +87,11 @@ function StudentAuthContent() {
     errorRegFailed: lang === 'ru' ? 'Ошибка при регистрации. Проверьте введенные данные.' : 'Каттоодо ката кетти. Маалыматтарды текшериңиз.',
     errorEnterCredentials: lang === 'ru' ? 'Введите email и пароль' : 'Email жана сырсөздү киргизиңиз',
     errorInvalidCredentials: lang === 'ru' ? 'Неверный email или пароль' : 'Email же сырсөз туура эмес',
+    electionExpiredBadge: lang === 'ru' ? 'ВРЕМЯ ИСТЕКЛО' : 'УБАКЫТ АЯКТАДЫ',
+    electionExpiredTitle: lang === 'ru' ? 'Время голосования истекло' : 'Добуш берүү убактысы аяктады',
+    electionExpiredDesc: lang === 'ru'
+      ? 'Прием голосов по этим выборам завершен. Вы можете войти в кабинет для просмотра результатов.'
+      : 'Бул шайлоо боюнча добуш берүү мөөнөтү бүттү. Жыйынтыктарды көрүү үчүн кабинетиңизге кирсеңиз болот.',
   };
 
   useEffect(() => {
@@ -246,6 +251,10 @@ function StudentAuthContent() {
   };
 
   const uniDisplayName = currentSelectedUni ? (lang === 'ky' && currentSelectedUni.name_ky ? currentSelectedUni.name_ky : currentSelectedUni.name) : '';
+  const isElectionExpired = !!electionInfo && (
+    (electionInfo.ends_at && new Date(electionInfo.ends_at) <= new Date()) ||
+    electionInfo.status === 'finished'
+  );
 
   return (
     <div className="min-h-screen bg-[var(--bg)] flex items-center justify-center p-4 py-12">
@@ -266,22 +275,41 @@ function StudentAuthContent() {
 
         {/* Election Invitation Banner (if came via direct voting link) */}
         {electionInfo && (
-          <div className="mb-6 p-4 rounded-[14px] bg-[var(--blue-soft)] border border-[var(--blue)]/20 flex items-center gap-3.5">
-            <div className="w-10 h-10 rounded-[10px] bg-[var(--blue)] text-white flex items-center justify-center shrink-0 shadow-sm">
-              <Vote className="w-5 h-5" />
+          isElectionExpired ? (
+            <div className="mb-6 p-4 rounded-[14px] bg-[var(--red-bg)] border border-[var(--red)]/20 flex items-center gap-3.5">
+              <div className="w-10 h-10 rounded-[10px] bg-[var(--red)] text-white flex items-center justify-center shrink-0 shadow-sm">
+                <AlertCircle className="w-5 h-5" />
+              </div>
+              <div>
+                <div className="text-[11px] uppercase font-bold text-[var(--red)] tracking-wider">
+                  {t.electionExpiredBadge}
+                </div>
+                <div className="text-[15px] font-bold text-[var(--ink)]">
+                  {lang === 'ky' && electionInfo.title_ky ? electionInfo.title_ky : electionInfo.title}
+                </div>
+                <div className="text-[12px] text-[var(--muted)]">
+                  {t.electionExpiredDesc}
+                </div>
+              </div>
             </div>
-            <div>
-              <div className="text-[11px] uppercase font-bold text-[var(--blue)] tracking-wider">
-                {t.voteByLink}
+          ) : (
+            <div className="mb-6 p-4 rounded-[14px] bg-[var(--blue-soft)] border border-[var(--blue)]/20 flex items-center gap-3.5">
+              <div className="w-10 h-10 rounded-[10px] bg-[var(--blue)] text-white flex items-center justify-center shrink-0 shadow-sm">
+                <Vote className="w-5 h-5" />
               </div>
-              <div className="text-[15px] font-bold text-[var(--ink)]">
-                {lang === 'ky' && electionInfo.title_ky ? electionInfo.title_ky : electionInfo.title}
-              </div>
-              <div className="text-[12px] text-[var(--muted)]">
-                {lang === 'ky' && electionInfo.university_details?.name_ky ? electionInfo.university_details.name_ky : electionInfo.university_details?.name}
+              <div>
+                <div className="text-[11px] uppercase font-bold text-[var(--blue)] tracking-wider">
+                  {t.voteByLink}
+                </div>
+                <div className="text-[15px] font-bold text-[var(--ink)]">
+                  {lang === 'ky' && electionInfo.title_ky ? electionInfo.title_ky : electionInfo.title}
+                </div>
+                <div className="text-[12px] text-[var(--muted)]">
+                  {lang === 'ky' && electionInfo.university_details?.name_ky ? electionInfo.university_details.name_ky : electionInfo.university_details?.name}
+                </div>
               </div>
             </div>
-          </div>
+          )
         )}
 
         {/* Main Auth Card */}

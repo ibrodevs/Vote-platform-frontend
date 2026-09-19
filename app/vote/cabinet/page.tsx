@@ -141,7 +141,24 @@ export default function StudentCabinetPage() {
     return name.slice(0, 2).toUpperCase();
   };
 
-  const filteredElections = elections.filter(elec => {
+  const getUniId = (objOrId: any) => {
+    if (!objOrId) return '';
+    if (typeof objOrId === 'string') return objOrId;
+    return objOrId.id || objOrId.uuid || objOrId.pk || '';
+  };
+
+  const studentUniId = getUniId(student?.university) || getUniId(university) || student?.university_id;
+
+  // Filter elections strictly to the student's university
+  const uniElections = elections.filter(elec => {
+    const elecUniId = getUniId(elec.university) || getUniId(elec.university_details);
+    if (studentUniId && elecUniId && String(elecUniId) !== String(studentUniId)) {
+      return false;
+    }
+    return true;
+  });
+
+  const filteredElections = uniElections.filter(elec => {
     if (activeFilter === 'active') {
       return elec.status === 'active';
     }
@@ -151,8 +168,8 @@ export default function StudentCabinetPage() {
     return true;
   });
 
-  const activeCount = elections.filter(e => e.status === 'active').length;
-  const votedCount = elections.filter(e => e.has_voted).length;
+  const activeCount = uniElections.filter(e => e.status === 'active').length;
+  const votedCount = uniElections.filter(e => e.has_voted).length;
 
   if (isLoading && !student) {
     return (

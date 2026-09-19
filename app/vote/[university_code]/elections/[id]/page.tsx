@@ -123,6 +123,43 @@ export default function ElectionBallotPage() {
     );
   }
 
+  const isTimeExpired = (election?.ends_at && new Date(election.ends_at) <= new Date()) || election?.status === 'finished';
+
+  // State: Voting Time Expired
+  if (isTimeExpired && !hasVoted && !isSuccess) {
+    return (
+      <div className="min-h-screen bg-[var(--bg)] py-16 px-4 flex items-center justify-center">
+        <div className="max-w-md w-full text-center p-8 sm:p-9 crm-card shadow-[var(--shadow-modal)]">
+          <div className="w-14 h-14 rounded-full bg-[var(--red-bg)] text-[var(--red)] flex items-center justify-center mx-auto mb-5 shadow-sm">
+            <Lock className="w-7 h-7" />
+          </div>
+
+          <div className="mb-4">
+            <Badge variant="red" dot={true}>
+              {lang === 'ru' ? 'ВРЕМЯ ИСТЕКЛО' : 'УБАКЫТ АЯКТАДЫ'}
+            </Badge>
+          </div>
+
+          <h1 className="text-[24px] sm:text-[26px] font-[800] text-[var(--ink)] tracking-tight mb-2">
+            {lang === 'ru' ? 'Время голосования истекло' : 'Добуш берүү убактысы аяктады'}
+          </h1>
+
+          <p className="text-[14px] text-[var(--muted)] leading-relaxed mb-6">
+            {lang === 'ru'
+              ? 'Прием голосов по этим выборам завершен. Если вы уже проголосовали, ваш голос был учтен.'
+              : 'Бул шайлоо боюнча добуш берүү мөөнөтү бүттү. Эгер сиз буга чейин добуш берген болсоңуз, добушуңуз эсептелди.'}
+          </p>
+
+          <Link href={`/vote/${uniCode}/elections`}>
+            <Button variant="secondary" size="md" className="w-full justify-center">
+              {t.back_to_elections}
+            </Button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   // State A: Already Voted / Success Screen
   if (isSuccess || hasVoted) {
     return (

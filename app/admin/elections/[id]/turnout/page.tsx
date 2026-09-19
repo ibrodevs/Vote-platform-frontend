@@ -1,17 +1,16 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
   Users, Vote, ShieldCheck, RefreshCw, CheckSquare,
-  ArrowLeft, AlertCircle, Trophy, Sparkles, TrendingUp,
-  Flame, Award, School, User
+  ArrowLeft, AlertCircle, TrendingUp
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { Modal } from '@/components/ui/Modal';
-import { api, getMediaUrl } from '@/lib/api';
+import { api } from '@/lib/api';
 
 export default function ElectionTurnoutPage() {
   const params = useParams();
@@ -19,41 +18,16 @@ export default function ElectionTurnoutPage() {
   const electionId = String(params.id || '');
 
   const [turnout, setTurnout] = useState<any>(null);
-  const [candidates, setCandidates] = useState<any[]>([]);
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isFinishing, setIsFinishing] = useState<boolean>(false);
-  const [highlightedCandidateId, setHighlightedCandidateId] = useState<string | null>(null);
   const [adminUser, setAdminUser] = useState<any>(null);
-
-  const prevVotesMapRef = useRef<{ [id: string]: number }>({});
 
   const fetchTurnout = () => {
     api.getElectionTurnout(electionId)
       .then(data => {
         setTurnout(data);
         setLastUpdated(new Date());
-
-        const incomingCandidates = Array.isArray(data.candidates) ? data.candidates : [];
-
-        // Check if any candidate's vote count increased
-        let updatedId: string | null = null;
-        incomingCandidates.forEach((cand: any) => {
-          const prev = prevVotesMapRef.current[cand.candidate_id];
-          if (prev !== undefined && cand.votes > prev) {
-            updatedId = cand.candidate_id;
-          }
-          prevVotesMapRef.current[cand.candidate_id] = cand.votes;
-        });
-
-        if (updatedId) {
-          setHighlightedCandidateId(updatedId);
-          setTimeout(() => setHighlightedCandidateId(null), 1800);
-        }
-
-        // Sort descending by votes
-        const sorted = [...incomingCandidates].sort((a, b) => b.votes - a.votes);
-        setCandidates(sorted);
       })
       .catch(err => console.error('Turnout fetch error', err))
       .finally(() => setIsLoading(false));
@@ -112,7 +86,6 @@ export default function ElectionTurnoutPage() {
     );
   }
 
-  const leader = candidates.length > 0 ? candidates[0] : null;
   const isObserver = adminUser?.role === 'observer';
 
   return (
@@ -225,167 +198,121 @@ export default function ElectionTurnoutPage() {
           </div>
         </div>
 
-        {/* Leading Candidate Card */}
+        {/* Remaining Eligible Voters Card */}
         <div className="crm-card p-6 sm:p-7 flex flex-col justify-between border-[var(--blue)]/30 bg-[var(--surface)]">
           <div>
             <div className="flex items-center justify-between text-[12px] text-[var(--blue)] font-bold uppercase tracking-wider mb-2">
-              <span>ТЕКУЩЕЕ 1-Е МЕСТО</span>
-              <Award className="w-4 h-4 text-[var(--blue)]" />
+              <span>ОСТАЛОСЬ ГОЛОСОВ</span>
+              <Users className="w-4 h-4 text-[var(--blue)]" />
             </div>
-            <div className="text-[17px] font-bold text-[var(--ink)] truncate mb-1">
-              {leader ? leader.full_name : 'Ожидание голосов'}
+            <div className="text-3xl sm:text-4xl font-[800] text-[var(--ink)] tracking-tight mb-1">
+              {Math.max((turnout?.total_eligible || 0) - (turnout?.total_voted || 0), 0)}
             </div>
-            <p className="text-[13px] text-[var(--muted)] truncate">
-              {leader ? `${leader.votes} голосов (${leader.percent}%)` : '—'}
+            <p className="text-[13px] text-[var(--muted)]">
+              Ожидают участия в голосовании
             </p>
           </div>
           <div className="pt-3 border-t border-[var(--line)] text-[12px] text-[var(--blue)] font-bold flex items-center gap-1.5">
             <CheckSquare className="w-3.5 h-3.5" />
-            <span>Наибольшее число голосов</span>
+            <span>Активный избирательный процесс</span>
           </div>
         </div>
       </div>
 
-      {/* Dynamic Animated Race & Leaderboard Section */}
-      <div className="crm-card p-6 sm:p-8">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-6 border-b border-[var(--line)] mb-6">
+      {/* Live Turnout Telemetry & Timeline Section */}
+      <div className="crm-card p-6 sm:p-8 space-y-8">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-6 border-b border-[var(--line)]">
           <div>
             <div className="flex items-center gap-2 mb-1">
               <TrendingUp className="w-5 h-5 text-[var(--blue)]" />
               <h2 className="text-[20px] sm:text-[22px] font-[800] text-[var(--ink)] tracking-tight">
-                Живая явка и распределение голосов
+                Телеметрия явки и статус голосования
               </h2>
             </div>
             <p className="text-[13.5px] text-[var(--muted)]">
-              Позиции кандидатов перестраиваются и анимируются в реальном времени по мере поступления бюллетеней
+              Динамика участия студентов в режиме реального времени без раскрытия персонифицированных результатов
             </p>
           </div>
 
           <div className="flex items-center gap-2 shrink-0">
-            <Badge variant="blue">
-              Кандидатов: {candidates.length}
+            <Badge variant="blue" dot={true}>
+              ТАЙНА ВОЛЕИЗЪЯВЛЕНИЯ
             </Badge>
           </div>
         </div>
 
-        {candidates.length === 0 ? (
-          <div className="p-10 text-center text-[var(--muted)] text-[14px]">
-            Кандидаты для данных выборов еще не зарегистрированы.
+        {/* Big Turnout Progress Bar with Milestones */}
+        <div className="space-y-3">
+          <div className="flex items-center justify-between text-[13px]">
+            <span className="font-semibold text-[var(--ink)]">Прогресс участия избирателей</span>
+            <span className="font-bold font-mono text-[var(--blue)] text-[15px]">{turnout?.turnout_percent || 0}%</span>
           </div>
-        ) : (
-          <div className="space-y-4">
-            {candidates.map((cand, index) => {
-              const isFirst = index === 0 && cand.votes > 0;
-              const isSecond = index === 1 && cand.votes > 0;
-              const isThird = index === 2 && cand.votes > 0;
-              const isHighlighted = highlightedCandidateId === cand.candidate_id;
 
-              return (
-                <div
-                  key={cand.candidate_id}
-                  className={`p-4 sm:p-5 rounded-[18px] border transition-all duration-700 ease-in-out relative overflow-hidden ${
-                    isHighlighted
-                      ? 'ring-2 ring-[var(--blue)] bg-[var(--blue-soft)]/50 scale-[1.01] shadow-md'
-                      : isFirst
-                      ? 'bg-gradient-to-r from-[var(--surface)] via-[var(--surface)] to-amber-500/5 border-amber-400/40 shadow-xs'
-                      : 'bg-[var(--surface)] border-[var(--line)] hover:border-[var(--blue)]/30'
-                  }`}
-                >
-                  {/* Top Race Info Row */}
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-3">
-                    <div className="flex items-center gap-3.5 min-w-0">
-                      {/* Rank Badge */}
-                      <div className="w-10 h-10 rounded-[12px] shrink-0 flex items-center justify-center font-bold text-[14px] font-mono shadow-xs">
-                        {isFirst ? (
-                          <div className="w-full h-full rounded-[12px] bg-[var(--blue)] text-white flex items-center justify-center font-bold">
-                            #1
-                          </div>
-                        ) : isSecond ? (
-                          <div className="w-full h-full rounded-[12px] bg-[var(--surface-2)] text-[var(--ink)] border border-[var(--line)] flex items-center justify-center font-bold">
-                            #2
-                          </div>
-                        ) : isThird ? (
-                          <div className="w-full h-full rounded-[12px] bg-[var(--surface-2)] text-[var(--ink)] border border-[var(--line)] flex items-center justify-center font-bold">
-                            #3
-                          </div>
-                        ) : (
-                          <div className="w-full h-full rounded-[12px] bg-[var(--surface-2)] text-[var(--muted)] border border-[var(--line)] flex items-center justify-center font-medium">
-                            #{index + 1}
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Candidate Avatar / Photo */}
-                      <div className="w-12 h-12 rounded-[12px] bg-[var(--surface-2)] border border-[var(--line)] overflow-hidden shrink-0 flex items-center justify-center text-[var(--blue)] font-bold text-[16px]">
-                        {cand.photo ? (
-                          <img
-                            src={getMediaUrl(cand.photo)}
-                            alt={cand.full_name}
-                            className="w-full h-full object-cover"
-                            onError={(e) => {
-                              const target = e.currentTarget;
-                              target.style.display = 'none';
-                              if (target.parentElement) {
-                                target.parentElement.innerHTML = `<span class="text-[var(--blue)] font-bold text-[15px]">${cand.full_name.slice(0, 2).toUpperCase()}</span>`;
-                              }
-                            }}
-                          />
-                        ) : (
-                          cand.full_name.slice(0, 2).toUpperCase()
-                        )}
-                      </div>
-
-                      {/* Candidate Details */}
-                      <div className="min-w-0">
-                        <h3 className="text-[16px] sm:text-[17px] font-bold text-[var(--ink)] truncate">
-                          {cand.full_name}
-                        </h3>
-
-                        {cand.position && (
-                          <div className="text-[12.5px] text-[var(--blue)] font-medium truncate">
-                            {cand.position}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Vote Count & Percent */}
-                    <div className="flex items-center justify-between sm:justify-end gap-3 pt-2 sm:pt-0 border-t sm:border-t-0 border-[var(--line)]">
-                      <div className="text-left sm:text-right">
-                        <div className="flex items-baseline gap-1.5 sm:justify-end">
-                          <span className={`text-[20px] sm:text-[22px] font-[800] tracking-tight transition-colors duration-300 ${
-                            isHighlighted ? 'text-[var(--blue)] scale-110' : 'text-[var(--ink)]'
-                          }`}>
-                            {cand.votes}
-                          </span>
-                          <span className="text-[12.5px] text-[var(--muted)] font-medium">голосов</span>
-                        </div>
-                      </div>
-
-                      <div className="min-w-[64px] text-right">
-                        <span className={`inline-block text-[13px] font-bold px-2.5 py-1 rounded-[8px] transition-all ${
-                          isFirst
-                            ? 'bg-[var(--blue)] text-white shadow-xs'
-                            : 'bg-[var(--surface-2)] text-[var(--ink)] border border-[var(--line)]'
-                        }`}>
-                          {cand.percent}%
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Animated Progress Track */}
-                  <div className="w-full bg-[var(--surface-2)] rounded-full h-3 overflow-hidden border border-[var(--line)]">
-                    <div
-                      className="h-full rounded-full transition-all duration-700 ease-out bg-[var(--blue)]"
-                      style={{ width: `${Math.min(cand.percent || 0, 100)}%` }}
-                    />
-                  </div>
-                </div>
-              );
-            })}
+          <div className="w-full bg-[var(--surface-2)] rounded-full h-5 overflow-hidden border border-[var(--line)] p-0.5 relative">
+            <div
+              className="bg-gradient-to-r from-[var(--blue)] to-[var(--blue-hover)] h-full transition-all duration-700 ease-out rounded-full"
+              style={{ width: `${Math.min(turnout?.turnout_percent || 0, 100)}%` }}
+            />
           </div>
-        )}
+
+          {/* Scale Milestones */}
+          <div className="flex justify-between text-[11px] text-[var(--muted)] font-mono px-1">
+            <span>0%</span>
+            <span>25% (Кворум 1)</span>
+            <span>50% (Половина)</span>
+            <span>75% (Высокая явка)</span>
+            <span>100%</span>
+          </div>
+        </div>
+
+        {/* Voting Timeline & Details */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+          <div className="p-4 rounded-[14px] bg-[var(--surface-2)] border border-[var(--line)] space-y-1">
+            <div className="text-[11.5px] text-[var(--muted)] uppercase font-bold tracking-wider">
+              Начало голосования
+            </div>
+            <div className="text-[14px] font-bold text-[var(--ink)] font-mono">
+              {turnout?.starts_at ? new Date(turnout.starts_at).toLocaleString('ru-RU') : '—'}
+            </div>
+          </div>
+
+          <div className="p-4 rounded-[14px] bg-[var(--surface-2)] border border-[var(--line)] space-y-1">
+            <div className="text-[11.5px] text-[var(--muted)] uppercase font-bold tracking-wider">
+              Окончание голосования
+            </div>
+            <div className="text-[14px] font-bold text-[var(--ink)] font-mono">
+              {turnout?.ends_at ? new Date(turnout.ends_at).toLocaleString('ru-RU') : '—'}
+            </div>
+          </div>
+
+          <div className="p-4 rounded-[14px] bg-[var(--surface-2)] border border-[var(--line)] space-y-1">
+            <div className="text-[11.5px] text-[var(--muted)] uppercase font-bold tracking-wider">
+              Статус процесса
+            </div>
+            <div className="text-[14px] font-bold text-[var(--green)] flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-[var(--green)] animate-pulse" />
+              <span>{turnout?.status === 'active' ? 'Идет голосование' : 'Завершено'}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Secrecy Protocol Card */}
+        <div className="p-5 rounded-[16px] bg-[var(--blue-soft)]/40 border border-[var(--blue)]/20 flex items-start gap-4">
+          <div className="w-10 h-10 rounded-[10px] bg-[var(--blue)] text-white flex items-center justify-center shrink-0 mt-0.5 shadow-sm">
+            <ShieldCheck className="w-5 h-5" />
+          </div>
+          <div className="space-y-1 text-[13px] text-[var(--body)] leading-relaxed">
+            <h4 className="font-bold text-[var(--ink)] text-[14.5px]">
+              Кандидаты и распределение голосов скрыты в режиме онлайн
+            </h4>
+            <p>
+              В строгом соответствии со стандартом тайны голосования Dobush.kg и Регламентом электронных выборов, голоса за конкретных кандидатов зашифрованы в базе данных. Они будут автоматически расшифрованы и подсчитаны только после официального завершения голосования.
+            </p>
+            <p className="text-[12.5px] text-[var(--muted)] pt-1">
+              Для подведения окончательных итогов нажмите <strong>«Завершить выборы»</strong> вверху страницы.
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* Security & Audit notice */}

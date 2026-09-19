@@ -152,6 +152,11 @@ export default function DirectElectionBallotPage() {
     protectionVal: lang === 'ru' ? '100% защита' : '100% корголгон',
     returnToCabinet: lang === 'ru' ? 'Вернуться в личный кабинет' : 'Жеке кабинетке кайтуу',
     electionFinished: lang === 'ru' ? 'ВЫБОРЫ ЗАВЕРШЕНЫ' : 'ШАЙЛОО АЯКТАДЫ',
+    timeExpiredBadge: lang === 'ru' ? 'ВРЕМЯ ИСТЕКЛО' : 'УБАКЫТ АЯКТАДЫ',
+    timeExpiredTitle: lang === 'ru' ? 'Время голосования истекло' : 'Добуш берүү убактысы аяктады',
+    timeExpiredDesc: (d: string) => lang === 'ru'
+      ? `Прием голосов по данной избирательной кампании официально окончен${d ? ` (${d})` : ''}. Вы больше не можете подать свой голос.`
+      : `Бул шайлоо өнөктүгү боюнча добуштарды кабыл алуу расмий аяктады${d ? ` (${d})` : ''}. Сиз мындан ары добуш бере албайсыз.`,
     votingNotActive: lang === 'ru' ? 'ГОЛОСОВАНИЕ НЕ АКТИВНО' : 'ДОБУШ БЕРҮҮ АКТИВДҮҮ ЭМЕС',
     votingEndedDesc: lang === 'ru' ? 'Прием голосов по данной кампании официально окончен.' : 'Бул кампания боюнча добуштарды кабыл алуу расмий аяктады.',
     votingNotStartedDesc: lang === 'ru' ? 'Голосование еще не началось.' : 'Добуш берүү али баштала элек.',
@@ -263,8 +268,15 @@ export default function DirectElectionBallotPage() {
     : (election.university_name || election.university_details?.name || student?.university?.name || '');
 
   // Check university match if student is loaded
-  const studentUniId = student?.university?.id || student?.university_id || student?.university;
-  const isDifferentUni = election?.university && studentUniId && String(election.university) !== String(studentUniId);
+  const getUniId = (objOrId: any) => {
+    if (!objOrId) return '';
+    if (typeof objOrId === 'string') return objOrId;
+    return objOrId.id || objOrId.uuid || objOrId.pk || '';
+  };
+
+  const electionUniId = getUniId(election?.university) || getUniId(election?.university_details);
+  const studentUniId = getUniId(student?.university) || getUniId(student?.university_details) || student?.university_id;
+  const isDifferentUni = Boolean(electionUniId && studentUniId && String(electionUniId) !== String(studentUniId));
 
   if (isDifferentUni) {
     return (
@@ -287,7 +299,48 @@ export default function DirectElectionBallotPage() {
     );
   }
 
-  // State: Voted or Finished
+  // Check if voting time expired
+  const isTimeExpired = (election?.ends_at && new Date(election.ends_at) <= new Date()) || election?.status === 'finished';
+
+  if (isTimeExpired) {
+    const formattedEndTime = election.ends_at
+      ? new Date(election.ends_at).toLocaleString(lang === 'ky' ? 'ky-KG' : 'ru-RU', {
+          day: 'numeric',
+          month: 'long',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        })
+      : '';
+
+    return (
+      <div className="min-h-screen bg-[var(--bg)] flex flex-col items-center justify-center p-4">
+        <div className="max-w-md w-full text-center p-8 bg-[var(--surface)] border border-[var(--line)] rounded-[22px] shadow-[var(--shadow-card)] space-y-4">
+          <div className="w-16 h-16 rounded-full bg-[var(--red-bg)] text-[var(--red)] flex items-center justify-center mx-auto">
+            <Clock className="w-8 h-8" />
+          </div>
+          <Badge variant="red" dot={true}>
+            {t.timeExpiredBadge}
+          </Badge>
+          <h1 className="text-[22px] sm:text-[24px] font-[800] text-[var(--ink)] tracking-tight">
+            {t.timeExpiredTitle}
+          </h1>
+          <p className="text-[14px] text-[var(--muted)] leading-relaxed">
+            {t.timeExpiredDesc(formattedEndTime)}
+          </p>
+          <div className="pt-2">
+            <Link href="/vote/cabinet" className="block w-full">
+              <Button variant="primary" className="w-full justify-center">
+                {t.toCabinet}
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // State: Voted
   if (isSuccess || hasVoted) {
     return (
       <div className="min-h-screen bg-[var(--bg)] py-16 px-4 flex items-center justify-center">
@@ -347,7 +400,7 @@ export default function DirectElectionBallotPage() {
     );
   }
 
-  // Not active
+  // Not active (not started yet)
   if (election.status !== 'active') {
     return (
       <div className="min-h-screen bg-[var(--bg)] flex flex-col items-center justify-center p-4">
@@ -356,11 +409,11 @@ export default function DirectElectionBallotPage() {
             <Clock className="w-6 h-6" />
           </div>
           <Badge variant="gray">
-            {election.status === 'finished' ? t.electionFinished : t.votingNotActive}
+            {t.votingNotActive}
           </Badge>
           <h2 className="text-[20px] font-bold text-[var(--ink)]">{electionTitle}</h2>
           <p className="text-[14px] text-[var(--muted)]">
-            {election.status === 'finished' ? t.votingEndedDesc : t.votingNotStartedDesc}
+            {t.votingNotStartedDesc}
           </p>
           <Link href="/vote/cabinet">
             <Button variant="secondary">{t.toCabinet}</Button>
