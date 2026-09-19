@@ -100,39 +100,7 @@ export default function ElectionTurnoutPage() {
     }
   };
 
-  // Quick simulation trigger for demonstration
-  const handleSimulateVote = async () => {
-    if (!candidates || candidates.length === 0) return;
-    const randCand = candidates[Math.floor(Math.random() * candidates.length)];
 
-    try {
-      await api.castVote({
-        election_id: electionId,
-        candidate_id: randCand.candidate_id
-      });
-      fetchTurnout();
-    } catch (e) {
-      // If student session is missing or error, simulate in local view for instant preview
-      setCandidates(prev => {
-        const next = prev.map(c => c.candidate_id === randCand.candidate_id ? { ...c, votes: c.votes + 1 } : c);
-        const totalV = next.reduce((sum, c) => sum + c.votes, 0);
-        const recalced = next.map(c => ({
-          ...c,
-          percent: totalV > 0 ? Number(((c.votes / totalV) * 100).toFixed(1)) : 0
-        })).sort((a, b) => b.votes - a.votes);
-        setHighlightedCandidateId(randCand.candidate_id);
-        setTimeout(() => setHighlightedCandidateId(null), 1800);
-        return recalced;
-      });
-      setTurnout((prev: any) => prev ? {
-        ...prev,
-        total_voted: (prev.total_voted || 0) + 1,
-        turnout_percent: prev.total_eligible > 0
-          ? Number((((prev.total_voted + 1) / prev.total_eligible) * 100).toFixed(1))
-          : 0
-      } : prev);
-    }
-  };
 
   if (isLoading) {
     return (
@@ -187,17 +155,6 @@ export default function ElectionTurnoutPage() {
 
         {!isObserver && (
           <div className="flex flex-wrap items-center gap-2.5 w-full md:w-auto">
-            <Button
-              variant="secondary"
-              size="md"
-              onClick={handleSimulateVote}
-              className="gap-2 text-[13px] flex-1 md:flex-none justify-center"
-              title="Добавить тестовый голос для демонстрации динамической анимации"
-            >
-              <TrendingUp className="w-4 h-4 text-[var(--blue)]" />
-              <span>Тестовый голос</span>
-            </Button>
-
             <Button
               variant="primary"
               size="md"

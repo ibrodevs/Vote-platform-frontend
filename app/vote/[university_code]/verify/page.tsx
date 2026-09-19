@@ -22,14 +22,10 @@ function VerifyContent() {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [timeLeft, setTimeLeft] = useState(60);
-  const [demoOtp, setDemoOtp] = useState('123456');
 
   useEffect(() => {
     const currentLang = (localStorage.getItem('app_lang') as Language) || 'ru';
     setLang(currentLang);
-
-    const savedOtp = sessionStorage.getItem('demo_otp');
-    if (savedOtp) setDemoOtp(savedOtp);
 
     const timer = setInterval(() => {
       setTimeLeft(prev => (prev > 0 ? prev - 1 : 0));
@@ -103,24 +99,7 @@ function VerifyContent() {
             </p>
           </div>
 
-          {/* Demo OTP Helper Box */}
-          <div className="mb-6 p-4 rounded-[12px] bg-[var(--surface-2)] border border-[var(--line)] text-center">
-            <span className="text-[12px] font-medium text-[var(--muted)] block mb-1">
-              {lang === 'ru' ? 'Тестовый код подтверждения:' : 'Сыноо коду:'}
-            </span>
-            <div className="flex items-center justify-center gap-2">
-              <code className="text-[18px] font-mono font-bold text-[var(--blue)] tracking-wider">
-                {demoOtp}
-              </code>
-              <button
-                type="button"
-                onClick={() => setCode(demoOtp)}
-                className="text-[12px] font-medium text-[var(--muted)] hover:text-[var(--ink)] hover:underline cursor-pointer"
-              >
-                ({lang === 'ru' ? 'вставить' : 'коюу'})
-              </button>
-            </div>
-          </div>
+
 
           {errorMsg && (
             <div className="mb-5 p-4 rounded-[12px] bg-[var(--red-bg)] border border-[var(--red)]/20 text-[var(--red)] text-[13.5px] flex items-center gap-2">

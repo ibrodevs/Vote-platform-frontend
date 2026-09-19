@@ -276,7 +276,7 @@ export default function HomePage() {
               <div className="flex items-center gap-3">
                 <a href="#universities">
                   <Button variant="secondary" size="md">
-                    Протестировать голосование
+                    Перейти к выборам
                   </Button>
                 </a>
               </div>

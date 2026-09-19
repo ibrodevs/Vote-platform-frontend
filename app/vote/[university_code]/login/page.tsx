@@ -26,17 +26,7 @@ export default function StudentLoginPage() {
 
   const t = translations[lang];
 
-  // Fill quick demo credentials
-  const fillDemoData = () => {
-    if (uniCode === 'kstu') {
-      setStudentId('2024001');
-      setPhoneNumber('+996700111001');
-    } else {
-      setStudentId('AUCA001');
-      setPhoneNumber('+996555111222');
-    }
-    setErrorMsg('');
-  };
+
 
   const handleIdentify = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -149,17 +139,7 @@ export default function StudentLoginPage() {
               </div>
             </div>
 
-            {/* Quick Demo Test Autofill */}
-            <div className="pt-1">
-              <button
-                type="button"
-                onClick={fillDemoData}
-                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[var(--surface-2)] border border-[var(--line)] text-[12px] font-semibold text-[var(--muted)] hover:text-[var(--ink)] hover:border-[var(--blue)] transition-colors cursor-pointer"
-              >
-                <span className="text-[var(--blue)]">⚡</span>
-                <span>{lang === 'ru' ? 'Заполнить демо-студента' : 'Демо толтуруу'}</span>
-              </button>
-            </div>
+
 
             <Button
               type="submit"

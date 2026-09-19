@@ -35,16 +35,7 @@ export default function AdminLoginPage() {
     }
   };
 
-  const fillDemo = (role: 'super' | 'kstu') => {
-    if (role === 'super') {
-      setEmail('admin@vote.kg');
-      setPassword('adminpassword123');
-    } else {
-      setEmail('kstu_admin@vote.kg');
-      setPassword('adminpassword123');
-    }
-    setErrorMsg('');
-  };
+
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -166,30 +157,7 @@ export default function AdminLoginPage() {
             </Button>
           </form>
 
-          {/* Demo fill shortcuts */}
-          <div className="mt-8 pt-6 border-t border-[var(--line)]">
-            <span className="block text-[12px] font-semibold text-[var(--muted)] mb-3 text-center uppercase tracking-wider">
-              Быстрый вход для тестирования:
-            </span>
-            <div className="flex flex-col gap-2.5">
-              <button
-                type="button"
-                onClick={() => fillDemo('super')}
-                className="w-full h-[44px] px-4 rounded-[12px] bg-[var(--surface-2)] border border-[var(--line)] text-[13.5px] text-[var(--ink)] hover:border-[var(--blue)] hover:bg-[var(--hover)] transition-all flex items-center justify-between cursor-pointer font-medium"
-              >
-                <span>Супер-администратор</span>
-                <span className="text-[12px] text-[var(--muted)] font-mono">admin@vote.kg</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => fillDemo('kstu')}
-                className="w-full h-[44px] px-4 rounded-[12px] bg-[var(--surface-2)] border border-[var(--line)] text-[13.5px] text-[var(--ink)] hover:border-[var(--blue)] hover:bg-[var(--hover)] transition-all flex items-center justify-between cursor-pointer font-medium"
-              >
-                <span>Администратор КГТУ</span>
-                <span className="text-[12px] text-[var(--muted)] font-mono">kstu_admin@vote.kg</span>
-              </button>
-            </div>
-          </div>
+
         </div>
       </div>
     </div>
