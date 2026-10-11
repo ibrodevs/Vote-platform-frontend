@@ -5,7 +5,12 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'voteplatformbackend.pythonanywhere.com',
+        hostname: 'api.dobush.kg',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'dobush-media.hel1.your-objectstorage.com',
         pathname: '/**',
       },
     ],

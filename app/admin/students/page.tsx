@@ -153,7 +153,7 @@ export default function AdminStudentsPage() {
   };
 
   const handleDownloadTemplate = (format: 'csv' | 'xlsx') => {
-    const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://voteplatformbackend.pythonanywhere.com/api/v1';
+    const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://api.dobush.kg/api/v1';
     window.open(`${API_BASE}/admin/students/template/?format=${format}`, '_blank');
   };
 

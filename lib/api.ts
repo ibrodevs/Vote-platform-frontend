@@ -1,4 +1,4 @@
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://voteplatformbackend.pythonanywhere.com/api/v1';
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://api.dobush.kg/api/v1';
 
 export class ApiError extends Error {
   code: string;
@@ -83,7 +83,7 @@ export function getMediaUrl(path?: string | null): string {
   if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('data:')) {
     return path;
   }
-  const base = (process.env.NEXT_PUBLIC_API_URL || 'https://voteplatformbackend.pythonanywhere.com/api/v1').replace(/\/api\/v1\/?$/, '');
+  const base = (process.env.NEXT_PUBLIC_API_URL || 'https://api.dobush.kg/api/v1').replace(/\/api\/v1\/?$/, '');
   return `${base}${path.startsWith('/') ? '' : '/'}${path}`;
 }
 
